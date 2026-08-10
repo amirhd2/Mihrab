@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #f8fafc;
+    --surface-card: #ffffff;
+    --surface-elevated: #f1f5f9;
+    --border-color: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+
+    --brand-primary: #059669;
+    --brand-primary-hover: #047857;
+    --brand-primary-light: #ecfdf5;
+
+    --status-success: #10b981;
+    --status-warning: #f59e0b;
+    --status-destructive: #ef4444;
+
+    --radius-sm: 0.375rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+  }
+
+  .dark {
+    --bg-main: #0b0f19;
+    --surface-card: #131b2e;
+    --surface-elevated: #1d283d;
+    --border-color: #233148;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    --brand-primary: #10b981;
+    --brand-primary-hover: #059669;
+    --brand-primary-light: rgba(16, 185, 129, 0.12);
+
+    --status-success: #10b981;
+    --status-warning: #fbbf24;
+    --status-destructive: #f87171;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Vazirmatn', 'Tahoma', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "locl" 1;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Reusable theme helper classes */
+.bg-surface-bg { background-color: var(--bg-main); }
+.bg-surface-card { background-color: var(--surface-card); }
+.bg-surface-elevated { background-color: var(--surface-elevated); }
+.border-theme { border-color: var(--border-color); }
+
+.text-primary-theme { color: var(--text-primary); }
+.text-secondary-theme { color: var(--text-secondary); }
+.text-muted-theme { color: var(--text-muted); }
+
+.bg-brand-primary { background-color: var(--brand-primary); }
+.hover\:bg-brand-primary-hover:hover { background-color: var(--brand-primary-hover); }
+.text-brand-primary { color: var(--brand-primary); }
+.bg-brand-primary-light { background-color: var(--brand-primary-light); }
+
+/* Custom smooth transitions */
+.transition-theme {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Persian number display class */
+.font-persian {
+  font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+}

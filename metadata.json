@@ -1,0 +1,6 @@
+{
+  "name": "Mihrab",
+  "description": "Mihrab (محراب) - Offline-first Persian Islamic worship companion",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
