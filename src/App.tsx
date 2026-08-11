@@ -21,7 +21,7 @@ function AppRoutes({ showToast }: { showToast: any }) {
         <Route path="/fasting" element={<FastingPage onShowToast={showToast} />} />
         <Route path="/fitr" element={<Navigate to="/fasting" replace />} />
         <Route path="/duas" element={<DuasPage />} />
-        <Route path="/education" element={<EducationPage />} />
+        <Route path="/education" element={<EducationPage onShowToast={showToast} />} />
         <Route
           path="/settings"
           element={<SettingsPage onShowToast={showToast} />}

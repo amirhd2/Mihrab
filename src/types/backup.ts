@@ -1,4 +1,4 @@
-import { QadaPrayerRecord, QadaHistoryRecord, FastingRecord, FitrKaffaraRecord, DuaBookmark, EducationBookmark, AppPreference } from './db';
+import { QadaPrayerRecord, QadaHistoryRecord, FastingRecord, FitrKaffaraRecord, DuaBookmark, EducationBookmark, AppPreference, EducationContentRecord, EducationTagRecord } from './db';
 
 export interface MihrabBackupData {
   version: number;
@@ -11,6 +11,8 @@ export interface MihrabBackupData {
     fitrLogs: FitrKaffaraRecord[];
     duaBookmarks: DuaBookmark[];
     educationBookmarks: EducationBookmark[];
+    educationContents?: EducationContentRecord[];
+    educationTags?: EducationTagRecord[];
     preferences: AppPreference[];
   };
 }

@@ -12,6 +12,8 @@ export class BackupService {
     const fitrLogs = await db.fitrLogs.toArray();
     const duaBookmarks = await db.duaBookmarks.toArray();
     const educationBookmarks = await db.educationBookmarks.toArray();
+    const educationContents = await db.educationContents.toArray();
+    const educationTags = await db.educationTags.toArray();
     const preferences = await db.preferences.toArray();
 
     const backupData: MihrabBackupData = {
@@ -25,6 +27,8 @@ export class BackupService {
         fitrLogs,
         duaBookmarks,
         educationBookmarks,
+        educationContents,
+        educationTags,
         preferences,
       },
     };

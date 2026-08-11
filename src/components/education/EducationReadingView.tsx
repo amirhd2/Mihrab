@@ -1,0 +1,232 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowRight, MoreVertical, Edit, Trash2, Copy, Share2, Tag as TagIcon, Check } from 'lucide-react';
+import { EducationContentRecord } from '../../types/db';
+
+interface EducationReadingViewProps {
+  item: EducationContentRecord;
+  onBack: () => void;
+  onEdit: (item: EducationContentRecord) => void;
+  onDelete: (item: EducationContentRecord) => void;
+  onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning') => void;
+}
+
+export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
+  item,
+  onBack,
+  onEdit,
+  onDelete,
+  onShowToast,
+}) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Format text paragraphs and headings
+  const renderFormattedText = (rawText: string) => {
+    const paragraphs = rawText.split(/\n\s*\n/);
+
+    return paragraphs.map((para, index) => {
+      const trimmed = para.trim();
+      if (!trimmed) return null;
+
+      // Check if line is a heading (starts with # or is short without trailing period or ends with :)
+      const isHeading =
+        trimmed.startsWith('#') ||
+        trimmed.startsWith('**') ||
+        (trimmed.length < 60 && !trimmed.endsWith('.') && (trimmed.endsWith(':') || !trimmed.includes('،')));
+
+      if (isHeading) {
+        const cleanHeading = trimmed.replace(/^[#*:]+\s*/, '').replace(/\*+$/, '');
+        return (
+          <h3
+            key={index}
+            className="text-base sm:text-lg font-bold text-primary-theme mt-6 mb-2 border-b border-neutral-200/50 dark:border-neutral-800/50 pb-1.5"
+          >
+            {cleanHeading}
+          </h3>
+        );
+      }
+
+      return (
+        <p key={index} className="text-sm sm:text-base text-primary-theme leading-relaxed sm:leading-loose mb-4">
+          {trimmed}
+        </p>
+      );
+    });
+  };
+
+  const fullShareText = `${item.title}\n\n${item.text}${item.source ? `\n\nمنبع: ${item.source}` : ''}`;
+
+  const handleCopy = async () => {
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(fullShareText);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = fullShareText;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      setIsMenuOpen(false);
+      if (onShowToast) onShowToast('متن با موفقیت کپی شد', 'success');
+    } catch (err) {
+      if (onShowToast) onShowToast('خطا در کپی متن', 'error');
+    }
+  };
+
+  const handleShare = async () => {
+    setIsMenuOpen(false);
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: item.title,
+          text: fullShareText,
+        });
+      } catch (err) {
+        // User cancelled or share failed
+      }
+    } else {
+      handleCopy();
+      if (onShowToast) onShowToast('متن برای اشتراک‌گذاری کپی شد', 'info');
+    }
+  };
+
+  return (
+    <div className="w-full max-w-3xl mx-auto space-y-6 pb-12 animate-in fade-in duration-200" dir="rtl">
+      {/* iOS-Inspired Reading Top Bar */}
+      <div className="flex items-center justify-between pb-4 border-b border-neutral-200/80 dark:border-neutral-800 sticky top-0 bg-surface-bg/90 backdrop-blur-md z-20 pt-2">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors active:scale-95"
+        >
+          <ArrowRight className="w-4 h-4" />
+          <span>بازگشت</span>
+        </button>
+
+        <h1 className="text-base sm:text-lg font-bold text-primary-theme truncate px-4 max-w-[220px] sm:max-w-md text-center">
+          {item.title}
+        </h1>
+
+        {/* Action Buttons: Edit Pencil + Three-Dot Menu */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onEdit(item)}
+            className="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors active:scale-95"
+            title="ویرایش مطلب"
+          >
+            <Edit className="w-5 h-5" />
+          </button>
+
+          {/* Three-Dot Menu */}
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated rounded-xl transition-colors"
+              title="منوی عملیات"
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
+
+            {isMenuOpen && (
+              <div className="absolute left-0 mt-2 w-48 bg-surface-card border border-neutral-200/90 dark:border-neutral-800 rounded-2xl shadow-xl py-1.5 z-30 animate-in zoom-in-95 duration-100">
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="w-full px-4 py-2.5 text-xs font-medium text-primary-theme hover:bg-surface-elevated flex items-center gap-2.5 text-right transition-colors"
+                >
+                  {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-secondary-theme" />}
+                  <span>کپی متن</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="w-full px-4 py-2.5 text-xs font-medium text-primary-theme hover:bg-surface-elevated flex items-center gap-2.5 text-right transition-colors"
+                >
+                  <Share2 className="w-4 h-4 text-secondary-theme" />
+                  <span>اشتراک‌گذاری</span>
+                </button>
+
+                <div className="my-1 border-t border-neutral-200/60 dark:border-neutral-800/60" />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    onDelete(item);
+                  }}
+                  className="w-full px-4 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 flex items-center gap-2.5 text-right transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>حذف مطلب</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Reading Article Body Container */}
+      <div className="bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-5 sm:p-8 shadow-sm space-y-6">
+        {/* Article Title Header */}
+        <div>
+          <h2 className="text-xl sm:text-2xl font-black text-primary-theme tracking-tight mb-3">
+            {item.title}
+          </h2>
+
+          {/* Tags Metadata Line */}
+          {item.tags && item.tags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 pt-1 pb-2">
+              <span className="text-xs text-muted-theme flex items-center gap-1 font-medium">
+                <TagIcon className="w-3.5 h-3.5" />
+                دسته:
+              </span>
+              {item.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-neutral-200/60 dark:border-neutral-800/60" />
+
+        {/* Main Article Content */}
+        <div className="text-primary-theme prose prose-emerald dark:prose-invert max-w-none">
+          {renderFormattedText(item.text)}
+        </div>
+
+        {/* Source Citation */}
+        {item.source && (
+          <div className="pt-6 border-t border-neutral-200/60 dark:border-neutral-800/60 flex items-center justify-end">
+            <p className="text-xs text-secondary-theme font-medium bg-surface-elevated/60 px-3 py-1.5 rounded-xl border border-neutral-200/60 dark:border-neutral-800/60">
+              منبع: <span className="text-primary-theme font-bold">{item.source}</span>
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};

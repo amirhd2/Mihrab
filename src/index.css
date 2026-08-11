@@ -27,10 +27,10 @@
   }
 
   .dark {
-    --bg-main: #0b0f19;
-    --surface-card: #131b2e;
-    --surface-elevated: #1d283d;
-    --border-color: #233148;
+    --bg-main: #090d16;
+    --surface-card: #12192a;
+    --surface-elevated: #1e2a40;
+    --border-color: #27364f;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
@@ -53,6 +53,11 @@
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent auto-zoom on input focus on iOS/mobile */
+  input, textarea, select {
+    font-size: 16px !important;
   }
 }
 

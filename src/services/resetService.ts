@@ -13,6 +13,8 @@ export class ResetService {
       db.fitrLogs,
       db.duaBookmarks,
       db.educationBookmarks,
+      db.educationContents,
+      db.educationTags,
       db.preferences,
       db.backupHistory,
     ], async () => {
@@ -22,6 +24,8 @@ export class ResetService {
       await db.fitrLogs.clear();
       await db.duaBookmarks.clear();
       await db.educationBookmarks.clear();
+      await db.educationContents.clear();
+      await db.educationTags.clear();
       await db.preferences.clear();
       await db.backupHistory.clear();
 

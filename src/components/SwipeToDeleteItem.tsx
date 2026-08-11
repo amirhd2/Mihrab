@@ -5,6 +5,7 @@ interface SwipeToDeleteItemProps {
   id: string | number;
   onDelete: () => void;
   children: React.ReactNode;
+  className?: string;
 }
 
 const CARD_BTN_GAP = 12; // Gap between card and delete button edge
@@ -20,6 +21,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
   id,
   onDelete,
   children,
+  className = '',
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -147,8 +149,9 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       deleteBtn.classList.remove('btn-animating');
       deleteIcon.classList.remove('icon-animating');
 
-      window.addEventListener('touchmove', onTouchMove, { passive: false });
+      window.addEventListener('touchmove', onTouchMove, { passive: true });
       window.addEventListener('touchend', onTouchEnd);
+      window.addEventListener('touchcancel', onTouchEnd);
       window.addEventListener('mousemove', onTouchMove);
       window.addEventListener('mouseup', onTouchEnd);
     };
@@ -235,6 +238,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       card.removeEventListener('mousedown', onTouchStart as any);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
       window.removeEventListener('mousemove', onTouchMove);
       window.removeEventListener('mouseup', onTouchEnd);
     };
@@ -243,7 +247,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
   return (
     <div
       ref={wrapperRef}
-      className="relative w-full ios-item-wrapper min-h-[58px] my-1 select-none overflow-hidden"
+      className={`relative w-full ios-item-wrapper select-none overflow-hidden ${className || 'min-h-[58px] my-1'}`}
     >
       {/* Red Delete Button Background (flush right, gap on left) */}
       <div className="absolute inset-0 flex items-center justify-start pointer-events-none p-0 z-0">
@@ -274,9 +278,9 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       {/* Foreground Content Card */}
       <div
         ref={cardRef}
-        className="card-content absolute inset-0 z-10 bg-surface-card rounded-xl flex items-center justify-between cursor-grab active:cursor-grabbing border border-neutral-200/80 dark:border-neutral-800/80 will-change-transform shadow-2xs"
+        className="card-content absolute inset-0 z-10 bg-surface-card rounded-2xl flex items-center justify-between cursor-grab active:cursor-grabbing border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs"
       >
-        <div className="w-full h-full flex items-center">{children}</div>
+        <div className="w-full h-full flex flex-col justify-between">{children}</div>
       </div>
     </div>
   );

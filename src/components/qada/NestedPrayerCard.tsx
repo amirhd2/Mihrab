@@ -95,12 +95,12 @@ export const NestedPrayerCard: React.FC<NestedPrayerCardProps> = ({
 
   return (
     <div
-      className={`relative rounded-2xl p-3.5 sm:p-4 bg-slate-100/80 dark:bg-slate-800/50 border transition-all duration-200 ${
+      className={`relative rounded-2xl p-3.5 sm:p-4 border transition-all duration-200 ${
         isAnimatingComplete
-          ? 'border-emerald-500/80 shadow-md shadow-emerald-500/10 ring-2 ring-emerald-500/20'
+          ? 'border-emerald-500/80 shadow-md shadow-emerald-500/10 ring-2 ring-emerald-500/20 bg-slate-100 dark:bg-slate-800'
           : count === 0
-          ? 'border-emerald-500/30 bg-emerald-500/5'
-          : 'border-neutral-200/90 dark:border-neutral-800/80 shadow-2xs'
+          ? 'border-emerald-500/40 bg-emerald-500/10 dark:bg-emerald-500/15'
+          : 'bg-slate-100/90 dark:bg-slate-800/90 border-neutral-200/90 dark:border-slate-700/80 shadow-xs dark:shadow-md dark:shadow-black/25'
       }`}
     >
       <div className="flex items-center justify-between gap-3">
@@ -130,14 +130,14 @@ export const NestedPrayerCard: React.FC<NestedPrayerCardProps> = ({
               onClick={handleDecrementClick}
               disabled={count <= 0}
               aria-label={`کاهش قضا ${titleFa}`}
-              className="w-8 h-8 rounded-full border border-neutral-200 dark:border-neutral-800 bg-surface-card hover:bg-surface-elevated active:scale-90 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center text-secondary-theme transition-all shadow-2xs"
+              className="w-8 h-8 rounded-full border border-neutral-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-90 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center text-secondary-theme transition-all shadow-2xs"
             >
               <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>
 
             {/* Numeric Capsule [ 125 ] */}
             <div
-              className="min-w-[64px] sm:min-w-[72px] px-3 py-1 rounded-full bg-surface-card border border-neutral-200/80 dark:border-neutral-800/80 text-center shadow-2xs overflow-hidden cursor-text flex items-center justify-center"
+              className="min-w-[64px] sm:min-w-[72px] px-3 py-1 rounded-full bg-white dark:bg-slate-900/90 border border-neutral-200/80 dark:border-slate-700/80 text-center shadow-2xs overflow-hidden cursor-text flex items-center justify-center"
               onClick={handleCountClick}
             >
               {isEditing ? (
@@ -177,7 +177,7 @@ export const NestedPrayerCard: React.FC<NestedPrayerCardProps> = ({
               type="button"
               onClick={handleIncrementClick}
               aria-label={`افزایش قضا ${titleFa}`}
-              className="w-8 h-8 rounded-full border border-neutral-200 dark:border-neutral-800 bg-surface-card hover:bg-surface-elevated active:scale-90 flex items-center justify-center text-secondary-theme transition-all shadow-2xs"
+              className="w-8 h-8 rounded-full border border-neutral-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-90 flex items-center justify-center text-secondary-theme transition-all shadow-2xs"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>

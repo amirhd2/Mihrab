@@ -143,7 +143,7 @@ export const WheelPicker: React.FC<WheelPickerProps> = ({ options, value, onChan
         {options.map((opt) => (
           <div
             key={opt.value}
-            style={{ scrollSnapAlign: 'center', transformStyle: 'preserve-3d', willChange: 'transform, opacity', userSelect: 'none' }}
+            style={{ scrollSnapAlign: 'center', transformStyle: 'preserve-3d', userSelect: 'none' }}
             className="h-[44px] flex items-center justify-center font-semibold text-base transition-colors duration-75 text-secondary-theme cursor-pointer"
             onClick={() => {
               const idx = options.findIndex(o => o.value === opt.value);

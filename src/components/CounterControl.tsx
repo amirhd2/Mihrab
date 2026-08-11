@@ -79,14 +79,14 @@ export const CounterControl: React.FC<CounterControlProps> = ({
         type="button"
         onClick={handleDecrementClick}
         disabled={count <= min}
-        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-neutral-200 dark:border-neutral-800 bg-surface-card hover:bg-surface-elevated active:scale-90 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center text-secondary-theme transition-all shadow-2xs shrink-0"
+        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-neutral-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-90 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center text-secondary-theme transition-all shadow-2xs shrink-0"
       >
         <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
       </button>
 
       {/* Numeric Capsule */}
       <div
-        className={`min-w-[64px] sm:min-w-[72px] px-3 py-1.5 sm:py-2 rounded-full bg-surface-card border border-neutral-200/80 dark:border-neutral-800/80 text-center shadow-2xs overflow-hidden flex items-center justify-center ${
+        className={`min-w-[64px] sm:min-w-[72px] px-3 py-1.5 sm:py-2 rounded-full bg-white dark:bg-slate-900/90 border border-neutral-200/80 dark:border-slate-700/80 text-center shadow-2xs overflow-hidden flex items-center justify-center ${
           onSetCount ? 'cursor-text' : ''
         }`}
         onClick={handleCountClick}
@@ -129,7 +129,7 @@ export const CounterControl: React.FC<CounterControlProps> = ({
         type="button"
         onClick={handleIncrementClick}
         disabled={count >= max}
-        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-neutral-200 dark:border-neutral-800 bg-surface-card hover:bg-surface-elevated active:scale-90 flex items-center justify-center text-secondary-theme transition-all shadow-2xs shrink-0 disabled:opacity-30 disabled:pointer-events-none"
+        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-neutral-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-90 flex items-center justify-center text-secondary-theme transition-all shadow-2xs shrink-0 disabled:opacity-30 disabled:pointer-events-none"
       >
         <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
       </button>

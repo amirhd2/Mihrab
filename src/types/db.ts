@@ -56,6 +56,22 @@ export interface EducationBookmark {
   bookmarkedAt: string;
 }
 
+export interface EducationContentRecord {
+  id?: number;
+  title: string;
+  text: string;
+  tags: string[];
+  source?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EducationTagRecord {
+  id?: number;
+  name: string;
+  createdAt: string;
+}
+
 export interface AppPreference {
   key: string;
   value: any;

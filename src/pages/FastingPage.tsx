@@ -240,7 +240,7 @@ export const FastingPage: React.FC<{
               </div>
             </div>
 
-            <div className="flex items-center justify-between mt-6 bg-surface-elevated/40 rounded-2xl p-4 border border-neutral-200/50 dark:border-neutral-800/50">
+            <div className="flex items-center justify-between mt-6 bg-slate-100/90 dark:bg-slate-800/90 rounded-2xl p-4 border border-slate-200 dark:border-slate-700/80 shadow-xs dark:shadow-md dark:shadow-black/25">
               <div className="flex-1 flex justify-start">
                 <CounterControl
                   count={qazaCount}
@@ -366,7 +366,7 @@ export const FastingPage: React.FC<{
                   <div className="pt-5 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Intentional Kaffarah */}
-                      <div className="bg-surface-bg border border-theme shadow-inner rounded-2xl p-4">
+                      <div className="bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700/80 shadow-md shadow-neutral-900/5 dark:shadow-black/40 rounded-2xl p-4 transition-all hover:shadow-lg">
                         <div className="flex items-center justify-between mb-4">
                           <span className="text-sm font-bold text-red-600 dark:text-red-400">کفاره عمد</span>
                         </div>
@@ -406,7 +406,7 @@ export const FastingPage: React.FC<{
                       </div>
 
                       {/* Unintentional Kaffarah */}
-                      <div className="bg-surface-bg border border-theme shadow-inner rounded-2xl p-4">
+                      <div className="bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700/80 shadow-md shadow-neutral-900/5 dark:shadow-black/40 rounded-2xl p-4 transition-all hover:shadow-lg">
                         <div className="flex items-center justify-between mb-4">
                           <span className="text-sm font-bold text-blue-600 dark:text-blue-400">کفاره غیرعمد</span>
                         </div>
