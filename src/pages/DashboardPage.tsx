@@ -109,28 +109,23 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-8">
-      {/* Top Header Bar with Mihrab Logo on Right and Settings Button on Left */}
+      {/* Top Header Bar with Welcome Text and Settings Button */}
       <header className="flex items-center justify-between gap-4 border-b border-theme/40 pb-3">
-        {/* Right Side (RTL Start): Mihrab Logo & Status */}
+        {/* Right Side (RTL Start): Logo & Welcome */}
         <div className="flex items-center gap-2.5 select-none">
           <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs">
             <Sparkles className="w-5 h-5" />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-lg tracking-tight text-primary-theme">
-              محراب
-            </span>
-            {isOffline ? (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
-                <WifiOff className="w-3 h-3" />
-                <span>آفلاین</span>
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                <Wifi className="w-3 h-3" />
-                <span>آنلاین</span>
-              </span>
-            )}
+          <div className="flex flex-col items-start justify-center">
+            <div className="inline-flex items-center gap-2">
+              <h1 className="text-lg sm:text-xl font-extrabold text-primary-theme tracking-tight">
+                به محراب خوش آمدید
+              </h1>
+              <OliveFlourish className="w-5 h-5 text-emerald-600 dark:text-emerald-400 opacity-80" />
+            </div>
+            <p className="text-[10px] sm:text-xs text-secondary-theme font-medium mt-0.5">
+              همراه شما در مسیر عبادت
+            </p>
           </div>
         </div>
 
@@ -139,19 +134,6 @@ export const DashboardPage: React.FC = () => {
           <SettingsButton />
         </div>
       </header>
-
-      {/* Welcome Header Area */}
-      <section className="text-center pt-1 pb-1 relative">
-        <div className="inline-flex items-center justify-center gap-3">
-          <h1 className="text-xl sm:text-2xl font-extrabold text-primary-theme tracking-tight">
-            به محراب خوش آمدید
-          </h1>
-          <OliveFlourish className="w-6 h-6 text-emerald-600 dark:text-emerald-400 opacity-80" />
-        </div>
-        <p className="text-xs sm:text-sm text-secondary-theme mt-1 font-medium">
-          همراه شما در مسیر عبادت
-        </p>
-      </section>
 
       {/* Main 4 Section Cards Grid */}
       {/* Responsive: 1-col on mobile portrait, 2-col 2x2 grid on tablet landscape & desktop */}
@@ -163,9 +145,9 @@ export const DashboardPage: React.FC = () => {
           onClick={() => navigate('/prayers')}
           onKeyDown={(e) => handleKeyDown(e, '/prayers')}
           aria-label="نمازهای قضا - مشاهده و ثبت نمازهای قضا"
-          className="group relative rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-emerald-500/10 via-surface-card to-surface-card border border-emerald-500/20 dark:border-emerald-500/30 shadow-xs hover:shadow-md hover:border-emerald-500/40 active:scale-[0.99] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+          className="group h-full relative rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-emerald-500/10 via-surface-card to-surface-card border border-emerald-500/20 dark:border-emerald-500/30 shadow-xs hover:shadow-md hover:border-emerald-500/40 active:scale-[0.99] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         >
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 h-full">
             {/* Section Icon Container on right in RTL */}
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
               <MosqueIcon className="w-7 h-7 sm:w-8 sm:h-8" />
@@ -198,9 +180,9 @@ export const DashboardPage: React.FC = () => {
           onClick={() => navigate('/fasting')}
           onKeyDown={(e) => handleKeyDown(e, '/fasting')}
           aria-label="روزه - مدیریت روزه، فطریه و کفاره"
-          className="group relative rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-amber-500/10 via-surface-card to-surface-card border border-amber-500/20 dark:border-amber-500/30 shadow-xs hover:shadow-md hover:border-amber-500/40 active:scale-[0.99] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+          className="group h-full relative rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-amber-500/10 via-surface-card to-surface-card border border-amber-500/20 dark:border-amber-500/30 shadow-xs hover:shadow-md hover:border-amber-500/40 active:scale-[0.99] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
         >
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 h-full">
             {/* Section Icon Container on right in RTL */}
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
               <CrescentMoonIcon className="w-7 h-7 sm:w-8 sm:h-8" />
@@ -217,14 +199,6 @@ export const DashboardPage: React.FC = () => {
               <p className="text-xs text-secondary-theme font-medium">
                 روزه باقیمانده
               </p>
-
-              {/* Subordinate Fitr/Kaffara context indicator badge */}
-              <div className="pt-1.5 flex justify-center">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
-                  <Gift className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-                  <span>فطریه و کفاره در این بخش</span>
-                </span>
-              </div>
             </div>
 
             {/* Navigation Arrow on left side in RTL */}
@@ -241,7 +215,7 @@ export const DashboardPage: React.FC = () => {
           onClick={() => navigate('/duas')}
           onKeyDown={(e) => handleKeyDown(e, '/duas')}
           aria-label="دعاها - منتخب ادعیه، زیارات و تعقیبات"
-          className="group relative rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-purple-500/10 via-surface-card to-surface-card border border-purple-500/20 dark:border-purple-500/30 shadow-xs hover:shadow-md hover:border-purple-500/40 active:scale-[0.99] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+          className="group h-full relative rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-purple-500/10 via-surface-card to-surface-card border border-purple-500/20 dark:border-purple-500/30 shadow-xs hover:shadow-md hover:border-purple-500/40 active:scale-[0.99] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
         >
           <div className="flex items-center justify-between gap-3 h-full">
             {/* Section Icon Container on right in RTL */}
@@ -273,7 +247,7 @@ export const DashboardPage: React.FC = () => {
           onClick={() => navigate('/education')}
           onKeyDown={(e) => handleKeyDown(e, '/education')}
           aria-label="آموزش و احکام - مقالات آموزشی و مسائل شرعی"
-          className="group relative rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-blue-500/10 via-surface-card to-surface-card border border-blue-500/20 dark:border-blue-500/30 shadow-xs hover:shadow-md hover:border-blue-500/40 active:scale-[0.99] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="group h-full relative rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-blue-500/10 via-surface-card to-surface-card border border-blue-500/20 dark:border-blue-500/30 shadow-xs hover:shadow-md hover:border-blue-500/40 active:scale-[0.99] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
           <div className="flex items-center justify-between gap-3 h-full">
             {/* Section Icon Container on right in RTL */}
@@ -297,14 +271,6 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Bottom Guidance Footer */}
-      <div className="pt-2 text-center">
-        <p className="inline-flex items-center gap-2 text-xs font-medium text-secondary-theme bg-surface-card border border-theme/50 px-4 py-2 rounded-full shadow-2xs">
-          <Lightbulb className="w-4 h-4 text-amber-500 shrink-0" />
-          <span>برای شروع، یکی از بخش‌ها را انتخاب کنید</span>
-        </p>
       </div>
     </div>
   );

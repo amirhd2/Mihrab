@@ -40,7 +40,7 @@ export const QadaPrayersPage: React.FC = () => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
-  const [singlePrayerCelebration, setSinglePrayerCelebration] = useState<string | null>(null);
+  const [singlePrayerCelebration, setSinglePrayerCelebration] = useState<PrayerType | null>(null);
   const [showAllCompletedModal, setShowAllCompletedModal] = useState(false);
 
   // Live Query from Dexie Database
@@ -145,7 +145,7 @@ export const QadaPrayersPage: React.FC = () => {
 
     // Check if this prayer reached 0
     if (newCount === 0) {
-      setSinglePrayerCelebration(PRAYER_TITLES[type]);
+      setSinglePrayerCelebration(type);
       setTimeout(() => setSinglePrayerCelebration(null), 3500);
     }
 
@@ -185,9 +185,7 @@ export const QadaPrayersPage: React.FC = () => {
 
   // 5. Clear all history records
   const handleClearAllHistory = async () => {
-    if (window.confirm('آیا از پاک کردن کامل تاریخچه ادای نمازها اطمینان دارید؟')) {
-      await db.qadaHistory.clear();
-    }
+    await db.qadaHistory.clear();
   };
 
   // 6. Reset all Qaza counters to 0
@@ -217,6 +215,40 @@ export const QadaPrayersPage: React.FC = () => {
       await db.qadaPrayers.add({ prayerType: type, count, completedCount: 0, updatedAt: now });
     }
   };
+
+  const renderCelebration = (type: PrayerType) => (
+    <AnimatePresence>
+      {singlePrayerCelebration === type && (
+        <motion.div
+          initial={{ opacity: 0, y: -8, height: 0 }}
+          animate={{ opacity: 1, y: 0, height: 'auto' }}
+          exit={{ opacity: 0, y: -8, height: 0 }}
+          className="mb-3 overflow-hidden"
+        >
+          <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 text-amber-300" />
+              </div>
+              <div>
+                <h4 className="text-xs font-extrabold">الحمدلله رب العالمین</h4>
+                <p className="text-[10px] text-white/90 font-medium mt-0.5">
+                  قضای {PRAYER_TITLES[type]} به پایان رسید.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSinglePrayerCelebration(null)}
+              className="p-1.5 rounded-full hover:bg-white/10"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   return (
     <div dir="rtl" className="space-y-5 max-w-6xl mx-auto pb-12 select-none">
@@ -282,56 +314,27 @@ export const QadaPrayersPage: React.FC = () => {
         }
       />
 
-      {/* SINGLE PRAYER CELEBRATION TOAST BANNER */}
-      <AnimatePresence>
-        {singlePrayerCelebration && (
-          <motion.div
-            initial={{ opacity: 0, y: -12, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -12, scale: 0.96 }}
-            className="p-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md flex items-center justify-between gap-3"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                <Sparkles className="w-6 h-6 text-amber-300" />
-              </div>
-              <div>
-                <h4 className="text-sm font-extrabold">الحمدلله رب العالمین</h4>
-                <p className="text-xs text-white/90 font-medium mt-0.5">
-                  قضای {singlePrayerCelebration} به پایان رسید. قبول حق باشد.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setSinglePrayerCelebration(null)}
-              className="p-1 rounded-full hover:bg-white/10"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* MAIN PRAYER CARDS GRID / LAYOUT */}
-      {/* Adaptive: 1 column on Mobile Portrait, 2x2 grid on Mobile Landscape / Tablet Portrait, 4 columns on Tablet Landscape */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* PARENT CARD 1: نماز صبح */}
-        <Card className="p-4 sm:p-5 flex flex-col justify-between">
+        <Card className="p-4 sm:p-5 flex flex-col justify-between col-span-1 md:col-span-2 lg:col-span-1">
           <div className="mb-3 text-center">
             <h2 className="text-sm sm:text-base font-extrabold text-primary-theme">
               نماز صبح
             </h2>
           </div>
-          <NestedPrayerCard
-            prayerType="fajr"
-            titleFa="نماز صبح"
+          <div className="flex-1 flex flex-col justify-end">
+            {renderCelebration('fajr')}
+            <NestedPrayerCard
+              prayerType="fajr"
+              titleFa="نماز صبح"
             count={prayerMap.fajr}
             onIncrement={() => handleIncrement('fajr')}
             onDecrement={() => handleDecrement('fajr')}
             onComplete={() => handleCompletePrayer('fajr')}
             onSetCount={(count) => handleSetCount('fajr', count)}
           />
+          </div>
         </Card>
 
         {/* PARENT CARD 2: نماز ظهر و عصر */}
@@ -341,25 +344,31 @@ export const QadaPrayersPage: React.FC = () => {
               نماز ظهر و عصر
             </h2>
           </div>
-          <div className="space-y-3">
-            <NestedPrayerCard
-              prayerType="dhuhr"
-              titleFa="نماز ظهر"
-              count={prayerMap.dhuhr}
-              onIncrement={() => handleIncrement('dhuhr')}
-              onDecrement={() => handleDecrement('dhuhr')}
-              onComplete={() => handleCompletePrayer('dhuhr')}
-              onSetCount={(count) => handleSetCount('dhuhr', count)}
-            />
-            <NestedPrayerCard
-              prayerType="asr"
-              titleFa="نماز عصر"
-              count={prayerMap.asr}
-              onIncrement={() => handleIncrement('asr')}
-              onDecrement={() => handleDecrement('asr')}
-              onComplete={() => handleCompletePrayer('asr')}
-              onSetCount={(count) => handleSetCount('asr', count)}
-            />
+          <div className="space-y-3 flex-1 flex flex-col justify-end">
+            <div>
+              {renderCelebration('dhuhr')}
+              <NestedPrayerCard
+                prayerType="dhuhr"
+                titleFa="نماز ظهر"
+                count={prayerMap.dhuhr}
+                onIncrement={() => handleIncrement('dhuhr')}
+                onDecrement={() => handleDecrement('dhuhr')}
+                onComplete={() => handleCompletePrayer('dhuhr')}
+                onSetCount={(count) => handleSetCount('dhuhr', count)}
+              />
+            </div>
+            <div>
+              {renderCelebration('asr')}
+              <NestedPrayerCard
+                prayerType="asr"
+                titleFa="نماز عصر"
+                count={prayerMap.asr}
+                onIncrement={() => handleIncrement('asr')}
+                onDecrement={() => handleDecrement('asr')}
+                onComplete={() => handleCompletePrayer('asr')}
+                onSetCount={(count) => handleSetCount('asr', count)}
+              />
+            </div>
           </div>
         </Card>
 
@@ -370,44 +379,53 @@ export const QadaPrayersPage: React.FC = () => {
               نماز مغرب و عشاء
             </h2>
           </div>
-          <div className="space-y-3">
-            <NestedPrayerCard
-              prayerType="maghrib"
-              titleFa="نماز مغرب"
-              count={prayerMap.maghrib}
-              onIncrement={() => handleIncrement('maghrib')}
-              onDecrement={() => handleDecrement('maghrib')}
-              onComplete={() => handleCompletePrayer('maghrib')}
-              onSetCount={(count) => handleSetCount('maghrib', count)}
-            />
-            <NestedPrayerCard
-              prayerType="isha"
-              titleFa="نماز عشاء"
-              count={prayerMap.isha}
-              onIncrement={() => handleIncrement('isha')}
-              onDecrement={() => handleDecrement('isha')}
-              onComplete={() => handleCompletePrayer('isha')}
-              onSetCount={(count) => handleSetCount('isha', count)}
-            />
+          <div className="space-y-3 flex-1 flex flex-col justify-end">
+            <div>
+              {renderCelebration('maghrib')}
+              <NestedPrayerCard
+                prayerType="maghrib"
+                titleFa="نماز مغرب"
+                count={prayerMap.maghrib}
+                onIncrement={() => handleIncrement('maghrib')}
+                onDecrement={() => handleDecrement('maghrib')}
+                onComplete={() => handleCompletePrayer('maghrib')}
+                onSetCount={(count) => handleSetCount('maghrib', count)}
+              />
+            </div>
+            <div>
+              {renderCelebration('isha')}
+              <NestedPrayerCard
+                prayerType="isha"
+                titleFa="نماز عشاء"
+                count={prayerMap.isha}
+                onIncrement={() => handleIncrement('isha')}
+                onDecrement={() => handleDecrement('isha')}
+                onComplete={() => handleCompletePrayer('isha')}
+                onSetCount={(count) => handleSetCount('isha', count)}
+              />
+            </div>
           </div>
         </Card>
 
         {/* PARENT CARD 4: نماز آیات */}
-        <Card className="p-4 sm:p-5 flex flex-col justify-between">
+        <Card className="p-4 sm:p-5 flex flex-col justify-between col-span-1 md:col-span-2 lg:col-span-1">
           <div className="mb-3 text-center">
             <h2 className="text-sm sm:text-base font-extrabold text-primary-theme">
               نماز آیات
             </h2>
           </div>
-          <NestedPrayerCard
-            prayerType="ayat"
-            titleFa="نماز آیات"
+          <div className="flex-1 flex flex-col justify-end">
+            {renderCelebration('ayat')}
+            <NestedPrayerCard
+              prayerType="ayat"
+              titleFa="نماز آیات"
             count={prayerMap.ayat}
             onIncrement={() => handleIncrement('ayat')}
             onDecrement={() => handleDecrement('ayat')}
             onComplete={() => handleCompletePrayer('ayat')}
             onSetCount={(count) => handleSetCount('ayat', count)}
           />
+          </div>
         </Card>
       </div>
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AppShell } from './components/AppShell';
 import { Snackbar } from './components/Snackbar';
@@ -17,7 +17,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <BrowserRouter>
+      <Router>
         <AppShell>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
@@ -35,7 +35,7 @@ export default function App() {
           </Routes>
         </AppShell>
         <Snackbar toasts={toasts} onRemove={removeToast} />
-      </BrowserRouter>
+      </Router>
     </ErrorBoundary>
   );
 }
