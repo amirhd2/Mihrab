@@ -12,6 +12,7 @@ interface NestedPrayerCardProps {
   onIncrement: () => void;
   onDecrement: () => void;
   onComplete: () => void;
+  onSetCount: (count: number) => void;
 }
 
 export const NestedPrayerCard: React.FC<NestedPrayerCardProps> = ({
@@ -21,9 +22,12 @@ export const NestedPrayerCard: React.FC<NestedPrayerCardProps> = ({
   onIncrement,
   onDecrement,
   onComplete,
+  onSetCount,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [isAnimatingComplete, setIsAnimatingComplete] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState('');
 
   const handleCompleteClick = () => {
     if (count <= 0) return;
@@ -58,6 +62,35 @@ export const NestedPrayerCard: React.FC<NestedPrayerCardProps> = ({
       } catch (_) {}
     }
     onDecrement();
+  };
+
+  const handleCountClick = () => {
+    setEditValue(count.toString());
+    setIsEditing(true);
+  };
+
+  const handleCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    // Allow numbers only
+    if (/^\d*$/.test(val)) {
+      setEditValue(val);
+    }
+  };
+
+  const handleCountBlurOrSubmit = () => {
+    setIsEditing(false);
+    if (editValue !== '') {
+      const newCount = parseInt(editValue, 10);
+      if (!isNaN(newCount)) {
+        onSetCount(newCount);
+      }
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur();
+    }
   };
 
   return (
@@ -103,23 +136,40 @@ export const NestedPrayerCard: React.FC<NestedPrayerCardProps> = ({
             </button>
 
             {/* Numeric Capsule [ 125 ] */}
-            <div className="min-w-[64px] sm:min-w-[72px] px-3 py-1 rounded-full bg-surface-card border border-neutral-200/80 dark:border-neutral-800/80 text-center shadow-2xs overflow-hidden">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.span
-                  key={count}
-                  initial={{ y: -8, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 8, opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className={`block font-extrabold text-sm sm:text-base leading-none ${
-                    count === 0
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-primary-theme'
-                  }`}
-                >
-                  {formatPersianNumber(count)}
-                </motion.span>
-              </AnimatePresence>
+            <div
+              className="min-w-[64px] sm:min-w-[72px] px-3 py-1 rounded-full bg-surface-card border border-neutral-200/80 dark:border-neutral-800/80 text-center shadow-2xs overflow-hidden cursor-text flex items-center justify-center"
+              onClick={handleCountClick}
+            >
+              {isEditing ? (
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoFocus
+                  value={editValue}
+                  onChange={handleCountChange}
+                  onBlur={handleCountBlurOrSubmit}
+                  onKeyDown={handleKeyDown}
+                  className="w-full bg-transparent outline-none text-center font-extrabold text-sm sm:text-base leading-none text-primary-theme p-0 m-0"
+                  style={{ direction: 'ltr' }}
+                />
+              ) : (
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={count}
+                    initial={{ y: -8, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 8, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className={`block font-extrabold text-sm sm:text-base leading-none ${
+                      count === 0
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-primary-theme'
+                    }`}
+                  >
+                    {formatPersianNumber(count)}
+                  </motion.span>
+                </AnimatePresence>
+              )}
             </div>
 
             {/* Plus Button [+] */}

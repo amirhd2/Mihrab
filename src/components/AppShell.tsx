@@ -23,14 +23,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {children}
       </main>
-
-      {/* Reusable Subtle Footer */}
-      <footer className="border-t border-theme/50 py-4 text-center text-xs text-muted-theme">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>برنامه محراب — دستیار شخصی و آفلاین عبادات</span>
-          <span>نسخه ۱.۰.۰ (پایه)</span>
-        </div>
-      </footer>
     </div>
   );
 };

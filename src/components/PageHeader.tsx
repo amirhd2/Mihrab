@@ -38,7 +38,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             </p>
           )}
         </div>
-        {actions && <div className="mt-3 flex items-center justify-center gap-2">{actions}</div>}
+        {actions && (
+          <div className="absolute left-0 top-0.5">
+            {actions}
+          </div>
+        )}
       </header>
     );
   }

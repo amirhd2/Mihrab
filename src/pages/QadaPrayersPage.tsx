@@ -206,6 +206,18 @@ export const QadaPrayersPage: React.FC = () => {
     setIsMoreMenuOpen(false);
   };
 
+  // 7. Set manual count
+  const handleSetCount = async (type: PrayerType, count: number) => {
+    const existing = await db.qadaPrayers.where('prayerType').equals(type).first();
+    const now = new Date().toISOString();
+
+    if (existing?.id) {
+      await db.qadaPrayers.update(existing.id, { count, updatedAt: now });
+    } else {
+      await db.qadaPrayers.add({ prayerType: type, count, completedCount: 0, updatedAt: now });
+    }
+  };
+
   return (
     <div dir="rtl" className="space-y-5 max-w-6xl mx-auto pb-12 select-none">
       {/* PAGE HEADER */}
@@ -306,7 +318,7 @@ export const QadaPrayersPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* PARENT CARD 1: نماز صبح */}
         <Card className="p-4 sm:p-5 flex flex-col justify-between">
-          <div className="mb-3 text-center sm:text-right">
+          <div className="mb-3 text-center">
             <h2 className="text-sm sm:text-base font-extrabold text-primary-theme">
               نماز صبح
             </h2>
@@ -318,12 +330,13 @@ export const QadaPrayersPage: React.FC = () => {
             onIncrement={() => handleIncrement('fajr')}
             onDecrement={() => handleDecrement('fajr')}
             onComplete={() => handleCompletePrayer('fajr')}
+            onSetCount={(count) => handleSetCount('fajr', count)}
           />
         </Card>
 
         {/* PARENT CARD 2: نماز ظهر و عصر */}
         <Card className="p-4 sm:p-5 flex flex-col justify-between">
-          <div className="mb-3 text-center sm:text-right">
+          <div className="mb-3 text-center">
             <h2 className="text-sm sm:text-base font-extrabold text-primary-theme">
               نماز ظهر و عصر
             </h2>
@@ -336,6 +349,7 @@ export const QadaPrayersPage: React.FC = () => {
               onIncrement={() => handleIncrement('dhuhr')}
               onDecrement={() => handleDecrement('dhuhr')}
               onComplete={() => handleCompletePrayer('dhuhr')}
+              onSetCount={(count) => handleSetCount('dhuhr', count)}
             />
             <NestedPrayerCard
               prayerType="asr"
@@ -344,13 +358,14 @@ export const QadaPrayersPage: React.FC = () => {
               onIncrement={() => handleIncrement('asr')}
               onDecrement={() => handleDecrement('asr')}
               onComplete={() => handleCompletePrayer('asr')}
+              onSetCount={(count) => handleSetCount('asr', count)}
             />
           </div>
         </Card>
 
         {/* PARENT CARD 3: نماز مغرب و عشاء */}
         <Card className="p-4 sm:p-5 flex flex-col justify-between">
-          <div className="mb-3 text-center sm:text-right">
+          <div className="mb-3 text-center">
             <h2 className="text-sm sm:text-base font-extrabold text-primary-theme">
               نماز مغرب و عشاء
             </h2>
@@ -363,6 +378,7 @@ export const QadaPrayersPage: React.FC = () => {
               onIncrement={() => handleIncrement('maghrib')}
               onDecrement={() => handleDecrement('maghrib')}
               onComplete={() => handleCompletePrayer('maghrib')}
+              onSetCount={(count) => handleSetCount('maghrib', count)}
             />
             <NestedPrayerCard
               prayerType="isha"
@@ -371,13 +387,14 @@ export const QadaPrayersPage: React.FC = () => {
               onIncrement={() => handleIncrement('isha')}
               onDecrement={() => handleDecrement('isha')}
               onComplete={() => handleCompletePrayer('isha')}
+              onSetCount={(count) => handleSetCount('isha', count)}
             />
           </div>
         </Card>
 
         {/* PARENT CARD 4: نماز آیات */}
         <Card className="p-4 sm:p-5 flex flex-col justify-between">
-          <div className="mb-3 text-center sm:text-right">
+          <div className="mb-3 text-center">
             <h2 className="text-sm sm:text-base font-extrabold text-primary-theme">
               نماز آیات
             </h2>
@@ -389,6 +406,7 @@ export const QadaPrayersPage: React.FC = () => {
             onIncrement={() => handleIncrement('ayat')}
             onDecrement={() => handleDecrement('ayat')}
             onComplete={() => handleCompletePrayer('ayat')}
+            onSetCount={(count) => handleSetCount('ayat', count)}
           />
         </Card>
       </div>
