@@ -11,7 +11,7 @@ export const Snackbar: React.FC<SnackbarProps> = ({ toasts, onRemove }) => {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-[90vw] max-w-[500px] z-[100] flex flex-col gap-2.5 pointer-events-none">
+    <div className="fixed bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2 w-[90vw] max-w-[500px] z-[100] flex flex-col gap-2.5 pointer-events-none">
       {toasts.map((toast) => {
         const icons = {
           success: <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />,

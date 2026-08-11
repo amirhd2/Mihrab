@@ -228,15 +228,17 @@ export const QadaPrayersPage: React.FC<{
     }
   };
 
-  const renderCelebration = (type: PrayerType) => (
-    <AnimatePresence>
-      {singlePrayerCelebration === type && (
-        <motion.div
-          initial={{ opacity: 0, y: -8, height: 0 }}
-          animate={{ opacity: 1, y: 0, height: 'auto' }}
-          exit={{ opacity: 0, y: -8, height: 0 }}
-          className="mb-3 overflow-hidden"
-        >
+  const renderCelebration = (type: PrayerType) => {
+    const isVisible = singlePrayerCelebration === type;
+    return (
+      <div
+        className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
+          isVisible
+            ? 'grid-rows-[1fr] opacity-100 mb-3'
+            : 'grid-rows-[0fr] opacity-0 mb-0 pointer-events-none'
+        }`}
+      >
+        <div className="overflow-hidden min-h-0">
           <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
@@ -252,15 +254,15 @@ export const QadaPrayersPage: React.FC<{
             <button
               type="button"
               onClick={() => setSinglePrayerCelebration(null)}
-              className="p-1.5 rounded-full hover:bg-white/10"
+              className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div dir="rtl" className="space-y-5 max-w-6xl mx-auto pb-12 select-none">

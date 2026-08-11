@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { X, Plus, Edit2, Trash2, Check, Tag as TagIcon, Layers } from 'lucide-react';
+import { X, Plus, Edit2, Check, Tag as TagIcon, Layers } from 'lucide-react';
 import { EducationTagRecord } from '../../types/db';
+import { SwipeToDeleteItem } from '../SwipeToDeleteItem';
+import { Dialog } from '../Dialog';
 
 interface TagManagerModalProps {
   isOpen: boolean;
@@ -71,178 +73,190 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200" dir="rtl">
-      <div className="bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-        {/* Modal Header */}
-        <div className="px-5 py-4 border-b border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between bg-surface-elevated/40">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <TagIcon className="w-5 h-5" />
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200" dir="rtl">
+        <div className="bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+          {/* Modal Header */}
+          <div className="px-5 py-4 border-b border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between bg-surface-elevated/40">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <TagIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-primary-theme">مدیریت تگ‌ها</h2>
+                <p className="text-xs text-secondary-theme">دسته‌بندی مطالب آموزش و احکام</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-base font-bold text-primary-theme">مدیریت تگ‌ها</h2>
-              <p className="text-xs text-secondary-theme">دسته‌بندی مطالب آموزش و احکام</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-2 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated rounded-full transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* New Tag Input Form */}
-        <div className="p-4 border-b border-neutral-200/60 dark:border-neutral-800/60 bg-surface-bg/50">
-          <form onSubmit={handleCreate} className="flex items-center gap-2">
-            <input
-              type="text"
-              value={newTagName}
-              onChange={(e) => setNewTagName(e.target.value)}
-              placeholder="نام تگ جدید..."
-              className="flex-1 bg-surface-card border border-neutral-200/90 dark:border-neutral-700/80 rounded-xl px-3.5 py-2 text-sm text-primary-theme placeholder:text-muted-theme focus:outline-hidden focus:ring-2 focus:ring-emerald-500/40"
-            />
             <button
-              type="submit"
-              disabled={!newTagName.trim()}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-40 flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0"
+              type="button"
+              onClick={onClose}
+              className="p-2 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated rounded-full transition-colors"
             >
-              <Plus className="w-4 h-4" />
-              افزودن
+              <X className="w-5 h-5" />
             </button>
-          </form>
-          {errorMsg && <p className="text-xs text-red-500 mt-2">{errorMsg}</p>}
-        </div>
-
-        {/* Tag List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {tags.length === 0 ? (
-            <div className="text-center py-8 text-secondary-theme">
-              <Layers className="w-8 h-8 mx-auto mb-2 opacity-40 text-muted-theme" />
-              <p className="text-xs">هنوز تگی ثبت نشده است.</p>
-            </div>
-          ) : (
-            tags.map((tag) => {
-              const count = tagUsageCounts[tag.name] || 0;
-              const isEditing = editingTagName === tag.name;
-
-              return (
-                <div
-                  key={tag.id || tag.name}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-surface-bg border border-neutral-200/70 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all"
-                >
-                  {isEditing ? (
-                    <div className="flex items-center gap-2 flex-1 pl-2">
-                      <input
-                        type="text"
-                        value={editInputVal}
-                        onChange={(e) => setEditInputVal(e.target.value)}
-                        className="flex-1 bg-surface-card border border-emerald-500 rounded-lg px-2.5 py-1 text-sm text-primary-theme focus:outline-hidden"
-                        autoFocus
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleSaveRename(tag.name)}
-                        className="p-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                        title="ذخیره"
-                      >
-                        <Check className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditingTagName(null)}
-                        className="p-1.5 text-secondary-theme hover:bg-surface-elevated rounded-lg transition-colors"
-                        title="انصراف"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (onSelectTagFilter) {
-                              onSelectTagFilter(tag.name);
-                              onClose();
-                            }
-                          }}
-                          className="font-semibold text-sm text-primary-theme hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-right"
-                        >
-                          {tag.name}
-                        </button>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium">
-                          {count} مطلب
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => handleStartRename(tag)}
-                          className="p-1.5 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated rounded-lg transition-colors"
-                          title="ویرایش تگ"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeletingTagName(tag.name)}
-                          className="p-1.5 text-secondary-theme hover:text-red-600 hover:bg-red-500/10 rounded-lg transition-colors"
-                          title="حذف تگ"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        {/* Delete Confirmation Alert Overlay */}
-        {deletingTagName && (
-          <div className="p-4 bg-red-500/10 border-t border-red-500/20 text-xs text-primary-theme flex flex-col gap-3">
-            <p className="font-semibold text-red-600 dark:text-red-400">
-              آیا از حذف تگ «{deletingTagName}» اطمینان دارید؟
-            </p>
-            <p className="text-secondary-theme">
-              با حذف تگ، مطالب مربوط به آن حذف نخواهند شد و فقط تگ از آن‌ها جدا می‌شود.
-            </p>
-            <div className="flex items-center justify-end gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => setDeletingTagName(null)}
-                className="px-3 py-1.5 bg-surface-card hover:bg-surface-elevated text-primary-theme rounded-xl font-medium border border-neutral-200 dark:border-neutral-700"
-              >
-                انصراف
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDelete}
-                className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium"
-              >
-                بله، حذف شود
-              </button>
-            </div>
           </div>
-        )}
 
-        {/* Footer */}
-        <div className="p-4 border-t border-neutral-200/80 dark:border-neutral-800 flex justify-end bg-surface-elevated/30">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-5 py-2 bg-surface-elevated hover:bg-neutral-200 dark:hover:bg-neutral-800 text-primary-theme text-sm font-medium rounded-xl transition-colors"
-          >
-            بستن
-          </button>
+          {/* New Tag Input Form */}
+          <div className="p-4 border-b border-neutral-200/60 dark:border-neutral-800/60 bg-surface-bg/50">
+            <form onSubmit={handleCreate} className="flex items-center gap-2 w-full">
+              <input
+                type="text"
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                placeholder="نام تگ جدید..."
+                className="flex-1 min-w-0 bg-surface-card border border-neutral-200/90 dark:border-neutral-700/80 rounded-xl px-3.5 py-2 text-sm text-primary-theme placeholder:text-muted-theme focus:outline-hidden focus:ring-2 focus:ring-emerald-500/40"
+              />
+              <button
+                type="submit"
+                disabled={!newTagName.trim()}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-40 flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0"
+              >
+                <Plus className="w-4 h-4" />
+                افزودن
+              </button>
+            </form>
+            {errorMsg && <p className="text-xs text-red-500 mt-2">{errorMsg}</p>}
+          </div>
+
+          {/* Tag List */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+            {tags.length === 0 ? (
+              <div className="text-center py-8 text-secondary-theme">
+                <Layers className="w-8 h-8 mx-auto mb-2 opacity-40 text-muted-theme" />
+                <p className="text-xs">هنوز تگی ثبت نشده است.</p>
+              </div>
+            ) : (
+              tags.map((tag) => {
+                const count = tagUsageCounts[tag.name] || 0;
+                const isEditing = editingTagName === tag.name;
+
+                return (
+                  <div key={tag.id || tag.name} className="h-16 w-full relative">
+                    <SwipeToDeleteItem
+                      key={tag.id || tag.name}
+                      id={tag.id || tag.name}
+                      onDelete={() => setDeletingTagName(tag.name)}
+                      className="h-full w-full"
+                    >
+                      <div className="w-full h-full p-3 rounded-2xl bg-surface-card border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between gap-2 shadow-2xs">
+                        {isEditing ? (
+                          <div className="flex items-center gap-2 w-full">
+                            <input
+                              type="text"
+                              value={editInputVal}
+                              onChange={(e) => setEditInputVal(e.target.value)}
+                              className="flex-1 min-w-0 bg-surface-bg border border-emerald-500 rounded-xl px-3 py-1.5 text-sm font-medium text-primary-theme focus:outline-hidden"
+                              autoFocus
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleSaveRename(tag.name)}
+                              className="p-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors shrink-0"
+                              title="ذخیره"
+                            >
+                              <Check className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingTagName(null)}
+                              className="p-2 text-secondary-theme hover:bg-surface-elevated rounded-xl transition-colors shrink-0"
+                              title="انصراف"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            {/* Right Side: Interactive Tag Button */}
+                            <div className="flex items-center gap-2 min-w-0 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (onSelectTagFilter) {
+                                    onSelectTagFilter(tag.name);
+                                    onClose();
+                                  }
+                                }}
+                                className="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95 group/tag truncate"
+                                title="کلیک کنید برای فیلتر بر اساس این تگ"
+                              >
+                                <TagIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 group-hover/tag:scale-110 transition-transform shrink-0" />
+                                <span className="truncate">{tag.name}</span>
+                              </button>
+                            </div>
+
+                            {/* Center: Usage Count Badge */}
+                            <div className="flex-1 flex justify-center items-center px-1">
+                              <span className="text-[11px] px-2.5 py-1 rounded-lg bg-surface-elevated text-secondary-theme font-medium shrink-0">
+                                {count} مطلب
+                              </span>
+                            </div>
+
+                            {/* Left Side: Rename Action Button */}
+                            <button
+                              type="button"
+                              onClick={() => handleStartRename(tag)}
+                              className="p-2 text-secondary-theme hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors shrink-0"
+                              title="ویرایش نام تگ"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </SwipeToDeleteItem>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-neutral-200/80 dark:border-neutral-800 flex justify-end bg-surface-elevated/30">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2 bg-surface-elevated hover:bg-neutral-200 dark:hover:bg-neutral-800 text-primary-theme text-sm font-medium rounded-xl transition-colors"
+            >
+              بستن
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Standard Delete Confirmation Popup */}
+      <Dialog
+        isOpen={!!deletingTagName}
+        onClose={() => setDeletingTagName(null)}
+        titleFa="تایید حذف تگ"
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => setDeletingTagName(null)}
+              className="px-4 py-2 bg-surface-elevated hover:bg-neutral-200 dark:hover:bg-neutral-800 text-primary-theme text-xs font-bold rounded-xl transition-colors"
+            >
+              انصراف
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDelete}
+              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm active:scale-95"
+            >
+              بله، حذف شود
+            </button>
+          </>
+        }
+      >
+        <div className="space-y-2 text-right">
+          <p className="font-bold text-primary-theme text-sm">
+            آیا از حذف تگ «{deletingTagName}» اطمینان دارید؟
+          </p>
+          <p className="text-xs text-secondary-theme leading-relaxed">
+            با حذف این تگ، مطالب مربوط به آن حذف نخواهند شد و فقط این تگ از دسته‌بندی آن‌ها جدا می‌گردد.
+          </p>
+        </div>
+      </Dialog>
+    </>
   );
 };

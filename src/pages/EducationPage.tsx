@@ -348,9 +348,9 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
         onClick={handleOpenAddForm}
         aria-label="افزودن مطلب جدید"
         title="افزودن مطلب جدید"
-        className="fixed bottom-6 left-6 z-30 w-14 h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg shadow-emerald-600/30 hover:shadow-xl transition-all duration-200 active:scale-90 flex items-center justify-center shrink-0"
+        className="fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg shadow-emerald-600/30 hover:shadow-xl transition-all duration-200 active:scale-90 flex items-center justify-center shrink-0"
       >
-        <Plus className="w-7 h-7 stroke-[2.5]" />
+        <Plus className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
       </button>
 
       {/* Add / Edit Form Modal */}

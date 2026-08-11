@@ -38,6 +38,17 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
 
     if (!wrapper || !card || !deleteBtn || !deleteIcon) return;
 
+    // Clean inline animation styles on mount/remount
+    wrapper.style.height = '';
+    wrapper.style.margin = '';
+    wrapper.style.opacity = '';
+    wrapper.classList.remove('wrapper-animating');
+    card.style.transform = '';
+    card.classList.remove('card-animating', 'rounded-2xl', 'shadow-lg', 'shadow-md');
+    deleteBtn.style.opacity = '0';
+    deleteBtn.style.transform = 'scale(0.5)';
+    deleteBtn.style.width = `${BTN_BASE_SIZE}px`;
+
     let startX = 0;
     let initialTranslateX = 0;
     let currentTranslateX = 0;
@@ -124,14 +135,8 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
     };
 
     const triggerFullDelete = () => {
-      wrapper.classList.add('wrapper-animating');
-      wrapper.style.height = '0px';
-      wrapper.style.margin = '0px';
-      wrapper.style.opacity = '0';
-
-      setTimeout(() => {
-        onDelete();
-      }, 350);
+      onDelete();
+      closeSwipe();
     };
 
     const onTouchStart = (e: TouchEvent | MouseEvent) => {

@@ -19,11 +19,63 @@ import {
   Star,
   Info,
   ChevronLeft,
+  ChevronDown,
+  ChevronUp,
   AlertTriangle,
   Sparkles,
   DownloadCloud,
   CheckCircle2,
 } from 'lucide-react';
+
+interface ReleaseInfo {
+  version: string;
+  badge?: string;
+  date: string;
+  isLatest?: boolean;
+  changes: string[];
+}
+
+const RELEASES: ReleaseInfo[] = [
+  {
+    version: 'نسخه ۱.۲.۰',
+    badge: 'جدیدترین نسخه',
+    date: 'مرداد ۱۴۰۵',
+    isLatest: true,
+    changes: [
+      'مدیریت و دسته‌بندی پیشرفته تگ‌ها در بخش آموزش و احکام همراه با قابلیت سوایپ به چپ برای حذف',
+      'بهینه‌سازی انیمیشن‌های نمایش روان در کارت‌های اقامه و قضای نماز بدون افت فریم',
+      'انتقال موقعیت نمایش پیام‌ها و اعلان‌ها (نوتیفیکیشن) به بخش پایینی صفحه جهت دید بهتر کاربر',
+      'اصلاح چیدمان دکمه شناور افزودن (FAB) و بهینه‌سازی نمایش در انواع رزولوشن‌های موبایل',
+      'بهبودهای کلی در سرعت اجرا، ظاهر مودال‌ها و روان‌سازی انیمیشن‌های برنامه',
+    ],
+  },
+  {
+    version: 'نسخه ۱.۱.۰',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'افزودن قابلیت سوایپ (کشیدن به چپ) برای حذف سریع آیتم‌ها در سراسر برنامه (تاریخچه، تگ‌ها و...)',
+      'امکان ثبت و ویرایش یادداشت‌ها و مطالب آموزشی همراه با فیلتر هوشمند تگ‌ها',
+      'بهبود عملکرد سیستم پشتیبان‌گیری و بازیابی اطلاعات',
+      'بهینه‌سازی کارت‌های محاسباتی بخش روزه، کفارات و فطریه',
+    ],
+  },
+  {
+    version: 'نسخه ۱.۰.۰',
+    badge: 'نسخه اصلی',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'راه اندازی نسخه ۱.۰ محراب',
+      'پیش‌خوان جامع عبادات با دسترسی سریع به چهار بخش اصلی',
+      'مدیریت و ثبت نمازهای قضا با شمارنده آسان',
+      'محاسبات قضا و کفاره روزه، فطریه و رد مظالم',
+      'کتابخانه منتخب ادعیه، زیارات و تعقیبات',
+      'بخش آموزشی احکام شرعی و مسائل کاربردی',
+      'پشتیبان‌گیری و بازیابی داده‌ها به‌صورت کامل',
+      'پشتیبانی از پوسته روشن، تاریک و سیستم',
+      'عملکرد ۱۰۰٪ آفلاین با ذخیره‌سازی محلی',
+    ],
+  },
+];
 
 interface SettingsPageProps {
   onShowToast: (msg: string, type?: 'info' | 'success' | 'error' | 'warning') => void;
@@ -43,6 +95,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
   const [isRestoring, setIsRestoring] = useState(false);
 
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
+  const [openReleaseIndex, setOpenReleaseIndex] = useState<number | null>(0);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -403,7 +456,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
       {/* Version Number Footnote */}
       <div className="text-center pt-2">
         <span className="text-xs font-semibold text-secondary-theme/70">
-          نسخه ۱.۰.۰ (۱۰۰)
+          نسخه ۱.۲.۰ (۱۲۰)
         </span>
       </div>
 
@@ -504,26 +557,60 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
           </Button>
         }
       >
-        <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-          <div className="p-3 bg-surface-elevated rounded-xl border border-theme/60 space-y-2">
-            <div className="flex items-center justify-between border-b border-theme/40 pb-2">
-              <span className="font-bold text-sm text-emerald-600 dark:text-emerald-400">
-                نسخه ۱.۰.۰ (نسخه اصلی)
-              </span>
-              <span className="text-[11px] text-secondary-theme">مرداد ۱۴۰۵</span>
-            </div>
-            <ul className="text-xs text-secondary-theme space-y-1.5 list-disc list-inside leading-relaxed">
-              <li>راه اندازی نسخه ۱.۰ محراب</li>
-              <li>پیش‌خوان جامع عبادات با دسترسی سریع به چهار بخش اصلی</li>
-              <li>مدیریت و ثبت نمازهای قضا با شمارنده آسان</li>
-              <li>محاسبات قضا و کفاره روزه، فطریه و رد مظالم</li>
-              <li>کتابخانه منتخب ادعیه، زیارات و تعقیبات</li>
-              <li>بخش آموزشی احکام شرعی و مسائل کاربردی</li>
-              <li>پشتیبان‌گیری و بازیابی داده‌ها به‌صورت کامل</li>
-              <li>پشتیبانی از پوسته روشن، تاریک و سیستم</li>
-              <li>عملکرد ۱۰۰٪ آفلاین با IndexedDB</li>
-            </ul>
-          </div>
+        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+          {RELEASES.map((rel, idx) => {
+            const isOpen = openReleaseIndex === idx;
+            return (
+              <div
+                key={rel.version}
+                className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                  rel.isLatest
+                    ? 'border-emerald-500/40 bg-emerald-500/5 dark:bg-emerald-500/10'
+                    : 'border-theme/60 bg-surface-card'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenReleaseIndex(isOpen ? null : idx)}
+                  className="w-full flex items-center justify-between p-3.5 text-right hover:bg-surface-elevated/50 transition-colors cursor-pointer select-none"
+                >
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-extrabold text-sm text-primary-theme">
+                      {rel.version}
+                    </span>
+                    {rel.badge && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                        {rel.badge}
+                      </span>
+                    )}
+                    <span className="text-[11px] text-secondary-theme opacity-80">
+                      ({rel.date})
+                    </span>
+                  </div>
+
+                  <div className="w-7 h-7 rounded-lg bg-surface-elevated flex items-center justify-center shrink-0 text-secondary-theme">
+                    {isOpen ? (
+                      <ChevronUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </div>
+                </button>
+
+                {isOpen && (
+                  <div className="px-4 pb-4 pt-2 border-t border-theme/30 animate-in fade-in duration-200">
+                    <ul className="text-xs text-secondary-theme space-y-2 list-disc list-inside leading-relaxed pr-1">
+                      {rel.changes.map((change, cIdx) => (
+                        <li key={cIdx} className="text-primary-theme/90">
+                          <span>{change}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </Dialog>
 
