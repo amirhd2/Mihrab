@@ -8,6 +8,11 @@ import {
   EducationBookmark,
   AppPreference,
   BackupHistoryLog,
+  QadaFastingState,
+  QadaFastingHistory,
+  FitriyaState,
+  KaffarahState,
+  FinancialHistory,
 } from '../types/db';
 
 export class MihrabDatabase extends Dexie {
@@ -19,6 +24,11 @@ export class MihrabDatabase extends Dexie {
   educationBookmarks!: Table<EducationBookmark, number>;
   preferences!: Table<AppPreference, string>;
   backupHistory!: Table<BackupHistoryLog, number>;
+  qadaFastingState!: Table<QadaFastingState, string>;
+  qadaFastingHistory!: Table<QadaFastingHistory, number>;
+  fitriyaState!: Table<FitriyaState, number>;
+  kaffarahState!: Table<KaffarahState, string>;
+  financialHistory!: Table<FinancialHistory, number>;
 
   constructor() {
     super('MihrabDatabase');
@@ -33,6 +43,15 @@ export class MihrabDatabase extends Dexie {
       educationBookmarks: '++id, &articleId, category',
       preferences: '&key, updatedAt',
       backupHistory: '++id, timestamp, type, status',
+    });
+
+    // Version 2 Schema
+    this.version(2).stores({
+      qadaFastingState: '&id',
+      qadaFastingHistory: '++id, timestamp',
+      fitriyaState: '&year',
+      kaffarahState: '&id',
+      financialHistory: '++id, type, timestamp',
     });
   }
 

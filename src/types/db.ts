@@ -70,3 +70,45 @@ export interface BackupHistoryLog {
   status: 'success' | 'failed';
   details?: string;
 }
+
+export interface QadaFastingState {
+  id: string; // 'current'
+  count: number;
+  updatedAt: string;
+}
+
+export interface QadaFastingHistory {
+  id?: number;
+  timestamp: string;
+  remainingCount: number;
+}
+
+export interface FitriyaState {
+  year: number;
+  peopleCount: number;
+  amountPerPerson: number;
+  updatedAt: string;
+}
+
+export interface KaffarahState {
+  id: string; // 'current'
+  isIntentionalActive: boolean;
+  intentionalCount: number;
+  intentionalAmount: number;
+  isUnintentionalActive: boolean;
+  unintentionalCount: number;
+  unintentionalAmount: number;
+  updatedAt: string;
+}
+
+export interface FinancialHistory {
+  id?: number;
+  type: 'fitriya' | 'kaffarah_intentional' | 'kaffarah_unintentional';
+  timestamp: string;
+  paymentDate: string;
+  amount: number;
+  peopleCount?: number;
+  quantity?: number;
+  amountPerItem?: number;
+  year?: number;
+}

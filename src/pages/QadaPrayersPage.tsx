@@ -32,7 +32,9 @@ const PRAYER_TITLES: Record<PrayerType, string> = {
   ayat: 'نماز آیات',
 };
 
-export const QadaPrayersPage: React.FC = () => {
+export const QadaPrayersPage: React.FC<{
+  onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning', duration?: number, action?: any) => void;
+}> = ({ onShowToast }) => {
   const navigate = useNavigate();
 
   // Modal & Sheet States
@@ -137,11 +139,21 @@ export const QadaPrayersPage: React.FC = () => {
     });
 
     // Add record to qadaHistory
-    await db.qadaHistory.add({
+    const historyId = await db.qadaHistory.add({
       prayerType: type,
       timestamp: now,
       remainingCount: newCount,
     });
+
+    if (onShowToast) {
+      onShowToast(`یک ${PRAYER_TITLES[type]} ثبت شد`, 'success', 3000, {
+        label: 'لغو',
+        onClick: async () => {
+          const record = await db.qadaHistory.get(historyId as number);
+          if (record) handleUndoRecord(record);
+        }
+      });
+    }
 
     // Check if this prayer reached 0
     if (newCount === 0) {

@@ -21,8 +21,8 @@ export default function App() {
         <AppShell>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
-            <Route path="/prayers" element={<QadaPrayersPage />} />
-            <Route path="/fasting" element={<FastingPage />} />
+            <Route path="/prayers" element={<QadaPrayersPage onShowToast={showToast} />} />
+            <Route path="/fasting" element={<FastingPage onShowToast={showToast} />} />
             <Route path="/fitr" element={<Navigate to="/fasting" replace />} />
             <Route path="/duas" element={<DuasPage />} />
             <Route path="/education" element={<EducationPage />} />
