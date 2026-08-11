@@ -23,11 +23,11 @@ export const Snackbar: React.FC<SnackbarProps> = ({ toasts, onRemove }) => {
         return (
           <div
             key={toast.id}
-            className="pointer-events-auto flex items-center justify-between gap-3 p-3.5 bg-surface-card border border-theme rounded-xl shadow-lg animate-in slide-in-from-bottom-2 duration-200"
+            className="pointer-events-auto flex items-center justify-between gap-3 p-4 bg-surface-card border-2 border-emerald-500/20 dark:border-emerald-500/30 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-2 duration-200 ring-1 ring-black/5 dark:ring-white/5"
           >
-            <div className="flex items-center gap-2.5 text-sm text-primary-theme font-medium flex-1">
-              <span>{toast.message}</span>
+            <div className="flex items-center gap-3 text-sm text-primary-theme font-bold flex-1">
               {icons[toast.type]}
+              <span>{toast.message}</span>
             </div>
             
             <div className="flex items-center gap-2 shrink-0">
@@ -38,7 +38,7 @@ export const Snackbar: React.FC<SnackbarProps> = ({ toasts, onRemove }) => {
                     toast.action!.onClick();
                     onRemove(toast.id);
                   }}
-                  className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-surface-elevated hover:bg-neutral-200 dark:hover:bg-neutral-800 text-primary-theme transition-colors border border-neutral-200 dark:border-neutral-800"
+                  className="text-xs font-bold px-6 py-2 rounded-xl bg-surface-elevated hover:bg-neutral-200 dark:hover:bg-neutral-800 text-primary-theme transition-colors border border-neutral-200 dark:border-neutral-700 shadow-sm"
                 >
                   {toast.action.label}
                 </button>
@@ -46,7 +46,7 @@ export const Snackbar: React.FC<SnackbarProps> = ({ toasts, onRemove }) => {
               <button
                 type="button"
                 onClick={() => onRemove(toast.id)}
-                className="p-1.5 text-secondary-theme hover:text-primary-theme transition-theme rounded-md bg-transparent hover:bg-surface-elevated"
+                className="p-2 text-secondary-theme hover:text-primary-theme transition-theme rounded-xl hover:bg-surface-elevated"
                 aria-label="بستن"
               >
                 <X className="w-4 h-4" />

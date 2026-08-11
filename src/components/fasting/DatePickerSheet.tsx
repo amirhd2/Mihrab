@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { RotateCcw } from 'lucide-react';
 import { WheelPicker } from './WheelPicker';
-import { getJalaliDaysInMonth, gregorianToJalali } from '../../utils/jalali';
+import { getJalaliDaysInMonth, gregorianToJalali, jalaliToGregorian } from '../../utils/jalali';
 import { toPersianDigits } from '../../utils/persianUtils';
 
 interface DatePickerSheetProps {
@@ -52,9 +52,10 @@ export const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
   }, [selectedMonth, selectedYear, selectedDay]);
 
   const handleConfirm = () => {
-    // The user requested: "در زمان زدن دکمه ثبت تاریخی که انتخاب میشود توسط کاربر ، ثبت نمی شود و تاریخی ثابت درج میشود"
-    // So we ignore the selectedDate and insert a fixed date. We will just use the current Date() as the fixed date.
-    onConfirm(new Date('2026-08-11T00:00:00Z'));
+    // Convert Jalali selected date back to Gregorian to return a valid Date object
+    const g = jalaliToGregorian(selectedYear, selectedMonth, selectedDay);
+    const d = new Date(g.gy, g.gm - 1, g.gd, 12, 0, 0); // use noon to avoid timezone issues
+    onConfirm(d);
     onClose();
   };
 

@@ -327,9 +327,9 @@ export const QadaPrayersPage: React.FC<{
       />
 
       {/* MAIN PRAYER CARDS GRID / LAYOUT */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         {/* PARENT CARD 1: نماز صبح */}
-        <Card className="p-4 sm:p-5 flex flex-col justify-between col-span-1 md:col-span-2 lg:col-span-1">
+        <Card className="p-4 sm:p-5 flex flex-col justify-between md:col-span-2">
           <div className="mb-3 text-center">
             <h2 className="text-sm sm:text-base font-extrabold text-primary-theme">
               نماز صبح
@@ -420,7 +420,7 @@ export const QadaPrayersPage: React.FC<{
         </Card>
 
         {/* PARENT CARD 4: نماز آیات */}
-        <Card className="p-4 sm:p-5 flex flex-col justify-between col-span-1 md:col-span-2 lg:col-span-1">
+        <Card className="p-4 sm:p-5 flex flex-col justify-between md:col-span-2">
           <div className="mb-3 text-center">
             <h2 className="text-sm sm:text-base font-extrabold text-primary-theme">
               نماز آیات

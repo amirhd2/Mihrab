@@ -1,0 +1,20 @@
+--- src/pages/FastingPage.tsx
++++ src/pages/FastingPage.tsx
+@@ -176,2 +176,17 @@
+   };
++
++  const formatLastRecordedTime = (isoString?: string | null) => {
++    if (!isoString) return 'ندارد';
++    try {
++      const date = new Date(isoString);
++      const now = new Date();
++      const isToday = date.toDateString() === now.toDateString();
++      const timeStr = date.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
++      if (isToday) {
++        return `امروز، ساعت ${timeStr}`;
++      }
++      return date.toLocaleDateString('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' });
++    } catch (e) {
++      return 'نامشخص';
++    }
++  };

@@ -80,25 +80,19 @@ export const DashboardPage: React.FC = () => {
 
   // Query live count data from IndexedDB
   const qadaRecords = useLiveQuery(() => db.qadaPrayers.toArray(), []);
-  const fastingRecords = useLiveQuery(() => db.fastingLogs.toArray(), []);
+  const fastingState = useLiveQuery(() => db.qadaFastingState.get('current'), []);
 
   // Compute total remaining qada prayers
   const totalQadaRemaining = React.useMemo(() => {
     if (!qadaRecords) return 0;
     return qadaRecords.reduce(
-      (sum, item) => sum + Math.max(0, (item.count || 0) - (item.completedCount || 0)),
+      (sum, item) => sum + Math.max(0, item.count || 0),
       0
     );
   }, [qadaRecords]);
 
   // Compute total remaining fasting days
-  const totalFastingRemaining = React.useMemo(() => {
-    if (!fastingRecords) return 0;
-    return fastingRecords.reduce(
-      (sum, item) => sum + Math.max(0, (item.targetCount || 0) - (item.completedCount || 0)),
-      0
-    );
-  }, [fastingRecords]);
+  const totalFastingRemaining = fastingState?.count || 0;
 
   const handleKeyDown = (e: React.KeyboardEvent, path: string) => {
     if (e.key === 'Enter' || e.key === ' ') {

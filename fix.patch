@@ -1,0 +1,54 @@
+--- src/pages/FastingPage.tsx
++++ src/pages/FastingPage.tsx
+@@ -668,3 +668,39 @@
+     </div>
+   );
+ };
++      <AnimatePresence>
++        {isConfirmOpen && (
++          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
++            <motion.div
++              initial={{ opacity: 0 }}
++              animate={{ opacity: 1 }}
++              exit={{ opacity: 0 }}
++              onClick={() => setIsConfirmOpen(false)}
++              className="absolute inset-0 bg-black/40 backdrop-blur-xs"
++            />
++            <motion.div
++              initial={{ scale: 0.95, opacity: 0 }}
++              animate={{ scale: 1, opacity: 1 }}
++              exit={{ scale: 0.95, opacity: 0 }}
++              className="relative w-full max-w-sm bg-surface-card rounded-3xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-xl"
++            >
++              <div className="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-4">
++                <Trash2 className="w-6 h-6" />
++              </div>
++              <h3 className="text-lg font-bold text-primary-theme text-center mb-2">
++                پاک کردن تاریخچه
++              </h3>
++              <p className="text-sm text-secondary-theme text-center mb-6 leading-relaxed">
++                آیا از پاک کردن تمام تاریخچه‌ها اطمینان دارید؟ این عمل غیرقابل بازگشت است.
++              </p>
++              <div className="flex gap-3">
++                <button
++                  type="button"
++                  onClick={() => setIsConfirmOpen(false)}
++                  className="flex-1 py-2.5 rounded-xl bg-surface-elevated text-primary-theme font-bold text-sm hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
++                >
++                  انصراف
++                </button>
++                <button
++                  type="button"
++                  onClick={handleConfirmClear}
++                  className="flex-1 py-2.5 rounded-xl bg-rose-600 text-white font-bold text-sm hover:bg-rose-700 transition-colors shadow-lg shadow-rose-600/20"
++                >
++                  پاک کردن
++                </button>
++              </div>
++            </motion.div>
++          </div>
++        )}
++      </AnimatePresence>
++    </div>
++  );
++};

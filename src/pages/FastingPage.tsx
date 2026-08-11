@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Check, CalendarCheck, Clock, List, ListFilter, X, Wheat, RotateCcw, Trash2 } from 'lucide-react';
+import { Check, CalendarCheck, Clock, List, ListFilter, X, Wheat, RotateCcw, Trash2, Calendar } from 'lucide-react';
 import { PageHeader } from '../components/PageHeader';
 import { CounterControl } from '../components/CounterControl';
 import { DatePickerSheet } from '../components/fasting/DatePickerSheet';
+import { Card } from '../components/Card';
 import { formatPersianNumber } from '../utils/persianUtils';
 import { db } from '../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -114,6 +115,21 @@ export const FastingPage: React.FC<{
     }
   };
 
+  const handleUndoFinancial = async (id: number) => {
+    await db.financialHistory.delete(id);
+  };
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  
+  const handleConfirmClear = async () => {
+    if (showHistorySheet === 'qaza') {
+      await db.qadaFastingHistory.clear();
+    } else if (showHistorySheet === 'financial') {
+      await db.financialHistory.clear();
+    }
+    setIsConfirmOpen(false);
+  };
+
   const handleFitriyaPayment = async (date: Date) => {
     setIsFitriyaPaid(true);
     const now = new Date().toISOString();
@@ -158,7 +174,23 @@ export const FastingPage: React.FC<{
   };
   
   const formatDate = (isoString: string) => {
-    return new Date(isoString).toLocaleDateString('fa-IR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    return new Date(isoString).toLocaleDateString('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  };
+
+  const formatLastRecordedTime = (isoString?: string | null) => {
+    if (!isoString) return 'ندارد';
+    try {
+      const date = new Date(isoString);
+      const now = new Date();
+      const isToday = date.toDateString() === now.toDateString();
+      const timeStr = date.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+      if (isToday) {
+        return `امروز، ساعت ${timeStr}`;
+      }
+      return date.toLocaleDateString('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    } catch (e) {
+      return 'نامشخص';
+    }
   };
 
   return (
@@ -171,7 +203,7 @@ export const FastingPage: React.FC<{
       />
 
       {/* Main Grid: Responsive adaptation */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         
         {/* Column 1: Qaza Fasting */}
         <div className="flex flex-col gap-4">
@@ -284,7 +316,7 @@ export const FastingPage: React.FC<{
         </div>
 
         {/* Column 3: Kaffarah */}
-        <div className="flex flex-col gap-4 lg:col-span-1 md:col-span-2">
+        <div className="flex flex-col gap-4 md:col-span-2">
           <div className="bg-surface-card border border-neutral-200/60 dark:border-neutral-800/60 rounded-3xl p-5 shadow-xs transition-all">
             <div 
               className="flex items-center justify-between cursor-pointer group"
@@ -418,43 +450,62 @@ export const FastingPage: React.FC<{
         </div>
       </div>
 
-      {/* Bottom Status Area */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-surface-card/90 backdrop-blur-md border-t border-theme/40 z-30 transform-gpu">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowHistorySheet('qaza')}
-              className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface-elevated border border-neutral-200 dark:border-neutral-800 text-[11px] sm:text-xs font-bold text-primary-theme hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors shadow-2xs"
-            >
-              <List className="w-3.5 h-3.5" />
-              تاریخچه روزه‌ها
-            </button>
-            <button
-              onClick={() => setShowHistorySheet('financial')}
-              className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface-elevated border border-neutral-200 dark:border-neutral-800 text-[11px] sm:text-xs font-bold text-primary-theme hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors shadow-2xs"
-            >
-              <ListFilter className="w-3.5 h-3.5" />
-              تاریخچه پرداخت‌ها
-            </button>
-          </div>
-          
-          <div className="flex items-center gap-6">
-            <div className="text-left flex flex-col items-end hidden sm:flex">
-              <span className="text-[10px] text-secondary-theme flex items-center gap-1">
-                آخرین ثبت: {lastQazaCompletedAt ? formatTime(lastQazaCompletedAt) : 'ندارد'}
-                <Clock className="w-3 h-3" />
-              </span>
+      {/* MAIN STATUS SECTION AT BOTTOM */}
+      <Card className="p-3.5 sm:p-4 border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs mt-6">
+        <div className="grid grid-cols-3 items-center divide-x divide-x-reverse divide-neutral-200 dark:divide-neutral-800">
+          {/* SECTION 1 (RIGHT in RTL): کل باقیمانده */}
+          <div className="flex items-center gap-2.5 sm:gap-3 justify-start pr-1 sm:pr-3">
+            <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 items-center justify-center shrink-0">
+              <Check className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            
-            <div className="flex items-center gap-2">
-              <div className="flex flex-col items-end">
-                <span className="text-[10px] text-secondary-theme">کل روزه قضا</span>
-                <span className="text-sm sm:text-base font-extrabold text-primary-theme">{formatPersianNumber(qazaCount)} روز</span>
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1">
+                <span className="text-base sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 leading-none">
+                  {formatPersianNumber(qazaCount)}
+                </span>
+                <span className="text-[10px] sm:text-xs text-secondary-theme font-semibold">
+                  روزه قضا
+                </span>
               </div>
             </div>
           </div>
+
+          {/* SECTION 2 (CENTER in RTL): آخرین ثبت */}
+          <div className="flex items-center gap-2 sm:gap-3 justify-center px-1 sm:px-3 text-center">
+            <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 items-center justify-center shrink-0">
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-xs text-secondary-theme font-medium">
+                آخرین ثبت
+              </p>
+              <p className="text-xs sm:text-sm font-bold text-primary-theme mt-0.5">
+                {formatLastRecordedTime(lastQazaCompletedAt)}
+              </p>
+            </div>
+          </div>
+
+          {/* SECTION 3 (LEFT in RTL): تاریخچه Button */}
+          <div className="flex items-center justify-end pl-1 sm:pl-3 gap-2">
+            <button
+              type="button"
+              onClick={() => setShowHistorySheet('financial')}
+              className="flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-surface-elevated/70 hover:bg-surface-elevated active:scale-95 text-primary-theme font-bold text-xs sm:text-sm transition-all border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs"
+              title="تاریخچه پرداخت‌ها"
+            >
+              <ListFilter className="w-4 h-4 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowHistorySheet('qaza')}
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-2xl bg-surface-elevated/70 hover:bg-surface-elevated active:scale-95 text-primary-theme font-bold text-xs sm:text-sm transition-all border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs"
+            >
+              <span className="hidden sm:inline">تاریخچه</span>
+              <List className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            </button>
+          </div>
         </div>
-      </div>
+      </Card>
 
       <DatePickerSheet
         isOpen={activeDatePicker !== null}
@@ -501,6 +552,17 @@ export const FastingPage: React.FC<{
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  {((showHistorySheet === 'qaza' && (qazaHistory?.length || 0) > 0) || (showHistorySheet === 'financial' && (financialHistory?.length || 0) > 0)) && (
+                    <button
+                      type="button"
+                      onClick={() => setIsConfirmOpen(true)}
+                      className="px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-colors border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 flex items-center gap-1.5"
+                      title="پاک کردن کامل تاریخچه"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">پاکسازی</span>
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => setShowHistorySheet(null)}
@@ -615,6 +677,14 @@ export const FastingPage: React.FC<{
                             </div>
                           </div>
                         </div>
+                        <button
+                          type="button"
+                          onClick={() => handleUndoFinancial(record.id!)}
+                          className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">لغو ثبت</span>
+                        </button>
                       </div>
                     ))
                   )
@@ -624,7 +694,51 @@ export const FastingPage: React.FC<{
           </div>
         )}
       </AnimatePresence>
-
+      <AnimatePresence>
+        {isConfirmOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsConfirmOpen(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-xs"
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-sm bg-surface-card rounded-3xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-xl"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-primary-theme text-center mb-2">
+                پاک کردن تاریخچه
+              </h3>
+              <p className="text-sm text-secondary-theme text-center mb-6 leading-relaxed">
+                آیا از پاک کردن تمام تاریخچه‌ها اطمینان دارید؟ این عمل غیرقابل بازگشت است.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmOpen(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-surface-elevated text-primary-theme font-bold text-sm hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+                >
+                  انصراف
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmClear}
+                  className="flex-1 py-2.5 rounded-xl bg-rose-600 text-white font-bold text-sm hover:bg-rose-700 transition-colors shadow-lg shadow-rose-600/20"
+                >
+                  پاک کردن
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
