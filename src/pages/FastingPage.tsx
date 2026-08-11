@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Check, CalendarCheck, Clock, List, ListFilter, X, Wheat, RotateCcw, Trash2, Calendar } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { PageHeader } from '../components/PageHeader';
 import { CounterControl } from '../components/CounterControl';
 import { DatePickerSheet } from '../components/fasting/DatePickerSheet';
@@ -64,7 +65,21 @@ export const FastingPage: React.FC<{
   }, []);
 
   const saveQazaCount = async (newCount: number, recordHistory: boolean = false) => {
-    setQazaCount(newCount);
+    const validCount = Math.max(0, newCount);
+    
+    // Trigger confetti if qaza count reaches 0 from > 0
+    if (qazaCount > 0 && validCount === 0) {
+      try {
+        confetti({
+          particleCount: 130,
+          spread: 85,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'],
+        });
+      } catch (_) {}
+    }
+
+    setQazaCount(validCount);
     const now = new Date().toISOString();
     let historyId = null;
     
@@ -72,13 +87,13 @@ export const FastingPage: React.FC<{
       setLastQazaCompletedAt(now);
       historyId = await db.qadaFastingHistory.add({
         timestamp: now,
-        remainingCount: newCount
+        remainingCount: validCount
       });
     }
     
     await db.qadaFastingState.put({
       id: 'current',
-      count: newCount,
+      count: validCount,
       updatedAt: now
     });
 
@@ -95,15 +110,21 @@ export const FastingPage: React.FC<{
     setIsQazaAnimating(true);
     setTimeout(() => setIsQazaAnimating(false), 600);
     
-    const historyId = await saveQazaCount(qazaCount - 1, true);
+    const newCount = qazaCount - 1;
+    const historyId = await saveQazaCount(newCount, true);
 
     if (onShowToast) {
-      onShowToast('یک روزه ثبت شد', 'success', 3000, {
-        label: 'لغو',
-        onClick: () => {
-          if (historyId) handleUndoQaza(historyId as number);
+      onShowToast(
+        newCount === 0 ? 'تبریک! تمامی روزه‌های قضای شما به پایان رسید 🎉' : 'یک روزه ثبت شد',
+        'success',
+        3500,
+        {
+          label: 'لغو',
+          onClick: () => {
+            if (historyId) handleUndoQaza(historyId as number);
+          }
         }
-      });
+      );
     }
   };
 
