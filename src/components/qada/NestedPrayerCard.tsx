@@ -95,7 +95,7 @@ export const NestedPrayerCard: React.FC<NestedPrayerCardProps> = ({
 
   return (
     <div
-      className={`relative rounded-2xl p-3.5 sm:p-4 bg-surface-elevated/40 dark:bg-neutral-900/40 border transition-all duration-200 ${
+      className={`relative rounded-2xl p-3.5 sm:p-4 bg-slate-100/80 dark:bg-slate-800/50 border transition-all duration-200 ${
         isAnimatingComplete
           ? 'border-emerald-500/80 shadow-md shadow-emerald-500/10 ring-2 ring-emerald-500/20'
           : count === 0

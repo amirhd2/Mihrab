@@ -1,6 +1,7 @@
 import React from 'react';
 import { WifiOff } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
+import { useTheme } from '../hooks/useTheme';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -8,6 +9,7 @@ interface AppShellProps {
 
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const { isOffline } = usePWA();
+  useTheme(); // Initialize and apply saved or system theme mode to document element
 
   return (
     <div className="min-h-screen bg-surface-bg text-primary-theme flex flex-col font-persian transition-theme">

@@ -9,6 +9,7 @@ import { Card } from '../components/Card';
 import { formatPersianNumber } from '../utils/persianUtils';
 import { db } from '../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { SwipeToDeleteItem } from '../components/SwipeToDeleteItem';
 
 export const FastingPage: React.FC<{
   onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning', duration?: number, action?: any) => void;
@@ -618,7 +619,7 @@ export const FastingPage: React.FC<{
                 </div>
               )}
 
-              <div className="flex-1 overflow-y-auto no-scrollbar pb-6 space-y-3">
+              <div className="flex-1 overflow-y-auto no-scrollbar pb-6 space-y-2">
                 {showHistorySheet === 'qaza' ? (
                   qazaHistory?.length === 0 ? (
                     <div className="py-12 text-center text-secondary-theme">
@@ -628,33 +629,43 @@ export const FastingPage: React.FC<{
                       </p>
                     </div>
                   ) : (
-                    qazaHistory?.map(record => (
-                      <div key={record.id} className="flex items-center justify-between p-3.5 rounded-2xl bg-surface-elevated/50 border border-neutral-200/80 dark:border-neutral-800/80">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                            <Check className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-bold text-primary-theme">روزه قضا</h4>
-                            <div className="flex items-center gap-2 text-xs text-secondary-theme mt-0.5 font-medium">
-                              <span>{formatDate(record.timestamp)}</span>
-                              <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">باقی‌مانده: {formatPersianNumber(record.remainingCount)}</span>
-                              <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                              <span dir="ltr">{formatTime(record.timestamp)}</span>
+                    <>
+                      <p className="text-[11px] text-center text-secondary-theme/80 font-medium mb-1">
+                        برای حذف هر مورد، کارت را به سمت چپ بکشید
+                      </p>
+                      {qazaHistory?.map(record => (
+                        <SwipeToDeleteItem key={record.id} id={record.id!} onDelete={() => handleUndoQaza(record.id!)}>
+                          <div className="flex items-center justify-between w-full p-3.5 sm:p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                                <Check className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-primary-theme">روزه قضا</h4>
+                                <div className="flex items-center gap-2 text-xs text-secondary-theme mt-0.5 font-medium">
+                                  <span>{formatDate(record.timestamp)}</span>
+                                  <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+                                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">باقی‌مانده: {formatPersianNumber(record.remainingCount)}</span>
+                                  <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+                                  <span dir="ltr">{formatTime(record.timestamp)}</span>
+                                </div>
+                              </div>
                             </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUndoQaza(record.id!);
+                              }}
+                              className="p-2 rounded-xl text-neutral-400 hover:text-rose-600 hover:bg-rose-500/10 active:scale-90 transition-all shrink-0 flex items-center gap-1"
+                              title="حذف"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleUndoQaza(record.id!)}
-                          className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
-                        >
-                          <RotateCcw className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">لغو ثبت</span>
-                        </button>
-                      </div>
-                    ))
+                        </SwipeToDeleteItem>
+                      ))}
+                    </>
                   )
                 ) : (
                   financialHistory?.length === 0 ? (
@@ -665,49 +676,59 @@ export const FastingPage: React.FC<{
                       </p>
                     </div>
                   ) : (
-                    financialHistory?.map(record => (
-                      <div key={record.id} className="flex items-center justify-between p-3.5 rounded-2xl bg-surface-elevated/50 border border-neutral-200/80 dark:border-neutral-800/80">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                            record.type === 'fitriya' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
-                            record.type === 'kaffarah_intentional' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
-                            'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                          }`}>
-                            <Wheat className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-bold text-primary-theme">
-                              {record.type === 'fitriya' ? 'فطریه' : record.type === 'kaffarah_intentional' ? 'کفاره عمد' : 'کفاره غیرعمد'}
-                            </h4>
-                            <div className="flex items-center gap-2 text-xs text-secondary-theme mt-0.5 font-medium">
-                              <span>{formatDate(record.paymentDate)}</span>
-                              {record.peopleCount && (
-                                <>
+                    <>
+                      <p className="text-[11px] text-center text-secondary-theme/80 font-medium mb-1">
+                        برای حذف هر مورد، کارت را به سمت چپ بکشید
+                      </p>
+                      {financialHistory?.map(record => (
+                        <SwipeToDeleteItem key={record.id} id={record.id!} onDelete={() => handleUndoFinancial(record.id!)}>
+                          <div className="flex items-center justify-between w-full p-3.5 sm:p-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                                record.type === 'fitriya' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
+                                record.type === 'kaffarah_intentional' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
+                                'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                              }`}>
+                                <Wheat className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-primary-theme">
+                                  {record.type === 'fitriya' ? 'فطریه' : record.type === 'kaffarah_intentional' ? 'کفاره عمد' : 'کفاره غیرعمد'}
+                                </h4>
+                                <div className="flex items-center gap-2 text-xs text-secondary-theme mt-0.5 font-medium">
+                                  <span>{formatDate(record.paymentDate)}</span>
+                                  {record.peopleCount && (
+                                    <>
+                                      <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+                                      <span>{formatPersianNumber(record.peopleCount)} نفر</span>
+                                    </>
+                                  )}
+                                  {record.quantity && (
+                                    <>
+                                      <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+                                      <span>{formatPersianNumber(record.quantity)} مورد</span>
+                                    </>
+                                  )}
                                   <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                                  <span>{formatPersianNumber(record.peopleCount)} نفر</span>
-                                </>
-                              )}
-                              {record.quantity && (
-                                <>
-                                  <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                                  <span>{formatPersianNumber(record.quantity)} مورد</span>
-                                </>
-                              )}
-                              <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{record.amount.toLocaleString('fa-IR')} تومان</span>
+                                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{record.amount.toLocaleString('fa-IR')} تومان</span>
+                                </div>
+                              </div>
                             </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUndoFinancial(record.id!);
+                              }}
+                              className="p-2 rounded-xl text-neutral-400 hover:text-rose-600 hover:bg-rose-500/10 active:scale-90 transition-all shrink-0 flex items-center gap-1"
+                              title="حذف"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleUndoFinancial(record.id!)}
-                          className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
-                        >
-                          <RotateCcw className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">لغو ثبت</span>
-                        </button>
-                      </div>
-                    ))
+                        </SwipeToDeleteItem>
+                      ))}
+                    </>
                   )
                 )}
               </div>

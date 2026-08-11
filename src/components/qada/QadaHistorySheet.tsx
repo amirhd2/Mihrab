@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, RotateCcw, Clock, Trash2, AlertTriangle } from 'lucide-react';
+import { X, Clock, Trash2, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { QadaHistoryRecord, PrayerType } from '../../types/db';
 import { PrayerIconContainer } from './PrayerIcons';
 import { formatPersianNumber } from '../../utils/persianUtils';
+import { SwipeToDeleteItem } from '../SwipeToDeleteItem';
 
 interface QadaHistorySheetProps {
   isOpen: boolean;
@@ -129,7 +130,7 @@ export const QadaHistorySheet: React.FC<QadaHistorySheetProps> = ({
               </div>
 
               {/* List Content */}
-              <div className="overflow-y-auto flex-1 space-y-3 pr-1 pl-1">
+              <div className="overflow-y-auto flex-1 space-y-2 pr-1 pl-1">
                 {historyRecords.length === 0 ? (
                   <div className="py-12 text-center text-secondary-theme">
                     <Clock className="w-10 h-10 mx-auto mb-3 opacity-30 text-neutral-400" />
@@ -141,39 +142,50 @@ export const QadaHistorySheet: React.FC<QadaHistorySheetProps> = ({
                     </p>
                   </div>
                 ) : (
-                  historyRecords.map((record) => (
-                    <div
-                      key={record.id || `${record.prayerType}-${record.timestamp}`}
-                      className="flex items-center justify-between p-3.5 rounded-2xl bg-surface-elevated/50 border border-neutral-200/80 dark:border-neutral-800/80"
-                    >
-                      {/* Right: Icon & Prayer Name */}
-                      <div className="flex items-center gap-3">
-                        <PrayerIconContainer type={record.prayerType} />
-                        <div>
-                          <h4 className="text-sm font-bold text-primary-theme">
-                            {PRAYER_NAMES[record.prayerType]}
-                          </h4>
-                          <div className="flex items-center gap-2 text-xs text-secondary-theme mt-0.5 font-medium">
-                            <span>{formatDateTimeFa(record.timestamp)}</span>
-                            <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
-                              باقیمانده: {formatPersianNumber(record.remainingCount)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Left: Undo Button */}
-                      <button
-                        type="button"
-                        onClick={() => onUndoRecord(record)}
-                        className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shrink-0"
+                  <>
+                    <p className="text-[11px] text-center text-secondary-theme/80 font-medium mb-1">
+                      برای حذف هر مورد، کارت را به سمت چپ بکشید
+                    </p>
+                    {historyRecords.map((record) => (
+                      <SwipeToDeleteItem
+                        key={record.id || `${record.prayerType}-${record.timestamp}`}
+                        id={record.id || `${record.prayerType}-${record.timestamp}`}
+                        onDelete={() => onUndoRecord(record)}
                       >
-                        <RotateCcw className="w-3.5 h-3.5" />
-                        <span>لغو ثبت</span>
-                      </button>
-                    </div>
-                  ))
+                        <div className="flex items-center justify-between w-full p-3.5 sm:p-4">
+                          {/* Right: Icon & Prayer Name */}
+                          <div className="flex items-center gap-3">
+                            <PrayerIconContainer type={record.prayerType} />
+                            <div>
+                              <h4 className="text-sm font-bold text-primary-theme">
+                                {PRAYER_NAMES[record.prayerType]}
+                              </h4>
+                              <div className="flex items-center gap-2 text-xs text-secondary-theme mt-0.5 font-medium">
+                                <span>{formatDateTimeFa(record.timestamp)}</span>
+                                <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+                                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                                  باقیمانده: {formatPersianNumber(record.remainingCount)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Left: Quick Delete Icon */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onUndoRecord(record);
+                            }}
+                            className="p-2 rounded-xl text-neutral-400 hover:text-rose-600 hover:bg-rose-500/10 active:scale-90 transition-all shrink-0 flex items-center gap-1"
+                            title="حذف"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </SwipeToDeleteItem>
+                    ))}
+                  </>
                 )}
               </div>
             </motion.div>
