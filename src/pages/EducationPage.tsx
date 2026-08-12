@@ -8,6 +8,7 @@ import { EducationCard } from '../components/education/EducationCard';
 import { EducationReadingView } from '../components/education/EducationReadingView';
 import { EducationFormModal } from '../components/education/EducationFormModal';
 import { TagManagerModal } from '../components/education/TagManagerModal';
+import { Dialog } from '../components/Dialog';
 import { Plus, Tag as TagIcon, BookOpen, SlidersHorizontal, FileText, SearchX } from 'lucide-react';
 import { ToastAction, ToastType } from '../hooks/useToast';
 
@@ -44,6 +45,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
   const [editingItem, setEditingItem] = useState<EducationContentRecord | null>(null);
 
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<EducationContentRecord | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Derived active reading item based on URL article search param
@@ -117,8 +119,8 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
     await loadData();
   };
 
-  // Handle Delete with Undo
-  const handleDeleteContent = async (item: EducationContentRecord) => {
+  // Confirm and delete item with undo toast
+  const confirmDeleteContent = async (item: EducationContentRecord) => {
     if (!item.id) return;
 
     try {
@@ -138,7 +140,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
           onClick: async () => {
             await EducationService.restoreContent(item);
             await loadData();
-            if (onShowToast) onShowToast('مطلب بازیابی شد', 'success');
+            if (onShowToast) onShowToast('مطلب بازگردانده شد', 'success');
           },
         });
       }
@@ -146,6 +148,10 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
       console.error('Error deleting content:', err);
       if (onShowToast) onShowToast('خطا در حذف مطلب', 'error');
     }
+  };
+
+  const handleDeleteContent = (item: EducationContentRecord) => {
+    setItemToDelete(item);
   };
 
   // Tag Management handlers
@@ -232,41 +238,8 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
       </div>
 
       {/* Tag Filters Row + Tag Management Action */}
-      <div className="flex items-center gap-2">
-        {/* Scrollable Filter Chips */}
-        <div className="flex-1 overflow-x-auto no-scrollbar py-1 flex items-center gap-2 scroll-smooth">
-          <button
-            type="button"
-            onClick={() => setSelectedTag('همه')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 border ${
-              selectedTag === 'همه'
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
-            }`}
-          >
-            همه
-          </button>
-
-          {tags.map((tag) => {
-            const isSelected = selectedTag === tag.name;
-            return (
-              <button
-                key={tag.id || tag.name}
-                type="button"
-                onClick={() => setSelectedTag(tag.name)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
-                  isSelected
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                    : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
-                }`}
-              >
-                {tag.name}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Subtle Tag Management Button */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
+        {/* Tag Management Button */}
         <button
           type="button"
           onClick={() => setIsTagModalOpen(true)}
@@ -276,6 +249,40 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
           <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
           <span className="hidden sm:inline">مدیریت تگ‌ها</span>
         </button>
+
+        {/* Vertical Divider */}
+        <div className="w-px h-5 bg-neutral-200 dark:bg-neutral-700 shrink-0 mx-1" />
+
+        {/* Scrollable Filter Chips */}
+        <button
+          type="button"
+          onClick={() => setSelectedTag('همه')}
+          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 border ${
+            selectedTag === 'همه'
+              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+              : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
+          }`}
+        >
+          همه
+        </button>
+
+        {tags.map((tag) => {
+          const isSelected = selectedTag === tag.name;
+          return (
+            <button
+              key={tag.id || tag.name}
+              type="button"
+              onClick={() => setSelectedTag(tag.name)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
+                isSelected
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                  : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
+              }`}
+            >
+              {tag.name}
+            </button>
+          );
+        })}
       </div>
 
       {/* Main Content Grid / Empty States */}
@@ -377,6 +384,40 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
         onDeleteTag={handleDeleteTag}
         onSelectTagFilter={(tagName) => setSelectedTag(tagName)}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        isOpen={!!itemToDelete}
+        onClose={() => setItemToDelete(null)}
+        titleFa="تأیید حذف مطلب"
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => setItemToDelete(null)}
+              className="px-4 py-2 text-xs sm:text-sm font-semibold text-secondary-theme hover:bg-surface-elevated rounded-xl transition-colors"
+            >
+              انصراف
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (itemToDelete) {
+                  confirmDeleteContent(itemToDelete);
+                  setItemToDelete(null);
+                }
+              }}
+              className="px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors shadow-xs"
+            >
+              حذف مطلب
+            </button>
+          </>
+        }
+      >
+        <p className="text-right py-2 text-primary-theme">
+          آیا از حذف مطلب <span className="font-bold text-emerald-600 dark:text-emerald-400">«{itemToDelete?.title}»</span> اطمینان دارید؟
+        </p>
+      </Dialog>
     </div>
   );
 };

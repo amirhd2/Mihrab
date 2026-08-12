@@ -3,6 +3,7 @@ import { X, Plus, Check } from 'lucide-react';
 import { DuaRecord, DuaTagRecord } from '../../types/db';
 import { db } from '../../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { usePreventBodyScroll } from '../../hooks/usePreventBodyScroll';
 
 interface AddEditDuaModalProps {
   dua: DuaRecord | null;
@@ -11,6 +12,8 @@ interface AddEditDuaModalProps {
 }
 
 export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ dua, onClose, onSave }) => {
+  usePreventBodyScroll(true);
+
   const [title, setTitle] = useState('');
   const [arabicText, setArabicText] = useState('');
   const [persianTranslation, setPersianTranslation] = useState('');
@@ -72,8 +75,8 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ dua, onClose, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-neutral-900/40 backdrop-blur-sm" dir="rtl">
-      <div className="bg-surface-card w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl shadow-xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 bg-neutral-900/40 backdrop-blur-sm" dir="rtl">
+      <div className="bg-surface-card w-[calc(100%-1.75rem)] max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[85vh] my-auto overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
           <h2 className="text-lg font-bold text-primary-theme">

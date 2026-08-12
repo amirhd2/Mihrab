@@ -10,9 +10,17 @@ interface DuaCardProps {
 }
 
 export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => {
-  // Use Persian translation snippet if available, else fallback to Arabic snippet
-  const snippet = dua.persianTranslation || dua.arabicText;
-  const textSnippet = snippet.length > 80 ? snippet.slice(0, 80).trim() + '...' : snippet;
+  // Truncate Arabic text to line 1 limit (~75 chars to fill ~90% of line)
+  const arabicSnippet = dua.arabicText.length > 75
+    ? dua.arabicText.slice(0, 75).trim() + '...'
+    : dua.arabicText;
+
+  // Truncate Persian translation to lines 2&3 limit (~80 chars)
+  const persianSnippet = dua.persianTranslation
+    ? (dua.persianTranslation.length > 80
+        ? dua.persianTranslation.slice(0, 80).trim() + '...'
+        : dua.persianTranslation)
+    : null;
 
   return (
     <div className="relative h-[190px] sm:h-[200px] w-full">
@@ -28,7 +36,7 @@ export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => 
           {/* Top Section: Header at Top-Right & Text Snippet */}
           <div>
             {/* Header (Top Right) */}
-            <div className="flex items-start justify-between gap-2 mb-2">
+            <div className="flex items-start justify-between gap-2 mb-3">
               <div className="flex items-center gap-1 flex-1 min-w-0">
                 <h3 className="text-base sm:text-lg font-bold text-primary-theme text-right group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1 truncate">
                   {dua.title}
@@ -40,10 +48,17 @@ export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => 
               <ChevronLeft className="w-4 h-4 text-muted-theme group-hover:text-emerald-500 group-hover:-translate-x-1 transition-all shrink-0 mt-1" />
             </div>
 
-            {/* Snippet Preview (Max 80 chars) */}
-            <p className="text-xs sm:text-sm text-secondary-theme leading-relaxed text-right line-clamp-3">
-              {textSnippet}
-            </p>
+            {/* Snippet Preview: Line 1 = Arabic, Lines 2 & 3 = Persian */}
+            <div className="space-y-2 sm:space-y-2.5 text-right mt-1.5" dir="rtl">
+              <p className="text-base sm:text-lg font-arabic font-semibold text-primary-theme/90 leading-snug line-clamp-1 truncate">
+                {arabicSnippet}
+              </p>
+              {persianSnippet ? (
+                <p className="text-[11px] sm:text-xs text-secondary-theme leading-relaxed line-clamp-2">
+                  {persianSnippet}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           {/* Footer: Source on Right, Tags on Bottom Left (Left Aligned) */}

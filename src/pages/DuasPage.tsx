@@ -10,6 +10,7 @@ import { AddEditDuaModal } from '../components/duas/AddEditDuaModal';
 import { TagManagerModal } from '../components/duas/TagManagerModal';
 import { DuaReadingView } from '../components/duas/DuaReadingView';
 import { SwipeToDeleteItem } from '../components/SwipeToDeleteItem';
+import { Dialog } from '../components/Dialog';
 import { useToastState } from '../hooks/useToast';
 
 interface DuasPageProps {
@@ -25,6 +26,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
   const [editingDua, setEditingDua] = useState<DuaRecord | null>(null);
   
   const [isTagManagerOpen, setIsTagManagerOpen] = useState(false);
+  const [duaToDelete, setDuaToDelete] = useState<DuaRecord | null>(null);
   
   const [searchParams, setSearchParams] = useSearchParams();
   const readingDuaId = searchParams.get('dua');
@@ -93,13 +95,13 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
     setEditingDua(null);
   };
 
-  const handleDeleteDua = async (id: number) => {
-    const dua = await db.duaContents.get(id);
-    if (!dua) return;
+  const confirmDeleteDua = async (dua: DuaRecord) => {
+    if (!dua.id) return;
+    const deletedId = dua.id;
     
-    await db.duaContents.delete(id);
+    await db.duaContents.delete(deletedId);
     
-    onShowToast('دعا حذف شد', 'success', 3500, {
+    onShowToast('دعا حذف شد', 'success', 4000, {
       label: 'بازگردانی',
       onClick: async () => {
         await db.duaContents.put(dua);
@@ -107,8 +109,15 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
       }
     });
     
-    if (readingDua?.id === id) {
+    if (readingDua?.id === deletedId) {
       setSearchParams({}, { replace: true });
+    }
+  };
+
+  const handleDeleteDua = (id: number) => {
+    const dua = duas.find(d => d.id === id);
+    if (dua) {
+      setDuaToDelete(dua);
     }
   };
 
@@ -230,8 +239,8 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
       )}
 
       {isTagManagerOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-sm sm:backdrop-blur-md transition-opacity">
-          <div className="w-full sm:max-w-md h-[80vh] sm:h-[600px] bg-surface-bg sm:rounded-3xl shadow-2xl flex flex-col relative overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-4 sm:zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 bg-black/40 backdrop-blur-sm sm:backdrop-blur-md transition-opacity">
+          <div className="w-[calc(100%-1.75rem)] max-w-md h-[80vh] sm:h-[600px] bg-surface-bg rounded-3xl shadow-2xl flex flex-col relative overflow-hidden my-auto animate-in zoom-in-95 duration-200">
             <TagManagerModal 
               onClose={() => setIsTagManagerOpen(false)} 
               onSelectTagFilter={(tag) => setActiveTag(tag)}
@@ -239,6 +248,40 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        isOpen={!!duaToDelete}
+        onClose={() => setDuaToDelete(null)}
+        titleFa="تأیید حذف دعا"
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => setDuaToDelete(null)}
+              className="px-4 py-2 text-xs sm:text-sm font-semibold text-secondary-theme hover:bg-surface-elevated rounded-xl transition-colors"
+            >
+              انصراف
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (duaToDelete) {
+                  confirmDeleteDua(duaToDelete);
+                  setDuaToDelete(null);
+                }
+              }}
+              className="px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors shadow-xs"
+            >
+              حذف دعا
+            </button>
+          </>
+        }
+      >
+        <p className="text-right py-2 text-primary-theme">
+          آیا از حذف دعای <span className="font-bold text-emerald-600 dark:text-emerald-400">«{duaToDelete?.title}»</span> اطمینان دارید؟
+        </p>
+      </Dialog>
 
       {/* Reading View Overlay */}
       {readingDua && (

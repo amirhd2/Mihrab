@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Tag as TagIcon, Check, BookOpen } from 'lucide-react';
+import { X, Plus, Check } from 'lucide-react';
 import { EducationContentRecord, EducationTagRecord } from '../../types/db';
+import { usePreventBodyScroll } from '../../hooks/usePreventBodyScroll';
 
 interface EducationFormModalProps {
   isOpen: boolean;
@@ -19,13 +20,15 @@ export const EducationFormModal: React.FC<EducationFormModalProps> = ({
   availableTags,
   onAddNewTag,
 }) => {
+  usePreventBodyScroll(isOpen);
+
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [source, setSource] = useState('');
 
   const [newTagInput, setNewTagInput] = useState('');
-  const [isAddingTagInline, setIsAddingTagInline] = useState(false);
+  const [showTagSelector, setShowTagSelector] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -63,22 +66,14 @@ export const EducationFormModal: React.FC<EducationFormModalProps> = ({
         setSelectedTags([...selectedTags, tagRecord.name]);
       }
       setNewTagInput('');
-      setIsAddingTagInline(false);
     } catch (err: any) {
       setErrorMsg(err.message || 'خطا در ایجاد تگ جدید');
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim()) {
-      setErrorMsg('لطفاً عنوان مطلب را وارد کنید');
-      return;
-    }
-    if (!text.trim()) {
-      setErrorMsg('لطفاً متن اصلی مطلب را وارد کنید');
-      return;
-    }
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!title.trim() || !text.trim()) return;
 
     setErrorMsg('');
     setIsSubmitting(true);
@@ -98,29 +93,24 @@ export const EducationFormModal: React.FC<EducationFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200" dir="rtl">
-      <div className="bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 bg-neutral-900/40 backdrop-blur-sm" dir="rtl">
+      <div className="bg-surface-card w-[calc(100%-1.75rem)] max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[85vh] my-auto overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="px-5 py-4 border-b border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between bg-surface-elevated/40">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <h2 className="text-base font-bold text-primary-theme">
-              {initialData ? 'ویرایش مطلب' : 'افزودن مطلب جدید'}
-            </h2>
-          </div>
+        <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
+          <h2 className="text-lg font-bold text-primary-theme">
+            {initialData ? 'ویرایش مطلب' : 'افزودن مطلب'}
+          </h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated rounded-full transition-colors"
+            className="p-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
+        {/* Scrollable Form */}
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
           {errorMsg && (
             <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-red-600 dark:text-red-400 font-medium">
               {errorMsg}
@@ -128,134 +118,124 @@ export const EducationFormModal: React.FC<EducationFormModalProps> = ({
           )}
 
           {/* Title Field */}
-          <div>
-            <label className="block text-xs font-bold text-primary-theme mb-1.5">
-              عنوان <span className="text-red-500">*</span>
-            </label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">عنوان</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="مثلاً: احکام وضو یا آموزش نماز صبح"
-              className="w-full bg-surface-bg border border-neutral-200/90 dark:border-neutral-700/80 rounded-2xl px-4 py-2.5 text-sm text-primary-theme placeholder:text-muted-theme focus:outline-hidden focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              placeholder="مثال: احکام وضو یا آموزش نماز صبح"
             />
           </div>
 
           {/* Main Text Area */}
-          <div>
-            <label className="block text-xs font-bold text-primary-theme mb-1.5">
-              متن اصلی <span className="text-red-500">*</span>
-            </label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">متن اصلی</label>
             <textarea
-              rows={8}
               value={text}
               onChange={(e) => setText(e.target.value)}
+              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all min-h-[120px] leading-relaxed resize-none"
               placeholder="متن آموزش یا حکم شرعی را وارد کنید..."
-              className="w-full bg-surface-bg border border-neutral-200/90 dark:border-neutral-700/80 rounded-2xl p-4 text-sm text-primary-theme placeholder:text-muted-theme focus:outline-hidden focus:ring-2 focus:ring-emerald-500/40 leading-relaxed resize-y"
             />
           </div>
 
-          {/* Tags Selection & Addition */}
-          <div>
-            <label className="block text-xs font-bold text-primary-theme mb-2">
-              تگ‌ها
-            </label>
-            <div className="flex flex-wrap gap-2 items-center">
-              {availableTags.map((tag) => {
-                const isSelected = selectedTags.includes(tag.name);
-                return (
-                  <button
-                    key={tag.id || tag.name}
-                    type="button"
-                    onClick={() => toggleTag(tag.name)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 border ${
-                      isSelected
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                        : 'bg-surface-bg text-secondary-theme border-neutral-200/80 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'
-                    }`}
-                  >
-                    {isSelected && <Check className="w-3.5 h-3.5 stroke-[2.5]" />}
-                    {tag.name}
-                  </button>
-                );
-              })}
-
-              {/* Inline Add Tag */}
-              {isAddingTagInline ? (
-                <div className="flex items-center gap-1">
-                  <input
-                    type="text"
-                    value={newTagInput}
-                    onChange={(e) => setNewTagInput(e.target.value)}
-                    placeholder="نام تگ جدید"
-                    className="bg-surface-bg border border-emerald-500 rounded-xl px-2.5 py-1 text-xs text-primary-theme focus:outline-hidden"
-                    autoFocus
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleCreateInlineTag();
-                      }
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={handleCreateInlineTag}
-                    className="px-2 py-1 bg-emerald-600 text-white text-xs font-medium rounded-xl hover:bg-emerald-700"
-                  >
-                    ثبت
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsAddingTagInline(false)}
-                    className="p-1 text-secondary-theme hover:bg-surface-elevated rounded-xl"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setIsAddingTagInline(true)}
-                  className="px-3 py-1.5 rounded-xl text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 transition-all flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  افزودن تگ جدید
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Optional Source */}
-          <div>
-            <label className="block text-xs font-bold text-primary-theme mb-1.5">
-              منبع <span className="text-muted-theme font-normal">(اختیاری)</span>
-            </label>
+          {/* Source Field */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">منبع (اختیاری)</label>
             <input
               type="text"
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              placeholder="مثلاً: توضیح المسائل آیت‌الله سیستانی"
-              className="w-full bg-surface-bg border border-neutral-200/90 dark:border-neutral-700/80 rounded-2xl px-4 py-2.5 text-sm text-primary-theme placeholder:text-muted-theme focus:outline-hidden focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              placeholder="مثال: توضیح المسائل آیت‌الله سیستانی"
             />
           </div>
-        </form>
+
+          {/* Tags Selection */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">تگ‌ها</label>
+              <button
+                type="button"
+                onClick={() => setShowTagSelector(!showTagSelector)}
+                className="text-xs text-emerald-600 font-medium hover:text-emerald-700"
+              >
+                {showTagSelector ? 'بستن انتخاب تگ' : 'انتخاب از تگ‌های موجود'}
+              </button>
+            </div>
+
+            {selectedTags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {selectedTags.map(tag => (
+                  <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-700 dark:text-emerald-400 text-xs rounded-full border border-emerald-200 dark:border-emerald-800">
+                    {tag}
+                    <button type="button" onClick={() => toggleTag(tag)} className="hover:text-emerald-900 dark:hover:text-emerald-200">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {showTagSelector && (
+              <div className="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl p-3 space-y-3">
+                {availableTags.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {availableTags.map(tag => {
+                      const isSelected = selectedTags.includes(tag.name);
+                      return (
+                        <button
+                          key={tag.id || tag.name}
+                          type="button"
+                          onClick={() => toggleTag(tag.name)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                            isSelected 
+                              ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 border-emerald-200 dark:border-emerald-800' 
+                              : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300'
+                          }`}
+                        >
+                          {isSelected && <Check className="w-3.5 h-3.5" />}
+                          {tag.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-neutral-500 text-center py-2">هیچ تگی وجود ندارد.</p>
+                )}
+                <div className="flex items-center gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-700">
+                  <input
+                    type="text"
+                    value={newTagInput}
+                    onChange={(e) => setNewTagInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCreateInlineTag(); } }}
+                    placeholder="ایجاد تگ جدید..."
+                    className="flex-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCreateInlineTag}
+                    disabled={!newTagInput.trim()}
+                    className="p-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 rounded-lg hover:bg-neutral-200 disabled:opacity-50 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-neutral-200/80 dark:border-neutral-800 flex items-center justify-end gap-3 bg-surface-elevated/30">
+        <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 shrink-0 bg-surface-card pb-safe">
           <button
             type="button"
-            onClick={onClose}
-            className="px-5 py-2.5 bg-surface-elevated hover:bg-neutral-200 dark:hover:bg-neutral-800 text-primary-theme text-sm font-medium rounded-2xl transition-colors"
+            onClick={() => handleSubmit()}
+            disabled={!title.trim() || !text.trim() || isSubmitting}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-neutral-300 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-xl transition-colors shadow-sm"
           >
-            انصراف
-          </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-2xl shadow-md transition-all active:scale-95 disabled:opacity-40"
-          >
-            {isSubmitting ? 'در حال ذخیره...' : 'ذخیره مطلب'}
+            {isSubmitting ? 'در حال ذخیره...' : 'ذخیره'}
           </button>
         </div>
       </div>

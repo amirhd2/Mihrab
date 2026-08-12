@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronRight, MoreHorizontal, Star, Edit3, Trash2, Copy, Share2, Heart, Type } from 'lucide-react';
+import { ChevronRight, MoreVertical, Star, Edit3, Trash2, Copy, Share2, Heart, Type } from 'lucide-react';
 import { DuaRecord, DuaTagRecord } from '../../types/db';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -98,14 +98,27 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
           <button
             onClick={() => onToggleFavorite(dua.id!)}
             className="p-2 text-amber-500 hover:bg-amber-50 rounded-full transition-colors dark:hover:bg-amber-500/10"
+            title="علامت‌گذاری"
           >
             <Star className="w-6 h-6" fill={dua.isFavorite ? 'currentColor' : 'none'} />
           </button>
           <button
+            onClick={() => {
+              onClose();
+              onEdit(dua);
+            }}
+            className="p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors dark:text-neutral-400 dark:hover:bg-neutral-800"
+            title="ویرایش"
+            aria-label="ویرایش"
+          >
+            <Edit3 className="w-5.5 h-5.5" />
+          </button>
+          <button
             onClick={() => setShowMenu(!showMenu)}
             className="p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors dark:text-neutral-400 dark:hover:bg-neutral-800"
+            title="گزینه‌های بیشتر"
           >
-            <MoreHorizontal className="w-6 h-6" />
+            <MoreVertical className="w-6 h-6" />
           </button>
 
           {/* 3-dot Menu */}
@@ -117,14 +130,6 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
                 exit={{ opacity: 0, scale: 0.95 }}
                 className="absolute top-12 left-2 w-48 bg-surface-card rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden z-50"
               >
-                <button
-                  onClick={() => { setShowMenu(false); onEdit(dua); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-right hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                >
-                  <Edit3 className="w-5 h-5 text-neutral-500" />
-                  <span className="text-sm font-medium">ویرایش</span>
-                </button>
-                <div className="h-px bg-neutral-200 dark:bg-neutral-800 w-full" />
                 <button
                   onClick={() => { setShowMenu(false); if (dua.id) onDelete(dua.id); }}
                   className="w-full flex items-center gap-3 px-4 py-3 text-right hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors text-red-600"
