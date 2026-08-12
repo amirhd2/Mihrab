@@ -56,6 +56,24 @@ export interface EducationBookmark {
   bookmarkedAt: string;
 }
 
+export interface DuaRecord {
+  id?: number;
+  title: string;
+  arabicText: string;
+  persianTranslation: string;
+  source?: string;
+  tags: string[];
+  isFavorite: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DuaTagRecord {
+  id?: number;
+  name: string;
+  createdAt: string;
+}
+
 export interface EducationContentRecord {
   id?: number;
   title: string;

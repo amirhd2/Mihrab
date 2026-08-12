@@ -44,7 +44,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
     wrapper.style.opacity = '';
     wrapper.classList.remove('wrapper-animating');
     card.style.transform = '';
-    card.classList.remove('card-animating', 'rounded-2xl', 'shadow-lg', 'shadow-md');
+    card.classList.remove('card-animating', 'shadow-lg', 'shadow-md');
     deleteBtn.style.opacity = '0';
     deleteBtn.style.transform = 'scale(0.5)';
     deleteBtn.style.width = `${BTN_BASE_SIZE}px`;
@@ -129,7 +129,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
 
       setTimeout(() => {
         if (!isOpen && !isDragging) {
-          card.classList.remove('rounded-2xl', 'shadow-lg', 'shadow-md');
+          card.classList.remove('shadow-lg', 'shadow-md');
         }
       }, 350);
     };
@@ -233,12 +233,21 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       triggerFullDelete();
     };
 
+    const onClick = (e: MouseEvent) => {
+      if (isOpen || isSlopPassed) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    };
+
     deleteBtn.addEventListener('click', handleBtnClick);
+    card.addEventListener('click', onClick, true); // Capture phase
     card.addEventListener('touchstart', onTouchStart as any, { passive: true });
     card.addEventListener('mousedown', onTouchStart as any);
 
     return () => {
       deleteBtn.removeEventListener('click', handleBtnClick);
+      card.removeEventListener('click', onClick, true);
       card.removeEventListener('touchstart', onTouchStart as any);
       card.removeEventListener('mousedown', onTouchStart as any);
       window.removeEventListener('touchmove', onTouchMove);
@@ -283,7 +292,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       {/* Foreground Content Card */}
       <div
         ref={cardRef}
-        className="card-content absolute inset-0 z-10 bg-surface-card rounded-2xl flex items-center justify-between cursor-grab active:cursor-grabbing border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs"
+        className="card-content relative z-10 w-full h-full bg-surface-card rounded-2xl flex items-center justify-between cursor-grab active:cursor-grabbing border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs hover:shadow-md transition-shadow duration-200"
       >
         <div className="w-full h-full flex flex-col justify-between">{children}</div>
       </div>

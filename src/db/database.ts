@@ -15,6 +15,8 @@ import {
   FinancialHistory,
   EducationContentRecord,
   EducationTagRecord,
+  DuaRecord,
+  DuaTagRecord,
 } from '../types/db';
 
 export class MihrabDatabase extends Dexie {
@@ -33,6 +35,8 @@ export class MihrabDatabase extends Dexie {
   financialHistory!: Table<FinancialHistory, number>;
   educationContents!: Table<EducationContentRecord, number>;
   educationTags!: Table<EducationTagRecord, number>;
+  duaContents!: Table<DuaRecord, number>;
+  duaTags!: Table<DuaTagRecord, number>;
 
   constructor() {
     super('MihrabDatabase');
@@ -63,6 +67,12 @@ export class MihrabDatabase extends Dexie {
       educationContents: '++id, title, *tags, createdAt, updatedAt',
       educationTags: '++id, &name, createdAt',
     });
+
+    // Version 4 Schema for Duas Library
+    this.version(4).stores({
+      duaContents: '++id, title, *tags, isFavorite, createdAt, updatedAt',
+      duaTags: '++id, &name, createdAt',
+    });
   }
 
   // Helper method to seed initial database records if empty
@@ -71,12 +81,12 @@ export class MihrabDatabase extends Dexie {
     if (prayerCount === 0) {
       const now = new Date().toISOString();
       await this.qadaPrayers.bulkAdd([
-        { prayerType: 'fajr', count: 125, completedCount: 0, updatedAt: now },
-        { prayerType: 'dhuhr', count: 98, completedCount: 0, updatedAt: now },
-        { prayerType: 'asr', count: 76, completedCount: 0, updatedAt: now },
-        { prayerType: 'maghrib', count: 64, completedCount: 0, updatedAt: now },
-        { prayerType: 'isha', count: 55, completedCount: 0, updatedAt: now },
-        { prayerType: 'ayat', count: 12, completedCount: 0, updatedAt: now },
+        { prayerType: 'fajr', count: 0, completedCount: 0, updatedAt: now },
+        { prayerType: 'dhuhr', count: 0, completedCount: 0, updatedAt: now },
+        { prayerType: 'asr', count: 0, completedCount: 0, updatedAt: now },
+        { prayerType: 'maghrib', count: 0, completedCount: 0, updatedAt: now },
+        { prayerType: 'isha', count: 0, completedCount: 0, updatedAt: now },
+        { prayerType: 'ayat', count: 0, completedCount: 0, updatedAt: now },
       ]);
     } else {
       // Check if ayat prayer is missing in existing DB
@@ -84,11 +94,20 @@ export class MihrabDatabase extends Dexie {
       if (!ayat) {
         await this.qadaPrayers.add({
           prayerType: 'ayat',
-          count: 12,
+          count: 0,
           completedCount: 0,
           updatedAt: new Date().toISOString(),
         });
       }
+    }
+
+    const fastingState = await this.qadaFastingState.get('current');
+    if (!fastingState) {
+      await this.qadaFastingState.put({
+        id: 'current',
+        count: 0,
+        updatedAt: new Date().toISOString(),
+      });
     }
 
     const prefCount = await this.preferences.count();
@@ -96,7 +115,7 @@ export class MihrabDatabase extends Dexie {
       const now = new Date().toISOString();
       await this.preferences.bulkAdd([
         { key: 'themeMode', value: 'system', updatedAt: now },
-        { key: 'appVersion', value: '1.0.0', updatedAt: now },
+        { key: 'appVersion', value: '1.2.0', updatedAt: now },
         { key: 'installedAt', value: now, updatedAt: now },
       ]);
     }
@@ -178,6 +197,94 @@ export class MihrabDatabase extends Dexie {
 در غسل ترتیبی ابتدا سر و گردن، سپس نیمه راست بدن و در نهایت نیمه چپ بدن شسته می‌شود.`,
           tags: ['احکام', 'آموزش'],
           source: 'توضیح المسائل',
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]);
+    }
+
+    // Seed default Dua Tags if empty
+    const duaTagCount = await this.duaTags.count();
+    if (duaTagCount === 0) {
+      const now = new Date().toISOString();
+      const defaultDuaTags = ['نماز', 'روزه', 'صبح', 'شب', 'مناسبتها', 'استغفار', 'زیارت'];
+      for (const name of defaultDuaTags) {
+        await this.duaTags.add({ name, createdAt: now });
+      }
+    }
+
+    // Seed default Duas if empty
+    const duaContentCount = await this.duaContents.count();
+    if (duaContentCount === 0) {
+      const now = new Date().toISOString();
+      await this.duaContents.bulkAdd([
+        {
+          title: 'دعای بعد از نماز',
+          arabicText: 'اللَّهُمَّ رَبَّنَا وَتَقَبَّلْ صَلاَتَنَا وَاغْفِرْ لَنَا وَارْحَمْنَا وَأَنْتَ خَيْرُ الرَّاحِمِينَ',
+          persianTranslation: 'پروردگارا، ای خدای ما، نماز ما را بپذیر و ما را ببخش و به ما رحم کن که تو بهترین رحم‌کنندگانی.',
+          source: 'مفاتیح الجنان',
+          tags: ['نماز'],
+          isFavorite: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          title: 'دعای روزه',
+          arabicText: 'اللَّهُمَّ إِنِّي لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ وَعَلَيْكَ تَوَكَّلْتُ',
+          persianTranslation: 'خدایا، برای تو روزه گرفتم و به تو ایمان آوردم و با روزی تو افطار کردم و بر تو توکل نمودم.',
+          source: 'مفاتیح الجنان',
+          tags: ['روزه'],
+          isFavorite: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          title: 'دعای صبح',
+          arabicText: 'اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ',
+          persianTranslation: 'خدایا، تو به صبح رسیدیم و به شام رسیدیم و به تو زنده‌ایم و به تو می‌میریم و بازگشت به سوی توست.',
+          source: 'مفاتیح الجنان',
+          tags: ['صبح'],
+          isFavorite: false,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          title: 'دعای کمیل',
+          arabicText: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ بِرَحْمَتِكَ الَّتِي وَسِعَتْ كُلَّ شَيْءٍ وَبِقُوَّتِكَ الَّتِي قَهَرْتَ بِهَا كُلَّ شَيْءٍ وَخَضَعَ لَهَا كُلُّ شَيْءٍ',
+          persianTranslation: 'خدایا، از تو می‌خواهم به نام رحمتت که همه چیز را فرا گرفته است و به نیرویت که با آن بر هر چیزی چیره شدی و همه چیز در برابرش خاضع گردید.',
+          source: 'مفاتیح الجنان',
+          tags: ['شب', 'مناسبتها'],
+          isFavorite: false,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          title: 'دعای عهد',
+          arabicText: 'اللَّهُمَّ رَبَّ النُّورِ الْعَظِيمِ وَرَبَّ الْكُرْسِيِّ الرَّفِيعِ وَرَبَّ الْبَحْرِ الْمَسْجُورِ وَمُنْزِلَ التَّوْرَاةِ وَالإِنْجِيلِ وَالزَّبُورِ',
+          persianTranslation: 'خدایا، ای پروردگار نور بزرگ و پروردگار تخت بلند و پروردگار دریای پرشده و نازل‌کننده تورات و انجیل و زبور.',
+          source: 'مفاتیح الجنان',
+          tags: ['صبح', 'مناسبتها'],
+          isFavorite: false,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          title: 'دعای ندبه',
+          arabicText: 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ وَصَلَّى اللَّهُ عَلَى سَيِّدِنَا مُحَمَّدٍ نَبِيِّهِ وَآلِهِ وَسَلَّمَ تَسْلِيماً',
+          persianTranslation: 'ستایش مخصوص خدای پروردگار جهانیان است و درود و سلام کامل خدا بر آقای ما محمد پیامبر او و خاندانش باد.',
+          source: 'مفاتیح الجنان',
+          tags: ['مناسبتها'],
+          isFavorite: false,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          title: 'دعای فرج',
+          arabicText: 'إِلَهِي عَظُمَ الْبَلاءُ وَبَرِحَ الْخَفَاءُ وَانْكَشَفَ الْغِطَاءُ وَانْقَطَعَ الرَّجَاءُ وَضَاقَتِ الأَرْضُ وَمُنِعَتِ السَّمَاءُ',
+          persianTranslation: 'خدایا! بلا و گرفتاری بزرگ شده و پوشیده آشکار گشته و پرده برافتاده و امید قطع شده و زمین تنگ گشته و آسمان بازداشته شده است.',
+          source: 'مفاتیح الجنان',
+          tags: ['نماز', 'مناسبتها'],
+          isFavorite: true,
           createdAt: now,
           updatedAt: now,
         },

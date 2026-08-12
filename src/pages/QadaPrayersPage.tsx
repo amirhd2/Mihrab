@@ -1,3 +1,4 @@
+import { usePreventBodyScroll } from '../hooks/usePreventBodyScroll';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -44,6 +45,8 @@ export const QadaPrayersPage: React.FC<{
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [singlePrayerCelebration, setSinglePrayerCelebration] = useState<PrayerType | null>(null);
   const [showAllCompletedModal, setShowAllCompletedModal] = useState(false);
+
+  usePreventBodyScroll(isHistoryOpen);
 
   // Live Query from Dexie Database
   const qadaPrayers = useLiveQuery(async () => {

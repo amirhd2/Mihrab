@@ -20,7 +20,7 @@ function AppRoutes({ showToast }: { showToast: any }) {
         <Route path="/prayers" element={<QadaPrayersPage onShowToast={showToast} />} />
         <Route path="/fasting" element={<FastingPage onShowToast={showToast} />} />
         <Route path="/fitr" element={<Navigate to="/fasting" replace />} />
-        <Route path="/duas" element={<DuasPage />} />
+        <Route path="/duas" element={<DuasPage onShowToast={showToast} />} />
         <Route path="/education" element={<EducationPage onShowToast={showToast} />} />
         <Route
           path="/settings"

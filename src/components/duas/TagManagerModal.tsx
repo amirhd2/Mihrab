@@ -1,99 +1,140 @@
 import { usePreventBodyScroll } from '../../hooks/usePreventBodyScroll';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { X, Plus, Edit2, Check, Tag as TagIcon, Layers } from 'lucide-react';
-import { EducationTagRecord } from '../../types/db';
+import { db } from '../../db/database';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { SwipeToDeleteItem } from '../SwipeToDeleteItem';
 import { Dialog } from '../Dialog';
 
 interface TagManagerModalProps {
-  isOpen: boolean;
   onClose: () => void;
-  tags: EducationTagRecord[];
-  tagUsageCounts: Record<string, number>;
-  onAddTag: (name: string) => Promise<any>;
-  onRenameTag: (oldName: string, newName: string) => Promise<void>;
-  onDeleteTag: (tagName: string) => Promise<void>;
   onSelectTagFilter?: (tagName: string) => void;
 }
 
 export const TagManagerModal: React.FC<TagManagerModalProps> = ({
-  isOpen,
   onClose,
-  tags,
-  tagUsageCounts,
-  onAddTag,
-  onRenameTag,
-  onDeleteTag,
   onSelectTagFilter,
 }) => {
   
-  usePreventBodyScroll(isOpen);
+  usePreventBodyScroll(true);
   const [newTagName, setNewTagName] = useState('');
   const [editingTagName, setEditingTagName] = useState<string | null>(null);
   const [editInputVal, setEditInputVal] = useState('');
-  const [deletingTagName, setDeletingTagName] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [deletingTagName, setDeletingTagName] = useState<string | null>(null);
 
-  if (!isOpen) return null;
+  const tags = useLiveQuery(() => db.duaTags.toArray()) || [];
+  const contents = useLiveQuery(() => db.duaContents.toArray()) || [];
+
+  const tagUsageCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    contents.forEach((item) => {
+      if (item.tags) {
+        item.tags.forEach((tag) => {
+          counts[tag] = (counts[tag] || 0) + 1;
+        });
+      }
+    });
+    return counts;
+  }, [contents]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTagName.trim()) return;
-    setErrorMsg('');
     try {
-      await onAddTag(newTagName.trim());
+      const exists = tags.some((t) => t.name === newTagName.trim());
+      if (exists) {
+        setErrorMsg('این تگ از قبل وجود دارد.');
+        return;
+      }
+      await db.duaTags.add({ name: newTagName.trim(), createdAt: new Date().toISOString() });
       setNewTagName('');
+      setErrorMsg('');
     } catch (err: any) {
-      setErrorMsg(err.message || 'خطا در افزودن تگ');
+      setErrorMsg('خطا در ثبت تگ.');
     }
   };
 
-  const handleStartRename = (tag: EducationTagRecord) => {
+  const handleStartRename = (tag: { name: string }) => {
     setEditingTagName(tag.name);
     setEditInputVal(tag.name);
+    setErrorMsg('');
   };
 
   const handleSaveRename = async (oldName: string) => {
-    if (!editInputVal.trim()) return;
-    setErrorMsg('');
-    try {
-      await onRenameTag(oldName, editInputVal.trim());
+    if (!editInputVal.trim() || editInputVal.trim() === oldName) {
       setEditingTagName(null);
-    } catch (err: any) {
-      setErrorMsg(err.message || 'خطا در ویرایش تگ');
+      return;
+    }
+    const newName = editInputVal.trim();
+    const exists = tags.some((t) => t.name === newName);
+    if (exists) {
+      setErrorMsg('این نام از قبل وجود دارد.');
+      return;
+    }
+    try {
+      // Find old tag and rename
+      const tagRecord = tags.find((t) => t.name === oldName);
+      if (tagRecord && tagRecord.id) {
+        await db.duaTags.update(tagRecord.id, { name: newName });
+      }
+      
+      // Update all contents using this tag
+      const itemsWithTag = contents.filter(c => c.tags && c.tags.includes(oldName));
+      for (const item of itemsWithTag) {
+        if (item.id) {
+          const newTags = item.tags!.map(t => t === oldName ? newName : t);
+          await db.duaContents.update(item.id, { tags: newTags });
+        }
+      }
+      setEditingTagName(null);
+      setErrorMsg('');
+    } catch (err) {
+      setErrorMsg('خطا در ویرایش تگ.');
     }
   };
 
   const handleConfirmDelete = async () => {
     if (!deletingTagName) return;
-    setErrorMsg('');
     try {
-      await onDeleteTag(deletingTagName);
+      const tagRecord = tags.find((t) => t.name === deletingTagName);
+      if (tagRecord && tagRecord.id) {
+        await db.duaTags.delete(tagRecord.id);
+      }
+      
+      // Remove tag from all contents
+      const itemsWithTag = contents.filter(c => c.tags && c.tags.includes(deletingTagName));
+      for (const item of itemsWithTag) {
+        if (item.id) {
+          const newTags = item.tags!.filter(t => t !== deletingTagName);
+          await db.duaContents.update(item.id, { tags: newTags });
+        }
+      }
       setDeletingTagName(null);
-    } catch (err: any) {
-      setErrorMsg(err.message || 'خطا در حذف تگ');
+    } catch (err) {
+      setErrorMsg('خطا در حذف تگ.');
     }
   };
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200" dir="rtl">
-        <div className="bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-          {/* Modal Header */}
-          <div className="px-5 py-4 border-b border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between bg-surface-elevated/40">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                <TagIcon className="w-5 h-5" />
+      <div className="flex flex-col h-full bg-surface-bg sm:rounded-3xl shadow-lg border-t sm:border border-neutral-200/50 dark:border-neutral-800/50 overflow-hidden" dir="rtl">
+        <div className="flex flex-col h-full relative">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-neutral-200/80 dark:border-neutral-800 bg-surface-card">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                <TagIcon className="w-4 h-4" />
               </div>
               <div>
                 <h2 className="text-base font-bold text-primary-theme">مدیریت تگ‌ها</h2>
-                <p className="text-xs text-secondary-theme">دسته‌بندی مطالب آموزش و احکام</p>
+                <p className="text-xs text-secondary-theme font-medium mt-0.5">افزودن و ویرایش دسته‌بندی‌ها</p>
               </div>
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="p-2 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated rounded-full transition-colors"
+              className="p-2 text-secondary-theme hover:bg-surface-elevated rounded-xl transition-colors active:scale-95"
             >
               <X className="w-5 h-5" />
             </button>
@@ -187,11 +228,11 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
                                 <span className="truncate">{tag.name}</span>
                               </button>
                             </div>
-
+                            
                             {/* Center: Usage Count Badge */}
                             <div className="flex-1 flex justify-center items-center px-1">
                               <span className="text-[11px] px-2.5 py-1 rounded-lg bg-surface-elevated text-secondary-theme font-medium shrink-0">
-                                {count} مطلب
+                                {count} دعا
                               </span>
                             </div>
 
@@ -256,7 +297,7 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
             آیا از حذف تگ «{deletingTagName}» اطمینان دارید؟
           </p>
           <p className="text-xs text-secondary-theme leading-relaxed">
-            با حذف این تگ، مطالب مربوط به آن حذف نخواهند شد و فقط این تگ از دسته‌بندی آن‌ها جدا می‌گردد.
+            با حذف این تگ، دعاهای مربوط به آن حذف نخواهند شد و فقط این تگ از دسته‌بندی آن‌ها جدا می‌گردد.
           </p>
         </div>
       </Dialog>

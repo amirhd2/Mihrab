@@ -1,3 +1,4 @@
+import { usePreventBodyScroll } from '../hooks/usePreventBodyScroll';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Check, CalendarCheck, Clock, List, ListFilter, X, Wheat, RotateCcw, Trash2, Calendar } from 'lucide-react';
@@ -38,6 +39,8 @@ export const FastingPage: React.FC<{
   const [showHistorySheet, setShowHistorySheet] = useState<'qaza' | 'financial' | null>(null);
   const [financialFilter, setFinancialFilter] = useState<'all' | 'fitriya' | 'kaffarah_intentional' | 'kaffarah_unintentional'>('all');
 
+  usePreventBodyScroll(showHistorySheet !== null);
+
   // Totals
   const fitriyaTotal = fitriyaPeople * fitriyaAmountPerPerson;
   const kaffarahTotal = (isKaffarahActive ? ((intentionalKaffarahCount * intentionalKaffarahAmount) + (unintentionalKaffarahCount * unintentionalKaffarahAmount)) : 0);
@@ -59,7 +62,7 @@ export const FastingPage: React.FC<{
         setQazaCount(qazaState.count);
         setLastQazaCompletedAt(qazaState.updatedAt);
       } else {
-        setQazaCount(42);
+        setQazaCount(0);
       }
     };
     loadData();

@@ -1,19 +1,43 @@
-import { QadaPrayerRecord, QadaHistoryRecord, FastingRecord, FitrKaffaraRecord, DuaBookmark, EducationBookmark, AppPreference, EducationContentRecord, EducationTagRecord } from './db';
+import {
+  QadaPrayerRecord,
+  QadaHistoryRecord,
+  FastingRecord,
+  FitrKaffaraRecord,
+  DuaBookmark,
+  EducationBookmark,
+  AppPreference,
+  EducationContentRecord,
+  EducationTagRecord,
+  QadaFastingState,
+  QadaFastingHistory,
+  FitriyaState,
+  KaffarahState,
+  FinancialHistory,
+  DuaRecord,
+  DuaTagRecord,
+} from './db';
 
 export interface MihrabBackupData {
   version: number;
   appName: 'Mihrab';
   exportedAt: string;
   data: {
-    qadaPrayers: QadaPrayerRecord[];
+    qadaPrayers?: QadaPrayerRecord[];
     qadaHistory?: QadaHistoryRecord[];
-    fastingLogs: FastingRecord[];
-    fitrLogs: FitrKaffaraRecord[];
-    duaBookmarks: DuaBookmark[];
-    educationBookmarks: EducationBookmark[];
+    qadaFastingState?: QadaFastingState[];
+    qadaFastingHistory?: QadaFastingHistory[];
+    fitriyaState?: FitriyaState[];
+    kaffarahState?: KaffarahState[];
+    financialHistory?: FinancialHistory[];
+    fastingLogs?: FastingRecord[];
+    fitrLogs?: FitrKaffaraRecord[];
+    duaBookmarks?: DuaBookmark[];
+    duaContents?: DuaRecord[];
+    duaTags?: DuaTagRecord[];
+    educationBookmarks?: EducationBookmark[];
     educationContents?: EducationContentRecord[];
     educationTags?: EducationTagRecord[];
-    preferences: AppPreference[];
+    preferences?: AppPreference[];
   };
 }
 
