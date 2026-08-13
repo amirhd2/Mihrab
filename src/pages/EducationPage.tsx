@@ -11,6 +11,7 @@ import { TagManagerModal } from '../components/education/TagManagerModal';
 import { Dialog } from '../components/Dialog';
 import { Plus, Tag as TagIcon, BookOpen, SlidersHorizontal, FileText, SearchX } from 'lucide-react';
 import { ToastAction, ToastType } from '../hooks/useToast';
+import { useMobileStickyScroll } from '../hooks/useMobileStickyScroll';
 
 interface EducationPageProps {
   onShowToast?: (message: string, type?: ToastType, duration?: number, action?: ToastAction) => void;
@@ -30,6 +31,7 @@ const normalizePersian = (str: string) => {
 };
 
 export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => {
+  const isStickyVisible = useMobileStickyScroll();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const articleId = searchParams.get('article');

@@ -22,6 +22,7 @@ import { PageHeader } from '../components/PageHeader';
 import { Card } from '../components/Card';
 import { NestedPrayerCard } from '../components/qada/NestedPrayerCard';
 import { QadaHistorySheet } from '../components/qada/QadaHistorySheet';
+import { useMobileStickyScroll } from '../hooks/useMobileStickyScroll';
 import { formatPersianNumber } from '../utils/persianUtils';
 
 const PRAYER_TITLES: Record<PrayerType, string> = {
@@ -37,6 +38,7 @@ export const QadaPrayersPage: React.FC<{
   onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning', duration?: number, action?: any) => void;
 }> = ({ onShowToast }) => {
   const navigate = useNavigate();
+  const isStickyVisible = useMobileStickyScroll();
 
   // Modal & Sheet States
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -268,7 +270,7 @@ export const QadaPrayersPage: React.FC<{
   };
 
   return (
-    <div dir="rtl" className="space-y-5 max-w-6xl mx-auto pb-12 select-none">
+    <div dir="rtl" className="space-y-5 max-w-6xl mx-auto pb-28 md:pb-12 select-none">
       {/* PAGE HEADER */}
       <PageHeader
         titleFa="نمازهای قضا"
@@ -447,9 +449,14 @@ export const QadaPrayersPage: React.FC<{
       </div>
 
       {/* MAIN STATUS SECTION AT BOTTOM */}
-      <Card className="p-3.5 sm:p-4 border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs">
-        <div className="grid grid-cols-3 items-center divide-x divide-x-reverse divide-neutral-200 dark:divide-neutral-800">
-          {/* SECTION 1 (RIGHT in RTL): کل باقیمانده */}
+      <div 
+        className={`md:static md:translate-y-0 fixed bottom-4 md:bottom-auto left-4 right-4 md:left-auto md:right-auto z-40 transition-transform duration-300 ease-in-out ${
+          isStickyVisible ? 'translate-y-0' : 'translate-y-[150%]'
+        }`}
+      >
+        <Card className="p-3.5 sm:p-4 border border-neutral-200/90 dark:border-neutral-800/80 shadow-lg md:shadow-xs">
+          <div className="grid grid-cols-3 items-center divide-x divide-x-reverse divide-neutral-200 dark:divide-neutral-800">
+            {/* SECTION 1 (RIGHT in RTL): کل باقیمانده */}
           <div className="flex items-center gap-2.5 sm:gap-3 justify-start pr-1 sm:pr-3">
             <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -496,7 +503,8 @@ export const QadaPrayersPage: React.FC<{
             </button>
           </div>
         </div>
-      </Card>
+        </Card>
+      </div>
 
       {/* HISTORY BOTTOM SHEET */}
       <QadaHistorySheet

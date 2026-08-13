@@ -19,6 +19,8 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showTopBar, setShowTopBar] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu on click outside
@@ -31,6 +33,30 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Handle scroll to hide/show top bar
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Don't hide if close to top
+      if (currentScrollY < 50) {
+        setShowTopBar(true);
+      } else {
+        // Show if scrolling up, hide if scrolling down
+        if (currentScrollY < lastScrollY) {
+          setShowTopBar(true);
+        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+          setShowTopBar(false);
+          setIsMenuOpen(false); // Close menu when hiding top bar
+        }
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   // Format text paragraphs and headings
   const renderFormattedText = (rawText: string) => {
@@ -109,7 +135,11 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6 pb-12 animate-in fade-in duration-200" dir="rtl">
       {/* iOS-Inspired Reading Top Bar */}
-      <div className="flex items-center justify-between pb-4 border-b border-neutral-200/80 dark:border-neutral-800 sticky top-0 bg-surface-bg/90 backdrop-blur-md z-20 pt-2">
+      <div 
+        className={`flex items-center justify-between pb-4 border-b border-neutral-200/80 dark:border-neutral-800 sticky top-0 bg-surface-bg z-20 pt-2 transition-transform duration-300 ${
+          showTopBar ? 'translate-y-0' : '-translate-y-[120%]'
+        }`}
+      >
         <button
           type="button"
           onClick={onBack}
@@ -146,7 +176,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
             </button>
 
             {isMenuOpen && (
-              <div className="absolute left-0 mt-2 w-48 bg-surface-card border border-neutral-200/90 dark:border-neutral-800 rounded-2xl shadow-xl py-1.5 z-30 animate-in zoom-in-95 duration-100">
+              <div className="absolute left-0 top-full mt-4 w-48 bg-surface-card border border-neutral-200/90 dark:border-neutral-800 rounded-2xl shadow-xl py-1.5 z-40 animate-in zoom-in-95 duration-100">
                 <button
                   type="button"
                   onClick={handleCopy}

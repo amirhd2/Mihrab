@@ -10,13 +10,16 @@ interface DuaCardProps {
 }
 
 export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => {
-  // Truncate Arabic text to line 1 limit (~75 chars to fill ~90% of line)
-  const arabicSnippet = dua.arabicText.length > 75
-    ? dua.arabicText.slice(0, 75).trim() + '...'
+  // Truncate Arabic text to line 1 limit (~55 chars) if Persian exists
+  const arabicSnippet1Line = dua.arabicText.length > 55
+    ? dua.arabicText.slice(0, 55).trim() + '...'
     : dua.arabicText;
 
+  // If no Persian, we show 3 lines of Arabic (line-clamp-3)
+  const showOnlyArabic = !dua.persianTranslation || dua.persianTranslation.trim() === '';
+
   // Truncate Persian translation to lines 2&3 limit (~80 chars)
-  const persianSnippet = dua.persianTranslation
+  const persianSnippet = !showOnlyArabic
     ? (dua.persianTranslation.length > 80
         ? dua.persianTranslation.slice(0, 80).trim() + '...'
         : dua.persianTranslation)
@@ -48,16 +51,22 @@ export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => 
               <ChevronLeft className="w-4 h-4 text-muted-theme group-hover:text-emerald-500 group-hover:-translate-x-1 transition-all shrink-0 mt-1" />
             </div>
 
-            {/* Snippet Preview: Line 1 = Arabic, Lines 2 & 3 = Persian */}
+            {/* Snippet Preview */}
             <div className="space-y-2 sm:space-y-2.5 text-right mt-1.5" dir="rtl">
-              <p className="text-base sm:text-lg font-arabic font-semibold text-primary-theme/90 leading-snug line-clamp-1 truncate">
-                {arabicSnippet}
-              </p>
-              {persianSnippet ? (
-                <p className="text-[11px] sm:text-xs text-secondary-theme leading-relaxed line-clamp-2">
-                  {persianSnippet}
+              {showOnlyArabic ? (
+                <p className="text-base sm:text-lg font-arabic font-semibold text-primary-theme/90 leading-snug line-clamp-3">
+                  {dua.arabicText}
                 </p>
-              ) : null}
+              ) : (
+                <>
+                  <p className="text-base sm:text-lg font-arabic font-semibold text-primary-theme/90 leading-snug line-clamp-1 truncate">
+                    {arabicSnippet1Line}
+                  </p>
+                  <p className="text-[11px] sm:text-xs text-secondary-theme leading-relaxed line-clamp-2">
+                    {persianSnippet}
+                  </p>
+                </>
+              )}
             </div>
           </div>
 

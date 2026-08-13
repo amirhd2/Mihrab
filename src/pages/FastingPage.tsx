@@ -10,11 +10,13 @@ import { Card } from '../components/Card';
 import { formatPersianNumber } from '../utils/persianUtils';
 import { db } from '../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useMobileStickyScroll } from '../hooks/useMobileStickyScroll';
 import { SwipeToDeleteItem } from '../components/SwipeToDeleteItem';
 
 export const FastingPage: React.FC<{
   onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning', duration?: number, action?: any) => void;
 }> = ({ onShowToast }) => {
+  const isStickyVisible = useMobileStickyScroll();
   // State for Qaza Fasting
   const [qazaCount, setQazaCount] = useState(0);
   const [lastQazaCompletedAt, setLastQazaCompletedAt] = useState<string | null>(null);
@@ -37,9 +39,10 @@ export const FastingPage: React.FC<{
   // Modals
   const [activeDatePicker, setActiveDatePicker] = useState<'fitriya' | 'kaffarah' | null>(null);
   const [showHistorySheet, setShowHistorySheet] = useState<'qaza' | 'financial' | null>(null);
+  const [isHistoryMenuOpen, setIsHistoryMenuOpen] = useState(false);
   const [financialFilter, setFinancialFilter] = useState<'all' | 'fitriya' | 'kaffarah_intentional' | 'kaffarah_unintentional'>('all');
 
-  usePreventBodyScroll(showHistorySheet !== null);
+  usePreventBodyScroll(showHistorySheet !== null || isHistoryMenuOpen);
 
   // Totals
   const fitriyaTotal = fitriyaPeople * fitriyaAmountPerPerson;
@@ -219,7 +222,7 @@ export const FastingPage: React.FC<{
   };
 
   return (
-    <div className="space-y-4 md:space-y-6 max-w-5xl mx-auto pb-24 md:pb-32">
+    <div className="space-y-4 md:space-y-6 max-w-5xl mx-auto pb-28 md:pb-32">
       <PageHeader
         titleFa="روزه‌های قضا"
         subtitleFa="مدیریت روزه‌های قضا و کفاره"
@@ -305,7 +308,8 @@ export const FastingPage: React.FC<{
                   inputMode="numeric"
                   value={fitriyaAmountPerPerson.toLocaleString('fa-IR')}
                   onChange={(e) => {
-                    const val = parseInt(e.target.value.replace(/,/g, '').replace(/[۰-۹]/g, d => '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)])) || 0;
+                    const str = e.target.value.replace(/[۰-۹]/g, d => '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)]).replace(/\D/g, '');
+                    const val = parseInt(str) || 0;
                     setFitriyaAmountPerPerson(val);
                   }}
                   onFocus={(e) => e.target.select()}
@@ -391,7 +395,8 @@ export const FastingPage: React.FC<{
                             inputMode="numeric"
                             value={intentionalKaffarahAmount.toLocaleString('fa-IR')}
                             onChange={(e) => {
-                              const val = parseInt(e.target.value.replace(/,/g, '').replace(/[۰-۹]/g, d => '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)])) || 0;
+                              const str = e.target.value.replace(/[۰-۹]/g, d => '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)]).replace(/\D/g, '');
+                              const val = parseInt(str) || 0;
                               setIntentionalKaffarahAmount(val);
                             }}
                             onFocus={(e) => e.target.select()}
@@ -431,7 +436,8 @@ export const FastingPage: React.FC<{
                             inputMode="numeric"
                             value={unintentionalKaffarahAmount.toLocaleString('fa-IR')}
                             onChange={(e) => {
-                              const val = parseInt(e.target.value.replace(/,/g, '').replace(/[۰-۹]/g, d => '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)])) || 0;
+                              const str = e.target.value.replace(/[۰-۹]/g, d => '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)]).replace(/\D/g, '');
+                              const val = parseInt(str) || 0;
                               setUnintentionalKaffarahAmount(val);
                             }}
                             onFocus={(e) => e.target.select()}
@@ -476,9 +482,14 @@ export const FastingPage: React.FC<{
       </div>
 
       {/* MAIN STATUS SECTION AT BOTTOM */}
-      <Card className="p-3.5 sm:p-4 border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs mt-6">
-        <div className="grid grid-cols-3 items-center divide-x divide-x-reverse divide-neutral-200 dark:divide-neutral-800">
-          {/* SECTION 1 (RIGHT in RTL): کل باقیمانده */}
+      <div 
+        className={`md:static md:translate-y-0 fixed bottom-4 md:bottom-auto left-4 right-4 md:left-auto md:right-auto z-40 transition-transform duration-300 ease-in-out ${
+          isStickyVisible ? 'translate-y-0' : 'translate-y-[150%]'
+        }`}
+      >
+        <Card className="p-3.5 sm:p-4 border border-neutral-200/90 dark:border-neutral-800/80 shadow-lg md:shadow-xs md:mt-6">
+          <div className="grid grid-cols-3 items-center divide-x divide-x-reverse divide-neutral-200 dark:divide-neutral-800">
+            {/* SECTION 1 (RIGHT in RTL): کل باقیمانده */}
           <div className="flex items-center gap-2.5 sm:gap-3 justify-start pr-1 sm:pr-3">
             <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 items-center justify-center shrink-0">
               <Check className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -511,26 +522,19 @@ export const FastingPage: React.FC<{
           </div>
 
           {/* SECTION 3 (LEFT in RTL): تاریخچه Button */}
-          <div className="flex items-center justify-end pl-1 sm:pl-3 gap-2">
+          <div className="flex items-center justify-end pl-1 sm:pl-3">
             <button
               type="button"
-              onClick={() => setShowHistorySheet('financial')}
-              className="flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-surface-elevated/70 hover:bg-surface-elevated active:scale-95 text-primary-theme font-bold text-xs sm:text-sm transition-all border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs"
-              title="تاریخچه پرداخت‌ها"
-            >
-              <ListFilter className="w-4 h-4 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowHistorySheet('qaza')}
+              onClick={() => setIsHistoryMenuOpen(true)}
               className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-2xl bg-surface-elevated/70 hover:bg-surface-elevated active:scale-95 text-primary-theme font-bold text-xs sm:text-sm transition-all border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs"
             >
-              <span className="hidden sm:inline">تاریخچه</span>
-              <List className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>تاریخچه</span>
+              <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </button>
           </div>
         </div>
-      </Card>
+        </Card>
+      </div>
 
       <DatePickerSheet
         isOpen={activeDatePicker !== null}
@@ -540,6 +544,76 @@ export const FastingPage: React.FC<{
         onConfirm={activeDatePicker === 'fitriya' ? handleFitriyaPayment : handleKaffarahPayment}
       />
       
+      {/* HISTORY MENU SHEET */}
+      <AnimatePresence>
+        {isHistoryMenuOpen && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsHistoryMenuOpen(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-xs"
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              drag="y"
+              dragConstraints={{ top: 0 }}
+              dragElastic={0.1}
+              onDragEnd={(_, info) => {
+                if (info.offset.y > 100 || info.velocity.y > 200) {
+                  setIsHistoryMenuOpen(false);
+                }
+              }}
+              className="relative w-full max-w-md bg-surface-bg border border-neutral-200/80 dark:border-neutral-800/80 rounded-t-[32px] overflow-hidden shadow-2xl safe-area-bottom z-10 flex flex-col"
+            >
+              <div className="w-full flex justify-center py-3">
+                <div className="w-12 h-1.5 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+              </div>
+              
+              <div className="px-5 pb-8">
+                <h3 className="text-lg font-extrabold text-primary-theme mb-4">تاریخچه</h3>
+                
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => {
+                      setIsHistoryMenuOpen(false);
+                      setShowHistorySheet('qaza');
+                    }}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-surface-elevated hover:bg-surface-elevated/80 border border-neutral-200/60 dark:border-neutral-800/60 active:scale-[0.98] transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                        <Check className="w-5 h-5" />
+                      </div>
+                      <span className="font-bold text-sm text-primary-theme">ثبت روزه‌ها</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsHistoryMenuOpen(false);
+                      setShowHistorySheet('financial');
+                    }}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-surface-elevated hover:bg-surface-elevated/80 border border-neutral-200/60 dark:border-neutral-800/60 active:scale-[0.98] transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                        <Wheat className="w-5 h-5" />
+                      </div>
+                      <span className="font-bold text-sm text-primary-theme">فطریه و کفاره</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* History Sheet */}
       <AnimatePresence>
         {showHistorySheet !== null && (
