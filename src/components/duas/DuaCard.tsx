@@ -35,7 +35,7 @@ export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => 
       >
         <div
           onClick={() => onSelect(dua)}
-          className="w-full h-full p-4 sm:p-5 transition-all duration-200 cursor-pointer group flex flex-col justify-between"
+          className="w-full h-full p-4 sm:p-5 transition-colors duration-200 cursor-pointer group flex flex-col justify-between"
         >
           {/* Top Section: Header at Top-Right & Text Snippet */}
           <div>

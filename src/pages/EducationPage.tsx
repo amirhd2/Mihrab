@@ -221,7 +221,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
           className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-surface-elevated/80 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated border border-neutral-200/80 dark:border-neutral-800 transition-all flex items-center gap-1.5 shrink-0"
           title="مدیریت تگ‌ها"
         >
-          <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
           <span className="hidden sm:inline">مدیریت تگ‌ها</span>
         </button>
 
@@ -234,7 +234,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
           onClick={() => setSelectedTag('همه')}
           className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 border ${
             selectedTag === 'همه'
-              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+              ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
               : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
           }`}
         >
@@ -250,7 +250,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
               onClick={() => setSelectedTag(tag.name)}
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
                 isSelected
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                   : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
               }`}
             >
@@ -284,7 +284,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
       ) : (
         /* Clean Empty States */
         <div className="bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-8 sm:p-12 text-center max-w-md mx-auto space-y-4 my-6">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto">
             {searchQuery ? (
               <SearchX className="w-6 h-6" />
             ) : selectedTag !== 'همه' ? (
@@ -315,7 +315,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
             <button
               type="button"
               onClick={handleOpenAddForm}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-2xl shadow-md transition-all active:scale-95 inline-flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl shadow-md transition-all active:scale-95 inline-flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4" />
               افزودن مطلب جدید
@@ -330,7 +330,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
         onClick={handleOpenAddForm}
         aria-label="افزودن مطلب جدید"
         title="افزودن مطلب جدید"
-        className={`fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg shadow-emerald-600/30 hover:shadow-xl transition-all duration-300 ease-in-out active:scale-90 flex items-center justify-center shrink-0 ${
+        className={`fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg shadow-blue-600/30 hover:shadow-xl transition-all duration-300 ease-in-out active:scale-90 flex items-center justify-center shrink-0 ${
           isStickyVisible ? 'translate-y-0 opacity-100' : 'translate-y-[150%] opacity-0'
         }`}
       >
@@ -403,7 +403,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
         }
       >
         <p className="text-right py-2 text-primary-theme">
-          آیا از حذف مطلب <span className="font-bold text-emerald-600 dark:text-emerald-400">«{itemToDelete?.title}»</span> اطمینان دارید؟
+          آیا از حذف مطلب <span className="font-bold text-blue-600 dark:text-blue-400">«{itemToDelete?.title}»</span> اطمینان دارید؟
         </p>
       </Dialog>
     </div>

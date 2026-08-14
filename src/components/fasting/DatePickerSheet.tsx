@@ -93,7 +93,7 @@ export const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
                 {title}
               </h3>
               <p className="text-xs text-secondary-theme">مبلغ قابل پرداخت</p>
-              <p className="text-emerald-600 dark:text-emerald-400 font-bold text-lg mt-1">
+              <p className="text-orange-600 dark:text-orange-400 font-bold text-lg mt-1">
                 {totalAmount.toLocaleString('fa-IR')} تومان
               </p>
             </div>
@@ -117,7 +117,7 @@ export const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
             <button
               type="button"
               onClick={resetToToday}
-              className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-surface-elevated text-secondary-theme hover:bg-emerald-500/10 hover:text-emerald-600 transition-colors mb-4 text-sm font-bold border border-neutral-200 dark:border-neutral-800"
+              className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-surface-elevated text-secondary-theme hover:bg-orange-500/10 hover:text-orange-600 transition-colors mb-4 text-sm font-bold border border-neutral-200 dark:border-neutral-800"
             >
               <RotateCcw className="w-4 h-4" />
               بازگشت به امروز
@@ -134,7 +134,7 @@ export const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="flex-1 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-colors shadow-sm"
+                className="flex-1 py-3.5 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm transition-colors shadow-sm"
               >
                 ثبت
               </button>

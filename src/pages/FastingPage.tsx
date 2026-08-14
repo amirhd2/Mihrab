@@ -235,13 +235,13 @@ export const FastingPage: React.FC<{
         
         {/* Column 1: Qaza Fasting */}
         <div className="flex flex-col gap-4">
-          <div className="bg-surface-card border border-amber-500/20 dark:border-amber-500/30 rounded-3xl p-5 shadow-xs relative overflow-hidden">
+          <div className="bg-surface-card border border-orange-500/20 dark:border-orange-500/30 rounded-3xl p-5 shadow-xs relative overflow-hidden">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-base font-extrabold text-primary-theme">روزه‌های قضا</h2>
                 <p className="text-[11px] text-secondary-theme">تعداد روزهای باقی‌مانده</p>
               </div>
-              <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
                  <CalendarCheck className="w-5 h-5" />
               </div>
             </div>
@@ -262,8 +262,8 @@ export const FastingPage: React.FC<{
                   disabled={qazaCount <= 0}
                   className={`w-12 h-12 rounded-full flex items-center justify-center text-white transition-all shadow-sm active:scale-90 disabled:opacity-30 ${
                     isQazaAnimating
-                      ? 'bg-emerald-500 scale-110 ring-4 ring-emerald-500/30'
-                      : 'bg-emerald-600 hover:bg-emerald-700'
+                      ? 'bg-orange-500 scale-110 ring-4 ring-orange-500/30'
+                      : 'bg-orange-600 hover:bg-orange-700'
                   }`}
                 >
                   <Check className="w-6 h-6 stroke-[2.5]" />
@@ -272,19 +272,19 @@ export const FastingPage: React.FC<{
             </div>
             
             <p className="text-center text-[10px] text-secondary-theme/70 mt-3 font-medium">
-              هر بار با زدن دکمه سبز، یک روز ثبت می‌شود
+              هر بار با زدن دکمه نارنجی، یک روز ثبت می‌شود
             </p>
           </div>
         </div>
 
         {/* Column 2: Fitriya */}
         <div className="flex flex-col gap-4">
-          <div className="bg-surface-card border border-amber-500/20 dark:border-amber-500/30 rounded-3xl p-5 shadow-xs">
+          <div className="bg-surface-card border border-orange-500/20 dark:border-orange-500/30 rounded-3xl p-5 shadow-xs">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-base font-extrabold text-primary-theme">فطریه ۱۴۰۵</h2>
               </div>
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
                  <Wheat className="w-5 h-5" />
               </div>
             </div>
@@ -313,14 +313,14 @@ export const FastingPage: React.FC<{
                     setFitriyaAmountPerPerson(val);
                   }}
                   onFocus={(e) => e.target.select()}
-                  className="bg-transparent text-left font-bold text-base text-primary-theme w-24 outline-none border-b border-neutral-300 dark:border-neutral-700 focus:border-emerald-500"
+                  className="bg-transparent text-left font-bold text-base text-primary-theme w-24 outline-none border-b border-neutral-300 dark:border-neutral-700 focus:border-orange-500"
                   dir="ltr"
                 />
               </div>
               
               <div className="flex flex-col items-center justify-center pt-4 pb-2">
                 <span className="text-[11px] text-secondary-theme font-medium mb-1">مبلغ قابل پرداخت</span>
-                <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                <span className="text-xl font-extrabold text-orange-600 dark:text-orange-400">
                   {fitriyaTotal.toLocaleString('fa-IR')} تومان
                 </span>
               </div>
@@ -329,13 +329,13 @@ export const FastingPage: React.FC<{
                 <button
                   type="button"
                   onClick={() => setActiveDatePicker('fitriya')}
-                  className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
                 >
                   <Check className="w-4 h-4" />
                   ثبت پرداخت
                 </button>
               ) : (
-                <div className="w-full py-3.5 rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold text-sm flex items-center justify-center gap-2 border border-emerald-500/20">
+                <div className="w-full py-3.5 rounded-2xl bg-orange-500/10 text-orange-700 dark:text-orange-300 font-bold text-sm flex items-center justify-center gap-2 border border-orange-500/20">
                   <Check className="w-4 h-4" />
                   پرداخت شده
                 </div>
@@ -346,18 +346,18 @@ export const FastingPage: React.FC<{
 
         {/* Column 3: Kaffarah */}
         <div className="flex flex-col gap-4 md:col-span-2">
-          <div className="bg-surface-card border border-amber-500/20 dark:border-amber-500/30 rounded-3xl p-5 shadow-xs transition-all">
+          <div className="bg-surface-card border border-orange-500/20 dark:border-orange-500/30 rounded-3xl p-5 shadow-xs transition-all">
             <div 
               className="flex items-center justify-between cursor-pointer group"
               onClick={() => setIsKaffarahActive(!isKaffarahActive)}
             >
               <div className="flex items-center gap-3">
                 <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                  isKaffarahActive ? 'bg-emerald-500 border-emerald-500' : 'border-neutral-300 dark:border-neutral-600'
+                  isKaffarahActive ? 'bg-orange-500 border-orange-500' : 'border-neutral-300 dark:border-neutral-600'
                 }`}>
                   {isKaffarahActive && <Check className="w-3.5 h-3.5 text-white" />}
                 </div>
-                <span className="text-sm font-bold text-primary-theme group-hover:text-emerald-600 transition-colors">نیاز به پرداخت کفاره دارم</span>
+                <span className="text-sm font-bold text-primary-theme group-hover:text-orange-600 transition-colors">نیاز به پرداخت کفاره دارم</span>
               </div>
               {!isKaffarahActive && <span className="text-[10px] text-secondary-theme">در صورت نیاز، تیک بزنید</span>}
             </div>
@@ -458,7 +458,7 @@ export const FastingPage: React.FC<{
                     <div className="pt-2">
                       <div className="flex items-center justify-between mb-4 px-2">
                         <span className="text-sm font-bold text-primary-theme">مجموع کفاره</span>
-                        <span className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">
+                        <span className="text-lg font-extrabold text-orange-600 dark:text-orange-400">
                           {kaffarahTotal.toLocaleString('fa-IR')} تومان
                         </span>
                       </div>
@@ -467,7 +467,7 @@ export const FastingPage: React.FC<{
                         type="button"
                         onClick={() => setActiveDatePicker('kaffarah')}
                         disabled={kaffarahTotal === 0}
-                        className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+                        className="w-full py-3.5 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
                       >
                         <Check className="w-4 h-4" />
                         ثبت پرداخت کفاره
@@ -487,16 +487,16 @@ export const FastingPage: React.FC<{
           isStickyVisible ? 'translate-y-0' : 'translate-y-[150%]'
         }`}
       >
-        <Card className="p-3.5 sm:p-4 border border-amber-500/20 dark:border-amber-500/30 shadow-lg md:shadow-xs md:mt-6">
+        <Card className="p-3.5 sm:p-4 border border-orange-500/20 dark:border-orange-500/30 shadow-lg md:shadow-xs md:mt-6">
           <div className="grid grid-cols-3 items-center divide-x divide-x-reverse divide-neutral-200 dark:divide-neutral-800">
             {/* SECTION 1 (RIGHT in RTL): کل باقیمانده */}
           <div className="flex items-center gap-2.5 sm:gap-3 justify-start pr-1 sm:pr-3">
-            <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 items-center justify-center shrink-0">
+            <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 items-center justify-center shrink-0">
               <Check className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1">
-                <span className="text-base sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 leading-none">
+                <span className="text-base sm:text-xl font-extrabold text-orange-600 dark:text-orange-400 leading-none">
                   {formatPersianNumber(qazaCount)}
                 </span>
                 <span className="text-[10px] sm:text-xs text-secondary-theme font-semibold">
@@ -508,7 +508,7 @@ export const FastingPage: React.FC<{
 
           {/* SECTION 2 (CENTER in RTL): آخرین ثبت */}
           <div className="flex items-center gap-2 sm:gap-3 justify-center px-1 sm:px-3 text-center">
-            <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 items-center justify-center shrink-0">
+            <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 items-center justify-center shrink-0">
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
@@ -529,7 +529,7 @@ export const FastingPage: React.FC<{
               className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-2xl bg-surface-elevated/70 hover:bg-surface-elevated active:scale-95 text-primary-theme font-bold text-xs sm:text-sm transition-all border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs"
             >
               <span>تاریخچه</span>
-              <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
             </button>
           </div>
         </div>
@@ -586,7 +586,7 @@ export const FastingPage: React.FC<{
                     className="flex items-center justify-between p-4 rounded-2xl bg-surface-elevated hover:bg-surface-elevated/80 border border-neutral-200/60 dark:border-neutral-800/60 active:scale-[0.98] transition-all"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center">
                         <Check className="w-5 h-5" />
                       </div>
                       <span className="font-bold text-sm text-primary-theme">ثبت روزه‌ها</span>
@@ -601,7 +601,7 @@ export const FastingPage: React.FC<{
                     className="flex items-center justify-between p-4 rounded-2xl bg-surface-elevated hover:bg-surface-elevated/80 border border-neutral-200/60 dark:border-neutral-800/60 active:scale-[0.98] transition-all"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center">
                         <Wheat className="w-5 h-5" />
                       </div>
                       <span className="font-bold text-sm text-primary-theme">فطریه و کفاره</span>
@@ -638,7 +638,7 @@ export const FastingPage: React.FC<{
               {/* Sheet Header */}
               <div className="flex items-center justify-between gap-3 mb-4 shrink-0 pb-3 border-b border-neutral-200/80 dark:border-neutral-800/80">
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center">
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
@@ -686,7 +686,7 @@ export const FastingPage: React.FC<{
                       onClick={() => setFinancialFilter(f.id as any)}
                       className={`px-4 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-colors border ${
                         financialFilter === f.id 
-                          ? 'bg-emerald-600 text-white border-emerald-600' 
+                          ? 'bg-orange-600 text-white border-orange-600' 
                           : 'bg-surface-elevated text-secondary-theme border-neutral-200 dark:border-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-800'
                       }`}
                     >
@@ -714,7 +714,7 @@ export const FastingPage: React.FC<{
                         <SwipeToDeleteItem key={record.id} id={record.id!} onDelete={() => handleUndoQaza(record.id!)}>
                           <div className="flex items-center justify-between w-full p-3.5 sm:p-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                              <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-600 dark:text-orange-400">
                                 <Check className="w-5 h-5" />
                               </div>
                               <div>
@@ -722,7 +722,7 @@ export const FastingPage: React.FC<{
                                 <div className="flex items-center gap-2 text-xs text-secondary-theme mt-0.5 font-medium">
                                   <span>{formatDate(record.timestamp)}</span>
                                   <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">باقی‌مانده: {formatPersianNumber(record.remainingCount)}</span>
+                                  <span className="text-orange-600 dark:text-orange-400 font-semibold">باقی‌مانده: {formatPersianNumber(record.remainingCount)}</span>
                                   <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
                                   <span dir="ltr">{formatTime(record.timestamp)}</span>
                                 </div>
@@ -762,7 +762,7 @@ export const FastingPage: React.FC<{
                           <div className="flex items-center justify-between w-full p-3.5 sm:p-4">
                             <div className="flex items-center gap-3">
                               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                                record.type === 'fitriya' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
+                                record.type === 'fitriya' ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400' :
                                 record.type === 'kaffarah_intentional' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
                                 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
                               }`}>
@@ -787,7 +787,7 @@ export const FastingPage: React.FC<{
                                     </>
                                   )}
                                   <span className="inline-block w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{record.amount.toLocaleString('fa-IR')} تومان</span>
+                                  <span className="text-orange-600 dark:text-orange-400 font-semibold">{record.amount.toLocaleString('fa-IR')} تومان</span>
                                 </div>
                               </div>
                             </div>

@@ -109,7 +109,7 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
               {/* Modal Header */}
               <div className="px-5 py-4 border-b border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between bg-surface-elevated/40">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                 <TagIcon className="w-5 h-5" />
               </div>
               <div>
@@ -134,12 +134,12 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 placeholder="نام تگ جدید..."
-                className="flex-1 min-w-0 bg-surface-card border border-neutral-200/90 dark:border-neutral-700/80 rounded-xl px-3.5 py-2 text-sm text-primary-theme placeholder:text-muted-theme focus:outline-hidden focus:ring-2 focus:ring-emerald-500/40"
+                className="flex-1 min-w-0 bg-surface-card border border-neutral-200/90 dark:border-neutral-700/80 rounded-xl px-3.5 py-2 text-sm text-primary-theme placeholder:text-muted-theme focus:outline-hidden focus:ring-2 focus:ring-blue-500/40"
               />
               <button
                 type="submit"
                 disabled={!newTagName.trim()}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-40 flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-40 flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 افزودن
@@ -175,13 +175,13 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
                               type="text"
                               value={editInputVal}
                               onChange={(e) => setEditInputVal(e.target.value)}
-                              className="flex-1 min-w-0 bg-surface-bg border border-emerald-500 rounded-xl px-3 py-1.5 text-sm font-medium text-primary-theme focus:outline-hidden"
+                              className="flex-1 min-w-0 bg-surface-bg border border-blue-500 rounded-xl px-3 py-1.5 text-sm font-medium text-primary-theme focus:outline-hidden"
                               autoFocus
                             />
                             <button
                               type="button"
                               onClick={() => handleSaveRename(tag.name)}
-                              className="p-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors shrink-0"
+                              className="p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shrink-0"
                               title="ذخیره"
                             >
                               <Check className="w-4 h-4" />
@@ -207,10 +207,10 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
                                     onClose();
                                   }
                                 }}
-                                className="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95 group/tag truncate"
+                                className="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/25 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95 group/tag truncate"
                                 title="کلیک کنید برای فیلتر بر اساس این تگ"
                               >
-                                <TagIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 group-hover/tag:scale-110 transition-transform shrink-0" />
+                                <TagIcon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 group-hover/tag:scale-110 transition-transform shrink-0" />
                                 <span className="truncate">{tag.name}</span>
                               </button>
                             </div>
@@ -226,7 +226,7 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
                             <button
                               type="button"
                               onClick={() => handleStartRename(tag)}
-                              className="p-2 text-secondary-theme hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors shrink-0"
+                              className="p-2 text-secondary-theme hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors shrink-0"
                               title="ویرایش نام تگ"
                             >
                               <Edit2 className="w-4 h-4" />

@@ -38,10 +38,19 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۱.۴.۰',
+    version: 'نسخه ۱.۵.۰',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'یکپارچه‌سازی و اختصاص پالت رنگی نارنجی به تمامی المان‌ها، دکمه‌ها و فرم‌های صفحه روزه',
+      'هماهنگی کامل پالت صفحه روزه و کفارات با تم پیش‌خوان',
+      'بهینه‌سازی کلی و رفع ایرادات جزئی در نمایش تاریخچه و پرداخت‌ها',
+    ],
+  },
+  {
+    version: 'نسخه ۱.۴.۰',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'نمایش دوخطی متن اصلی در کارت‌های بخش آموزش و احکام',
       'دسترسی دائمی و سریع به تگ‌های موجود در فرم‌های ثبت و ویرایش احکام و ادعیه',
@@ -476,7 +485,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
       {/* Version Number Footnote */}
       <div className="text-center pt-2">
         <span className="text-xs font-semibold text-secondary-theme/70">
-          نسخه ۱.۴.۰ (۱۴۰)
+          نسخه ۱.۵.۰ (۱۵۰)
         </span>
       </div>
 

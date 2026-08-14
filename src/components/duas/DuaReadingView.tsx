@@ -120,7 +120,7 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
         <button
           type="button"
           onClick={handleBack}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors active:scale-95"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-500/10 rounded-xl transition-colors active:scale-95"
         >
           <ArrowRight className="w-4 h-4" />
           <span>بازگشت</span>
@@ -140,10 +140,9 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
           </button>
           <button
             onClick={() => {
-              onClose();
               onEdit(dua);
             }}
-            className="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors active:scale-95"
+            className="p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-500/10 rounded-xl transition-colors active:scale-95"
             title="ویرایش"
             aria-label="ویرایش"
           >
@@ -192,7 +191,7 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
                         onClick={() => { setTextSize(size); setShowMenu(false); }}
                         className={`p-1.5 rounded-lg flex-1 text-center transition-colors flex justify-center items-center ${
                           textSize === size
-                            ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400'
+                            ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400'
                             : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-500'
                         }`}
                       >

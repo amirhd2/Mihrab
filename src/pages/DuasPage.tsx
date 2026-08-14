@@ -163,7 +163,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
           className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-surface-elevated/80 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated border border-neutral-200/80 dark:border-neutral-800 transition-all flex items-center gap-1.5 shrink-0"
           title="مدیریت تگ‌ها"
         >
-          <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <SlidersHorizontal className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
           <span className="hidden sm:inline">مدیریت تگ‌ها</span>
         </button>
 
@@ -173,7 +173,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
           onClick={() => setActiveTag('all')}
           className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
             activeTag === 'all'
-              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+              ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
               : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
           }`}
         >
@@ -186,7 +186,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
             onClick={() => setActiveTag(tag.name)}
             className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
               activeTag === tag.name
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
                 : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
             }`}
           >
@@ -198,7 +198,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
       <div>
         {filteredDuas.length === 0 ? (
           <div className="bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-8 sm:p-12 text-center max-w-md mx-auto space-y-4 my-6">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mx-auto">
               {searchQuery ? (
                 <SearchX className="w-6 h-6" />
               ) : activeTag !== 'all' && activeTag !== 'favorites' ? (
@@ -233,7 +233,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
               <button
                 type="button"
                 onClick={() => { setEditingDua(null); setIsAddEditModalOpen(true); }}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-2xl shadow-md transition-all active:scale-95 inline-flex items-center gap-1.5"
+                className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-2xl shadow-md transition-all active:scale-95 inline-flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
                 افزودن دعای جدید
@@ -257,7 +257,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
       {/* FAB */}
       <button
         onClick={() => { setEditingDua(null); setIsAddEditModalOpen(true); }}
-        className={`fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg shadow-emerald-600/30 hover:shadow-xl transition-all duration-300 ease-in-out active:scale-90 flex items-center justify-center shrink-0 ${
+        className={`fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg shadow-purple-600/30 hover:shadow-xl transition-all duration-300 ease-in-out active:scale-90 flex items-center justify-center shrink-0 ${
           isStickyVisible ? 'translate-y-0 opacity-100' : 'translate-y-[150%] opacity-0'
         }`}
       >
@@ -265,16 +265,12 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
       </button>
 
       {/* Modals */}
-      <AnimatePresence>
-        {isAddEditModalOpen && (
-          <AddEditDuaModal
-            isOpen={isAddEditModalOpen}
-            dua={editingDua}
-            onClose={() => { setIsAddEditModalOpen(false); setEditingDua(null); }}
-            onSave={handleSaveDua}
-          />
-        )}
-      </AnimatePresence>
+      <AddEditDuaModal
+        isOpen={isAddEditModalOpen}
+        dua={editingDua}
+        onClose={() => { setIsAddEditModalOpen(false); setEditingDua(null); }}
+        onSave={handleSaveDua}
+      />
 
       <AnimatePresence>
         {isTagManagerOpen && (
@@ -346,7 +342,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
         }
       >
         <p className="text-right py-2 text-primary-theme">
-          آیا از حذف دعای <span className="font-bold text-emerald-600 dark:text-emerald-400">«{duaToDelete?.title}»</span> اطمینان دارید؟
+          آیا از حذف دعای <span className="font-bold text-purple-600 dark:text-purple-400">«{duaToDelete?.title}»</span> اطمینان دارید؟
         </p>
       </Dialog>
 

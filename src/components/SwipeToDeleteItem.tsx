@@ -13,7 +13,7 @@ const CARD_BTN_GAP = 12; // Gap between card and delete button edge
 const BTN_BASE_SIZE = 52; // Initial circular size
 const BTN_OPEN_WIDTH = 76; // Expanded width when open
 const FULL_SWIPE_RATIO = 0.70; // 70% width threshold for auto-delete
-const SLOP_THRESHOLD = 15; // Threshold to start drag
+const SLOP_THRESHOLD = 6; // Low threshold for smooth gesture start
 
 // Global store for active swipe close function
 let globalActiveSwipeCloseFn: (() => void) | null = null;
@@ -46,10 +46,13 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
     wrapper.style.opacity = '';
     wrapper.classList.remove('wrapper-animating');
     card.style.transform = '';
+    card.style.transition = '';
     card.classList.remove('card-animating', 'shadow-lg', 'shadow-md');
     deleteBtn.style.opacity = '0';
+    deleteBtn.style.transition = '';
     deleteBtn.style.transform = 'scale(0.5)';
     deleteBtn.style.width = `${BTN_BASE_SIZE}px`;
+    deleteIcon.style.transition = '';
 
     let startX = 0;
     let startY = 0;
@@ -118,6 +121,9 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       globalActiveSwipeCloseFn = closeSwipe;
 
       currentTranslateX = -(BTN_OPEN_WIDTH + CARD_BTN_GAP);
+      card.style.transition = '';
+      deleteBtn.style.transition = '';
+      deleteIcon.style.transition = '';
       card.classList.add('card-animating', 'rounded-2xl', 'shadow-md');
       deleteBtn.classList.add('btn-animating');
       deleteIcon.classList.add('icon-animating');
@@ -132,6 +138,9 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       }
 
       currentTranslateX = 0;
+      card.style.transition = '';
+      deleteBtn.style.transition = '';
+      deleteIcon.style.transition = '';
       card.classList.add('card-animating');
       deleteBtn.classList.add('btn-animating');
       deleteIcon.classList.add('icon-animating');
@@ -163,6 +172,10 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       wrapperWidth = wrapper.offsetWidth;
       initialTranslateX = isOpen ? -(BTN_OPEN_WIDTH + CARD_BTN_GAP) : 0;
 
+      card.style.transition = 'none';
+      deleteBtn.style.transition = 'none';
+      deleteIcon.style.transition = 'none';
+
       card.classList.remove('card-animating');
       deleteBtn.classList.remove('btn-animating');
       deleteIcon.classList.remove('icon-animating');
@@ -180,17 +193,18 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
 
       const x = getX(e);
       const y = getY(e);
-      const deltaX = startX - x; // Swiping left = positive delta
-      const deltaY = startY - y;
+      const rawDeltaX = startX - x; // Swiping left = positive delta
+      const rawDeltaY = startY - y;
 
       if (!isSlopPassed) {
-        if (Math.abs(deltaY) > SLOP_THRESHOLD && Math.abs(deltaY) > Math.abs(deltaX)) {
+        if (Math.abs(rawDeltaY) > 8 && Math.abs(rawDeltaY) > Math.abs(rawDeltaX)) {
           isVerticalScrolling = true;
           return;
         }
 
-        if (Math.abs(deltaX) > SLOP_THRESHOLD) {
+        if (Math.abs(rawDeltaX) > SLOP_THRESHOLD) {
           isSlopPassed = true;
+          startX = x + (rawDeltaX > 0 ? SLOP_THRESHOLD : -SLOP_THRESHOLD);
           card.classList.add('rounded-2xl', 'shadow-lg');
         } else {
           return;
@@ -201,11 +215,12 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
         e.preventDefault();
       }
 
+      const deltaX = startX - x;
       let calculatedX = initialTranslateX - deltaX;
 
       // Elastic resistance when pulling right beyond 0
       if (calculatedX > 0) {
-        calculatedX = calculatedX * 0.2;
+        calculatedX = calculatedX * 0.15;
       }
 
       currentTranslateX = calculatedX;
@@ -218,8 +233,13 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
 
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
       window.removeEventListener('mousemove', onTouchMove);
       window.removeEventListener('mouseup', onTouchEnd);
+
+      card.style.transition = '';
+      deleteBtn.style.transition = '';
+      deleteIcon.style.transition = '';
 
       card.classList.add('card-animating');
       deleteBtn.classList.add('btn-animating');
@@ -318,7 +338,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       {/* Foreground Content Card */}
       <div
         ref={cardRef}
-        className={`card-content relative z-10 w-full h-full rounded-2xl flex items-center justify-between cursor-grab active:cursor-grabbing shadow-2xs hover:shadow-md transition-all duration-200 ${
+        className={`card-content relative z-10 w-full h-full rounded-2xl flex items-center justify-between cursor-grab active:cursor-grabbing shadow-2xs hover:shadow-md transition-colors transition-shadow duration-200 ${
           cardClassName || 'bg-surface-card border border-neutral-200/80 dark:border-neutral-800/80'
         }`}
       >

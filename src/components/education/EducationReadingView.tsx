@@ -154,7 +154,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
         <button
           type="button"
           onClick={handleBack}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors active:scale-95"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors active:scale-95"
         >
           <ArrowRight className="w-4 h-4" />
           <span>بازگشت</span>
@@ -169,7 +169,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
           <button
             type="button"
             onClick={() => onEdit(item)}
-            className="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors active:scale-95"
+            className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors active:scale-95"
             title="ویرایش مطلب"
           >
             <Edit className="w-5 h-5" />
@@ -199,7 +199,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
                   onClick={handleCopy}
                   className="w-full px-4 py-2.5 text-xs font-medium text-primary-theme hover:bg-surface-elevated flex items-center gap-2.5 text-right transition-colors"
                 >
-                  {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-secondary-theme" />}
+                  {copied ? <Check className="w-4 h-4 text-blue-500" /> : <Copy className="w-4 h-4 text-secondary-theme" />}
                   <span>کپی متن</span>
                 </button>
 
@@ -237,7 +237,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
         onScroll={handleScroll}
       >
         {/* Reading Article Body Container */}
-        <div className="w-full max-w-3xl bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-5 sm:p-8 shadow-sm space-y-6 h-max min-h-full">
+        <div className="w-full max-w-3xl bg-gradient-to-br from-blue-500/[0.06] via-surface-card to-surface-card border border-blue-500/15 dark:border-blue-500/20 rounded-3xl p-5 sm:p-8 shadow-sm space-y-6 h-max min-h-full">
           {/* Article Title Header */}
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-primary-theme tracking-tight mb-3">
@@ -248,13 +248,13 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
             {item.tags && item.tags.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 pt-1 pb-2">
                 <span className="text-xs text-muted-theme flex items-center gap-1 font-medium">
-                  <TagIcon className="w-3.5 h-3.5" />
+                  <TagIcon className="w-3.5 h-3.5 text-blue-500" />
                   دسته:
                 </span>
                 {item.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                    className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
                   >
                     {tag}
                   </span>
@@ -263,17 +263,17 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
             )}
           </div>
 
-          <div className="border-t border-neutral-200/60 dark:border-neutral-800/60" />
+          <div className="border-t border-blue-500/10 dark:border-blue-500/15" />
 
           {/* Main Article Content */}
-          <div className="text-primary-theme prose prose-emerald dark:prose-invert max-w-none">
+          <div className="text-primary-theme prose prose-blue dark:prose-invert max-w-none">
             {renderFormattedText(item.text)}
           </div>
 
           {/* Source Citation */}
           {item.source && (
-            <div className="pt-6 border-t border-neutral-200/60 dark:border-neutral-800/60 flex items-center justify-end">
-              <p className="text-xs text-secondary-theme font-medium bg-surface-elevated/60 px-3 py-1.5 rounded-xl border border-neutral-200/60 dark:border-neutral-800/60">
+            <div className="pt-6 border-t border-blue-500/10 dark:border-blue-500/15 flex items-center justify-end">
+              <p className="text-xs text-secondary-theme font-medium bg-blue-500/[0.05] px-3 py-1.5 rounded-xl border border-blue-500/15 dark:border-blue-500/20">
                 منبع: <span className="text-primary-theme font-bold">{item.source}</span>
               </p>
             </div>

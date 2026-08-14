@@ -89,7 +89,7 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
       {isOpen && (
         <div 
           key="add-edit-dua-container"
-          className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4" 
+          className="fixed inset-0 z-[60] flex items-center justify-center p-3.5 sm:p-4" 
           dir="rtl"
         >
           <motion.div
@@ -137,7 +137,7 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
               placeholder="مثال: دعای بعد از نماز"
             />
           </div>
@@ -147,7 +147,7 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
             <textarea
               value={arabicText}
               onChange={(e) => setArabicText(e.target.value)}
-              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all min-h-[120px] font-arabic leading-relaxed resize-none"
+              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all min-h-[120px] font-arabic leading-relaxed resize-none"
               placeholder="اَللَّهُمَّ..."
             />
           </div>
@@ -157,7 +157,7 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
             <textarea
               value={persianTranslation}
               onChange={(e) => setPersianTranslation(e.target.value)}
-              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all min-h-[100px] resize-none"
+              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all min-h-[100px] resize-none"
               placeholder="پروردگارا..."
             />
           </div>
@@ -168,7 +168,7 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
               type="text"
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
               placeholder="مثال: مفاتیح الجنان"
             />
           </div>
@@ -179,9 +179,9 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
             {selectedTags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {selectedTags.map(tag => (
-                  <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-700 dark:text-emerald-400 text-xs rounded-full border border-emerald-200 dark:border-emerald-800">
+                  <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 dark:bg-purple-900/10 text-purple-700 dark:text-purple-400 text-xs rounded-full border border-purple-200 dark:border-purple-800">
                     {tag}
-                    <button onClick={() => toggleTag(tag)} className="hover:text-emerald-900 dark:hover:text-emerald-200">
+                    <button onClick={() => toggleTag(tag)} className="hover:text-purple-900 dark:hover:text-purple-200">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </span>
@@ -201,7 +201,7 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
                         onClick={() => toggleTag(tag.name)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border transition-colors ${
                           isSelected 
-                            ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 border-emerald-200 dark:border-emerald-800' 
+                            ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 border-purple-200 dark:border-purple-800' 
                             : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300'
                         }`}
                       >
@@ -221,7 +221,7 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
                   onChange={(e) => setNewTag(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddNewTag(); } }}
                   placeholder="ایجاد تگ جدید..."
-                  className="flex-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                  className="flex-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-purple-500"
                 />
                 <button
                   type="button"
@@ -241,7 +241,7 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
           <button
             onClick={handleSave}
             disabled={!title.trim() || !arabicText.trim()}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-neutral-300 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-xl transition-colors shadow-sm"
+            className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-neutral-300 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-xl transition-colors shadow-sm"
           >
             ذخیره
           </button>
