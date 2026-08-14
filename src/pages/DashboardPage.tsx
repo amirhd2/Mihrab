@@ -131,7 +131,7 @@ export const DashboardPage: React.FC = () => {
 
       {/* Main 4 Section Cards Grid */}
       {/* Responsive: 1-col on mobile portrait, 2-col 2x2 grid on tablet landscape & desktop */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr">
         {/* 1. QADA PRAYERS CARD */}
         <div
           role="button"

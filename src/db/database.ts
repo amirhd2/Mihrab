@@ -121,19 +121,22 @@ export class MihrabDatabase extends Dexie {
     }
 
     // Seed default tags and education content if empty
-    const tagCount = await this.educationTags.count();
-    if (tagCount === 0) {
-      const now = new Date().toISOString();
-      const defaultTags = ['احکام', 'وضو', 'نماز', 'روزه', 'آموزش', 'اذکار'];
-      for (const name of defaultTags) {
-        await this.educationTags.add({ name, createdAt: now });
-      }
-    }
+    const skipContentSeed = localStorage.getItem('mihrab_skip_content_seed') === 'true';
 
-    const contentCount = await this.educationContents.count();
-    if (contentCount === 0) {
-      const now = new Date().toISOString();
-      await this.educationContents.bulkAdd([
+    if (!skipContentSeed) {
+      const tagCount = await this.educationTags.count();
+      if (tagCount === 0) {
+        const now = new Date().toISOString();
+        const defaultTags = ['احکام', 'وضو', 'نماز', 'روزه', 'آموزش', 'اذکار'];
+        for (const name of defaultTags) {
+          await this.educationTags.add({ name, createdAt: now });
+        }
+      }
+
+      const contentCount = await this.educationContents.count();
+      if (contentCount === 0) {
+        const now = new Date().toISOString();
+        await this.educationContents.bulkAdd([
         {
           title: 'احکام وضو',
           text: `وضو یکی از مقدمات مهم نماز است و برای انجام صحیح آن، رعایت شرایط زیر لازم است:
@@ -289,6 +292,7 @@ export class MihrabDatabase extends Dexie {
           updatedAt: now,
         },
       ]);
+      }
     }
   }
 }

@@ -37,10 +37,19 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۱.۲.۰',
+    version: 'نسخه ۱.۳.۰',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'هوشمندسازی دکمه‌های شناور (FAB) در تمامی صفحات (حذف هنگام اسکرول به پایین و نمایش با اسکرول به بالا)',
+      'تکمیل و بهبود سیستم پشتیبان‌گیری، بازیابی و حذف اطلاعات برای سازگاری کامل با تمامی داده‌ها',
+      'بهبود عملکرد و رفع ایرادات جزئی',
+    ],
+  },
+  {
+    version: 'نسخه ۱.۲.۰',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'مدیریت و دسته‌بندی پیشرفته تگ‌ها در بخش آموزش و احکام همراه با قابلیت سوایپ به چپ برای حذف',
       'بهینه‌سازی انیمیشن‌های نمایش روان در کارت‌های اقامه و قضای نماز بدون افت فریم',
@@ -456,7 +465,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
       {/* Version Number Footnote */}
       <div className="text-center pt-2">
         <span className="text-xs font-semibold text-secondary-theme/70">
-          نسخه ۱.۲.۰ (۱۲۰)
+          نسخه ۱.۳.۰ (۱۳۰)
         </span>
       </div>
 

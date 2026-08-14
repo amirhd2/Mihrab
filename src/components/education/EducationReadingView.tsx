@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, UIEvent } from 'react';
 import { ArrowRight, MoreVertical, Edit, Trash2, Copy, Share2, Tag as TagIcon, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { EducationContentRecord } from '../../types/db';
 
 interface EducationReadingViewProps {
@@ -8,6 +9,7 @@ interface EducationReadingViewProps {
   onEdit: (item: EducationContentRecord) => void;
   onDelete: (item: EducationContentRecord) => void;
   onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning') => void;
+  isPopStateBack?: boolean;
 }
 
 export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
@@ -16,6 +18,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
   onEdit,
   onDelete,
   onShowToast,
+  isPopStateBack = false,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -35,28 +38,23 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
   }, []);
 
   // Handle scroll to hide/show top bar
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Don't hide if close to top
-      if (currentScrollY < 50) {
+  const handleScroll = (e: UIEvent<HTMLDivElement>) => {
+    const currentScrollY = e.currentTarget.scrollTop;
+    
+    // Don't hide if close to top
+    if (currentScrollY < 50) {
+      setShowTopBar(true);
+    } else {
+      // Show if scrolling up, hide if scrolling down
+      if (currentScrollY < lastScrollY) {
         setShowTopBar(true);
-      } else {
-        // Show if scrolling up, hide if scrolling down
-        if (currentScrollY < lastScrollY) {
-          setShowTopBar(true);
-        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
-          setShowTopBar(false);
-          setIsMenuOpen(false); // Close menu when hiding top bar
-        }
+      } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        setShowTopBar(false);
+        setIsMenuOpen(false); // Close menu when hiding top bar
       }
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+    }
+    setLastScrollY(currentScrollY);
+  };
 
   // Format text paragraphs and headings
   const renderFormattedText = (rawText: string) => {
@@ -133,10 +131,17 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-6 pb-12 animate-in fade-in duration-200" dir="rtl">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={isPopStateBack ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 16 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
+      className="fixed inset-0 z-50 bg-neutral-50 dark:bg-neutral-900 overflow-hidden"
+      dir="rtl"
+    >
       {/* iOS-Inspired Reading Top Bar */}
       <div 
-        className={`flex items-center justify-between pb-4 border-b border-neutral-200/80 dark:border-neutral-800 sticky top-0 bg-surface-bg z-20 pt-2 transition-transform duration-300 ${
+        className={`absolute top-0 left-0 right-0 bg-surface-bg border-b border-neutral-200/80 dark:border-neutral-800 px-4 pt-2 pb-4 flex items-center justify-between z-20 transition-transform duration-300 ${
           showTopBar ? 'translate-y-0' : '-translate-y-[120%]'
         }`}
       >
@@ -154,7 +159,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
         </h1>
 
         {/* Action Buttons: Edit Pencil + Three-Dot Menu */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 relative" ref={menuRef}>
           <button
             type="button"
             onClick={() => onEdit(item)}
@@ -164,19 +169,25 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
             <Edit className="w-5 h-5" />
           </button>
 
-          {/* Three-Dot Menu */}
-          <div className="relative" ref={menuRef}>
-            <button
-              type="button"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated rounded-xl transition-colors"
-              title="منوی عملیات"
-            >
-              <MoreVertical className="w-5 h-5" />
-            </button>
+          {/* Three-Dot Menu Button */}
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated rounded-xl transition-colors"
+            title="منوی عملیات"
+          >
+            <MoreVertical className="w-5 h-5" />
+          </button>
 
+          {/* Three-Dot Menu with AnimatePresence */}
+          <AnimatePresence>
             {isMenuOpen && (
-              <div className="absolute left-0 top-full mt-4 w-48 bg-surface-card border border-neutral-200/90 dark:border-neutral-800 rounded-2xl shadow-xl py-1.5 z-40 animate-in zoom-in-95 duration-100">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="absolute left-0 top-full mt-4 w-48 bg-surface-card border border-neutral-200/90 dark:border-neutral-800 rounded-2xl shadow-xl py-1.5 z-30 overflow-hidden"
+              >
                 <button
                   type="button"
                   onClick={handleCopy}
@@ -208,55 +219,61 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
                   <Trash2 className="w-4 h-4" />
                   <span>حذف مطلب</span>
                 </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Main Reading Area */}
+      <div 
+        className="w-full h-full overflow-y-auto bg-neutral-50/50 dark:bg-neutral-900 px-4 pt-[76px] pb-12 flex justify-center"
+        onScroll={handleScroll}
+      >
+        {/* Reading Article Body Container */}
+        <div className="w-full max-w-3xl bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-5 sm:p-8 shadow-sm space-y-6 h-max min-h-full">
+          {/* Article Title Header */}
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-primary-theme tracking-tight mb-3">
+              {item.title}
+            </h2>
+
+            {/* Tags Metadata Line */}
+            {item.tags && item.tags.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 pt-1 pb-2">
+                <span className="text-xs text-muted-theme flex items-center gap-1 font-medium">
+                  <TagIcon className="w-3.5 h-3.5" />
+                  دسته:
+                </span>
+                {item.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* Reading Article Body Container */}
-      <div className="bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-5 sm:p-8 shadow-sm space-y-6">
-        {/* Article Title Header */}
-        <div>
-          <h2 className="text-xl sm:text-2xl font-black text-primary-theme tracking-tight mb-3">
-            {item.title}
-          </h2>
+          <div className="border-t border-neutral-200/60 dark:border-neutral-800/60" />
 
-          {/* Tags Metadata Line */}
-          {item.tags && item.tags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 pt-1 pb-2">
-              <span className="text-xs text-muted-theme flex items-center gap-1 font-medium">
-                <TagIcon className="w-3.5 h-3.5" />
-                دسته:
-              </span>
-              {item.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                >
-                  {tag}
-                </span>
-              ))}
+          {/* Main Article Content */}
+          <div className="text-primary-theme prose prose-emerald dark:prose-invert max-w-none">
+            {renderFormattedText(item.text)}
+          </div>
+
+          {/* Source Citation */}
+          {item.source && (
+            <div className="pt-6 border-t border-neutral-200/60 dark:border-neutral-800/60 flex items-center justify-end">
+              <p className="text-xs text-secondary-theme font-medium bg-surface-elevated/60 px-3 py-1.5 rounded-xl border border-neutral-200/60 dark:border-neutral-800/60">
+                منبع: <span className="text-primary-theme font-bold">{item.source}</span>
+              </p>
             </div>
           )}
         </div>
-
-        <div className="border-t border-neutral-200/60 dark:border-neutral-800/60" />
-
-        {/* Main Article Content */}
-        <div className="text-primary-theme prose prose-emerald dark:prose-invert max-w-none">
-          {renderFormattedText(item.text)}
-        </div>
-
-        {/* Source Citation */}
-        {item.source && (
-          <div className="pt-6 border-t border-neutral-200/60 dark:border-neutral-800/60 flex items-center justify-end">
-            <p className="text-xs text-secondary-theme font-medium bg-surface-elevated/60 px-3 py-1.5 rounded-xl border border-neutral-200/60 dark:border-neutral-800/60">
-              منبع: <span className="text-primary-theme font-bold">{item.source}</span>
-            </p>
-          </div>
-        )}
       </div>
-    </div>
+    </motion.div>
   );
 };

@@ -1,6 +1,7 @@
 import { usePreventBodyScroll } from '../../hooks/usePreventBodyScroll';
 import React, { useState } from 'react';
 import { X, Plus, Edit2, Check, Tag as TagIcon, Layers } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { EducationTagRecord } from '../../types/db';
 import { SwipeToDeleteItem } from '../SwipeToDeleteItem';
 import { Dialog } from '../Dialog';
@@ -33,8 +34,6 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
   const [editInputVal, setEditInputVal] = useState('');
   const [deletingTagName, setDeletingTagName] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
-
-  if (!isOpen) return null;
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,10 +76,32 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200" dir="rtl">
-        <div className="bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-          {/* Modal Header */}
-          <div className="px-5 py-4 border-b border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between bg-surface-elevated/40">
+      <AnimatePresence>
+        {isOpen && (
+          <div 
+            key="education-tag-manager"
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4" 
+            dir="rtl"
+          >
+            <motion.div
+              key="education-tag-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="absolute inset-0 bg-black/60"
+              onClick={onClose}
+            />
+            <motion.div
+              key="education-tag-card"
+              initial={{ opacity: 0, scale: 0.92, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 8 }}
+              transition={{ duration: 0.18, ease: "easeInOut" }}
+              className="relative bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            >
+              {/* Modal Header */}
+              <div className="px-5 py-4 border-b border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between bg-surface-elevated/40">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                 <TagIcon className="w-5 h-5" />
@@ -224,8 +245,10 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
               بستن
             </button>
           </div>
-        </div>
-      </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Standard Delete Confirmation Popup */}
       <Dialog

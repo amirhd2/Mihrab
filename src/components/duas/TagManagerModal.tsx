@@ -1,22 +1,25 @@
 import { usePreventBodyScroll } from '../../hooks/usePreventBodyScroll';
 import React, { useState, useMemo } from 'react';
 import { X, Plus, Edit2, Check, Tag as TagIcon, Layers } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { SwipeToDeleteItem } from '../SwipeToDeleteItem';
 import { Dialog } from '../Dialog';
 
 interface TagManagerModalProps {
+  isOpen?: boolean;
   onClose: () => void;
   onSelectTagFilter?: (tagName: string) => void;
 }
 
 export const TagManagerModal: React.FC<TagManagerModalProps> = ({
+  isOpen = true,
   onClose,
   onSelectTagFilter,
 }) => {
   
-  usePreventBodyScroll(true);
+  usePreventBodyScroll(isOpen);
   const [newTagName, setNewTagName] = useState('');
   const [editingTagName, setEditingTagName] = useState<string | null>(null);
   const [editInputVal, setEditInputVal] = useState('');

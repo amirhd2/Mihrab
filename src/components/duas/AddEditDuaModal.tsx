@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { DuaRecord, DuaTagRecord } from '../../types/db';
 import { db } from '../../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { usePreventBodyScroll } from '../../hooks/usePreventBodyScroll';
 
 interface AddEditDuaModalProps {
+  isOpen: boolean;
   dua: DuaRecord | null;
   onClose: () => void;
   onSave: (dua: Omit<DuaRecord, 'id' | 'createdAt' | 'updatedAt'>) => void;
 }
 
-export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ dua, onClose, onSave }) => {
-  usePreventBodyScroll(true);
+export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, onClose, onSave }) => {
+  usePreventBodyScroll(isOpen);
 
   const [title, setTitle] = useState('');
   const [arabicText, setArabicText] = useState('');
@@ -25,14 +27,24 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ dua, onClose, 
   const availableTags = useLiveQuery(() => db.duaTags.toArray()) || [];
 
   useEffect(() => {
-    if (dua) {
-      setTitle(dua.title);
-      setArabicText(dua.arabicText);
-      setPersianTranslation(dua.persianTranslation);
-      setSource(dua.source || '');
-      setSelectedTags(dua.tags || []);
+    if (isOpen) {
+      if (dua) {
+        setTitle(dua.title);
+        setArabicText(dua.arabicText);
+        setPersianTranslation(dua.persianTranslation);
+        setSource(dua.source || '');
+        setSelectedTags(dua.tags || []);
+      } else {
+        setTitle('');
+        setArabicText('');
+        setPersianTranslation('');
+        setSource('');
+        setSelectedTags([]);
+      }
+      setShowTagSelector(false);
+      setNewTag('');
     }
-  }, [dua]);
+  }, [dua, isOpen]);
 
   const handleSave = () => {
     if (!title.trim() || !arabicText.trim()) return;
@@ -75,10 +87,33 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ dua, onClose, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 bg-neutral-900/40 backdrop-blur-sm" dir="rtl">
-      <div className="bg-surface-card w-[calc(100%-1.75rem)] max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[85vh] my-auto overflow-hidden animate-in zoom-in-95 duration-200">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
+    <AnimatePresence>
+      {isOpen && (
+        <div 
+          key="add-edit-dua-container"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4" 
+          dir="rtl"
+        >
+          <motion.div
+            key="add-edit-dua-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="absolute inset-0 bg-neutral-900/50"
+            onClick={onClose}
+          />
+          <motion.div
+            key="add-edit-dua-card"
+            initial={{ opacity: 0, scale: 0.92, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 8 }}
+            transition={{ duration: 0.18, ease: "easeInOut" }}
+            className="relative bg-surface-card w-[calc(100%-1.75rem)] max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[85vh] my-auto overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
           <h2 className="text-lg font-bold text-primary-theme">
             {dua ? 'ویرایش دعا' : 'افزودن دعا'}
           </h2>
@@ -218,7 +253,9 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ dua, onClose, 
             ذخیره
           </button>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 };

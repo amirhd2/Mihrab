@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { PageHeader } from '../components/PageHeader';
 import { SearchField } from '../components/SearchField';
 import { EducationContentRecord, EducationTagRecord } from '../types/db';
@@ -49,6 +50,20 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<EducationContentRecord | null>(null);
   const [loading, setLoading] = useState(true);
+  const isPopStateBack = useRef(false);
+
+  // Listen for browser popstate (e.g. swipe-back or back button) to suppress exit animation
+  useEffect(() => {
+    const handlePopState = () => {
+      isPopStateBack.current = true;
+      setTimeout(() => {
+        isPopStateBack.current = false;
+      }, 400);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Derived active reading item based on URL article search param
   const activeReadingItem = useMemo(() => {
@@ -191,36 +206,8 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
     setIsFormOpen(true);
   };
 
-  // If Reading View is Active
-  if (activeReadingItem) {
-    return (
-      <div className="space-y-6">
-        <EducationReadingView
-          item={activeReadingItem}
-          onBack={() => setSearchParams({}, { replace: true })}
-          onEdit={(item) => handleOpenEditForm(item)}
-          onDelete={(item) => handleDeleteContent(item)}
-          onShowToast={(msg, type) => onShowToast && onShowToast(msg, type)}
-        />
-
-        {/* Form Modal for Editing */}
-        <EducationFormModal
-          isOpen={isFormOpen}
-          onClose={() => {
-            setIsFormOpen(false);
-            setEditingItem(null);
-          }}
-          onSave={handleSaveContent}
-          initialData={editingItem}
-          availableTags={tags}
-          onAddNewTag={handleAddTag}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-5 pb-20 relative" dir="rtl">
+    <div className="relative min-h-screen space-y-5 pb-20" dir="rtl">
       {/* Header */}
       <PageHeader
         titleFa="آموزش و احکام"
@@ -357,10 +344,29 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
         onClick={handleOpenAddForm}
         aria-label="افزودن مطلب جدید"
         title="افزودن مطلب جدید"
-        className="fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg shadow-emerald-600/30 hover:shadow-xl transition-all duration-200 active:scale-90 flex items-center justify-center shrink-0"
+        className={`fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg shadow-emerald-600/30 hover:shadow-xl transition-all duration-300 ease-in-out active:scale-90 flex items-center justify-center shrink-0 ${
+          isStickyVisible ? 'translate-y-0 opacity-100' : 'translate-y-[150%] opacity-0'
+        }`}
       >
         <Plus className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
       </button>
+
+      {/* Reading View Overlay */}
+      <AnimatePresence>
+        {activeReadingItem && (
+          <EducationReadingView
+            item={activeReadingItem}
+            isPopStateBack={isPopStateBack.current}
+            onBack={() => {
+              isPopStateBack.current = false;
+              setSearchParams({}, { replace: true });
+            }}
+            onEdit={(item) => handleOpenEditForm(item)}
+            onDelete={(item) => handleDeleteContent(item)}
+            onShowToast={(msg, type) => onShowToast && onShowToast(msg, type)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Add / Edit Form Modal */}
       <EducationFormModal

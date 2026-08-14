@@ -9,6 +9,7 @@ interface DuaReadingViewProps {
   onEdit: (dua: DuaRecord) => void;
   onDelete: (id: number) => void;
   onToggleFavorite: (id: number) => void;
+  isPopStateBack?: boolean;
 }
 
 type TextSize = 'sm' | 'base' | 'lg' | 'xl';
@@ -19,6 +20,7 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
   onEdit,
   onDelete,
   onToggleFavorite,
+  isPopStateBack = false,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showTextSize, setShowTextSize] = useState(false);
@@ -96,9 +98,10 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 50 }}
+      exit={isPopStateBack ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 16 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
       className="fixed inset-0 z-50 bg-neutral-50 dark:bg-neutral-900 overflow-hidden"
       dir="rtl"
     >

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { EducationContentRecord, EducationTagRecord } from '../../types/db';
 import { usePreventBodyScroll } from '../../hooks/usePreventBodyScroll';
 
@@ -47,8 +48,6 @@ export const EducationFormModal: React.FC<EducationFormModalProps> = ({
     setErrorMsg('');
   }, [initialData, isOpen]);
 
-  if (!isOpen) return null;
-
   const toggleTag = (tagName: string) => {
     if (selectedTags.includes(tagName)) {
       setSelectedTags(selectedTags.filter(t => t !== tagName));
@@ -93,10 +92,33 @@ export const EducationFormModal: React.FC<EducationFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 bg-neutral-900/40 backdrop-blur-sm" dir="rtl">
-      <div className="bg-surface-card w-[calc(100%-1.75rem)] max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[85vh] my-auto overflow-hidden animate-in zoom-in-95 duration-200">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
+    <AnimatePresence>
+      {isOpen && (
+        <div 
+          key="education-form-container"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4" 
+          dir="rtl"
+        >
+          <motion.div
+            key="education-form-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="absolute inset-0 bg-neutral-900/50"
+            onClick={onClose}
+          />
+          <motion.div
+            key="education-form-card"
+            initial={{ opacity: 0, scale: 0.92, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 8 }}
+            transition={{ duration: 0.18, ease: "easeInOut" }}
+            className="relative bg-surface-card w-full max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[85vh] my-auto overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
           <h2 className="text-lg font-bold text-primary-theme">
             {initialData ? 'ویرایش مطلب' : 'افزودن مطلب'}
           </h2>
@@ -238,7 +260,9 @@ export const EducationFormModal: React.FC<EducationFormModalProps> = ({
             {isSubmitting ? 'در حال ذخیره...' : 'ذخیره'}
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
+      )}
+    </AnimatePresence>
   );
 };

@@ -1,7 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from 'motion/react';
 import { PageHeader } from '../components/PageHeader';
-import { Search, Plus, Tag as TagIcon, SlidersHorizontal } from 'lucide-react';
+import { Search, Plus, Tag as TagIcon, SlidersHorizontal, SearchX, FileText } from 'lucide-react';
+import { SearchField } from '../components/SearchField';
 import { db } from '../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { DuaRecord } from '../types/db';
@@ -29,6 +31,20 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
   
   const [isTagManagerOpen, setIsTagManagerOpen] = useState(false);
   const [duaToDelete, setDuaToDelete] = useState<DuaRecord | null>(null);
+  const isPopStateBack = useRef(false);
+
+  // Listen for browser popstate (e.g. swipe-back or back button) to suppress exit animation
+  useEffect(() => {
+    const handlePopState = () => {
+      isPopStateBack.current = true;
+      setTimeout(() => {
+        isPopStateBack.current = false;
+      }, 400);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   
   const [searchParams, setSearchParams] = useSearchParams();
   const readingDuaId = searchParams.get('dua');
@@ -135,82 +151,111 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-4 px-4 pb-4">
-        <PageHeader
-          titleFa="دعاها"
-          showBack
-          onBackClick={() => navigate('/')}
-          centered
+    <div className="space-y-5 pb-20 relative" dir="rtl">
+      {/* Header */}
+      <PageHeader
+        titleFa="دعاها"
+        showBack
+        onBackClick={() => navigate('/')}
+        centered
+      />
+
+      {/* Live Search Field */}
+      <div>
+        <SearchField
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholderFa="جستجوی دعا، متن یا تگ‌ها..."
         />
+      </div>
 
-        {/* Search */}
-        <div className="relative">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="جستجوی دعا..."
-            className="w-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-2xl px-12 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-2xs"
-          />
-          <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-        </div>
+      {/* Tags Row */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
+        <button
+          type="button"
+          onClick={() => setIsTagManagerOpen(true)}
+          className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-surface-elevated/80 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated border border-neutral-200/80 dark:border-neutral-800 transition-all flex items-center gap-1.5 shrink-0"
+          title="مدیریت تگ‌ها"
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span className="hidden sm:inline">مدیریت تگ‌ها</span>
+        </button>
 
-        {/* Tags Row */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
+        <div className="w-px h-5 bg-neutral-200 dark:bg-neutral-700 shrink-0 mx-1" />
+
+        <button
+          onClick={() => setActiveTag('all')}
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
+            activeTag === 'all'
+              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+              : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
+          }`}
+        >
+          همه
+        </button>
+
+        {sortedTags.map(tag => (
           <button
-            type="button"
-            onClick={() => setIsTagManagerOpen(true)}
-            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-surface-elevated/80 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated border border-neutral-200/80 dark:border-neutral-800 transition-all flex items-center gap-1.5 shrink-0"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span className="hidden sm:inline">مدیریت تگ‌ها</span>
-          </button>
-
-          <div className="w-px h-5 bg-neutral-200 dark:bg-neutral-700 shrink-0 mx-1" />
-
-          <button
-            onClick={() => setActiveTag('all')}
+            key={tag.id}
+            onClick={() => setActiveTag(tag.name)}
             className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
-              activeTag === 'all'
+              activeTag === tag.name
                 ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                 : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
             }`}
           >
-            همه
+            {tag.name}
           </button>
-          
-
-
-          {sortedTags.map(tag => (
-            <button
-              key={tag.id}
-              onClick={() => setActiveTag(tag.name)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
-                activeTag === tag.name
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                  : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
-              }`}
-            >
-              {tag.name}
-            </button>
-          ))}
-        </div>
+        ))}
       </div>
 
-      <div className="space-y-5 pb-20 relative px-4" dir="rtl">
+      <div>
         {filteredDuas.length === 0 ? (
-          <div className="text-center py-16 text-neutral-500">
-            {searchQuery 
-              ? 'نتیجه‌ای یافت نشد.' 
-              : activeTag === 'favorites' 
-                ? 'هیچ دعایی در علاقه‌مندی‌ها وجود ندارد.'
-                : activeTag !== 'all'
-                  ? 'هیچ دعایی با این تگ یافت نشد.'
-                  : 'هنوز دعایی اضافه نشده است.'}
+          <div className="bg-surface-card border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-8 sm:p-12 text-center max-w-md mx-auto space-y-4 my-6">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
+              {searchQuery ? (
+                <SearchX className="w-6 h-6" />
+              ) : activeTag !== 'all' && activeTag !== 'favorites' ? (
+                <TagIcon className="w-6 h-6" />
+              ) : (
+                <FileText className="w-6 h-6" />
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-primary-theme">
+                {searchQuery
+                  ? 'دعایی پیدا نشد'
+                  : activeTag === 'favorites'
+                  ? 'هیچ دعایی در علاقه‌مندی‌ها نیست'
+                  : activeTag !== 'all'
+                  ? `هیچ دعایی با تگ «${activeTag}» یافت نشد`
+                  : 'هنوز دعایی اضافه نشده'}
+              </h3>
+              <p className="text-xs text-secondary-theme leading-relaxed">
+                {searchQuery
+                  ? 'عبارت دیگری را جستجو کنید یا فیلترها را تغییر دهید.'
+                  : activeTag === 'favorites'
+                  ? 'می‌توانید با انتخاب آیکون قلب، دعاها را به این لیست اضافه کنید.'
+                  : activeTag !== 'all'
+                  ? 'می‌توانید تگ دیگری را انتخاب کرده یا دعای جدیدی اضافه کنید.'
+                  : 'با استفاده از دکمه افزودن، اولین دعای خود را ثبت کنید.'}
+              </p>
+            </div>
+
+            {activeTag === 'all' && !searchQuery && (
+              <button
+                type="button"
+                onClick={() => { setEditingDua(null); setIsAddEditModalOpen(true); }}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-2xl shadow-md transition-all active:scale-95 inline-flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" />
+                افزودن دعای جدید
+              </button>
+            )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
             {filteredDuas.map(dua => (
               <DuaCard 
                 key={dua.id}
@@ -234,24 +279,50 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
       </button>
 
       {/* Modals */}
-      {isAddEditModalOpen && (
-        <AddEditDuaModal
-          dua={editingDua}
-          onClose={() => { setIsAddEditModalOpen(false); setEditingDua(null); }}
-          onSave={handleSaveDua}
-        />
-      )}
+      <AnimatePresence>
+        {isAddEditModalOpen && (
+          <AddEditDuaModal
+            isOpen={isAddEditModalOpen}
+            dua={editingDua}
+            onClose={() => { setIsAddEditModalOpen(false); setEditingDua(null); }}
+            onSave={handleSaveDua}
+          />
+        )}
+      </AnimatePresence>
 
-      {isTagManagerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 bg-black/40 backdrop-blur-sm sm:backdrop-blur-md transition-opacity">
-          <div className="w-[calc(100%-1.75rem)] max-w-md h-[80vh] sm:h-[600px] bg-surface-bg rounded-3xl shadow-2xl flex flex-col relative overflow-hidden my-auto animate-in zoom-in-95 duration-200">
-            <TagManagerModal 
-              onClose={() => setIsTagManagerOpen(false)} 
-              onSelectTagFilter={(tag) => setActiveTag(tag)}
+      <AnimatePresence>
+        {isTagManagerOpen && (
+          <div 
+            key="duas-tag-manager"
+            className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4" 
+            dir="rtl"
+          >
+            <motion.div
+              key="duas-tag-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setIsTagManagerOpen(false)}
             />
+            <motion.div
+              key="duas-tag-modal-card"
+              initial={{ opacity: 0, scale: 0.92, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 8 }}
+              transition={{ duration: 0.18, ease: "easeInOut" }}
+              className="relative w-[calc(100%-1.75rem)] max-w-md h-[80vh] sm:h-[600px] bg-surface-bg rounded-3xl shadow-2xl flex flex-col overflow-hidden my-auto"
+            >
+              <TagManagerModal 
+                isOpen={isTagManagerOpen}
+                onClose={() => setIsTagManagerOpen(false)} 
+                onSelectTagFilter={(tag) => setActiveTag(tag)}
+              />
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* Delete Confirmation Dialog */}
       <Dialog
@@ -288,15 +359,21 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
       </Dialog>
 
       {/* Reading View Overlay */}
-      {readingDua && (
-        <DuaReadingView
-          dua={readingDua}
-          onClose={() => setSearchParams({}, { replace: true })}
-          onEdit={(d) => { setEditingDua(d); setIsAddEditModalOpen(true); }}
-          onDelete={handleDeleteDua}
-          onToggleFavorite={handleToggleFavorite}
-        />
-      )}
+      <AnimatePresence>
+        {readingDua && (
+          <DuaReadingView
+            dua={readingDua}
+            isPopStateBack={isPopStateBack.current}
+            onClose={() => {
+              isPopStateBack.current = false;
+              setSearchParams({}, { replace: true });
+            }}
+            onEdit={(d) => { setEditingDua(d); setIsAddEditModalOpen(true); }}
+            onDelete={handleDeleteDua}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

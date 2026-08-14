@@ -45,6 +45,9 @@ export class ResetService {
       await db.preferences.clear();
       await db.backupHistory.clear();
 
+      // Set flag to prevent default content from re-seeding after wipe
+      localStorage.setItem('mihrab_skip_content_seed', 'true');
+
       // Re-seed initial default records so app functionality stays healthy with 0 counts
       await db.seedInitialDataIfNeeded();
     });
