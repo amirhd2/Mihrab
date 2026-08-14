@@ -6,6 +6,7 @@ interface SwipeToDeleteItemProps {
   onDelete: () => void;
   children: React.ReactNode;
   className?: string;
+  cardClassName?: string;
 }
 
 const CARD_BTN_GAP = 12; // Gap between card and delete button edge
@@ -22,6 +23,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
   onDelete,
   children,
   className = '',
+  cardClassName = '',
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -316,7 +318,9 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       {/* Foreground Content Card */}
       <div
         ref={cardRef}
-        className="card-content relative z-10 w-full h-full bg-surface-card rounded-2xl flex items-center justify-between cursor-grab active:cursor-grabbing border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs hover:shadow-md transition-shadow duration-200"
+        className={`card-content relative z-10 w-full h-full rounded-2xl flex items-center justify-between cursor-grab active:cursor-grabbing shadow-2xs hover:shadow-md transition-all duration-200 ${
+          cardClassName || 'bg-surface-card border border-neutral-200/80 dark:border-neutral-800/80'
+        }`}
       >
         <div className="w-full h-full flex flex-col justify-between">{children}</div>
       </div>

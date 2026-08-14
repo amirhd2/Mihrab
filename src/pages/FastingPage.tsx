@@ -235,7 +235,7 @@ export const FastingPage: React.FC<{
         
         {/* Column 1: Qaza Fasting */}
         <div className="flex flex-col gap-4">
-          <div className="bg-surface-card border border-neutral-200/60 dark:border-neutral-800/60 rounded-3xl p-5 shadow-xs relative overflow-hidden">
+          <div className="bg-surface-card border border-amber-500/20 dark:border-amber-500/30 rounded-3xl p-5 shadow-xs relative overflow-hidden">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-base font-extrabold text-primary-theme">روزه‌های قضا</h2>
@@ -279,7 +279,7 @@ export const FastingPage: React.FC<{
 
         {/* Column 2: Fitriya */}
         <div className="flex flex-col gap-4">
-          <div className="bg-surface-card border border-neutral-200/60 dark:border-neutral-800/60 rounded-3xl p-5 shadow-xs">
+          <div className="bg-surface-card border border-amber-500/20 dark:border-amber-500/30 rounded-3xl p-5 shadow-xs">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-base font-extrabold text-primary-theme">فطریه ۱۴۰۵</h2>
@@ -346,7 +346,7 @@ export const FastingPage: React.FC<{
 
         {/* Column 3: Kaffarah */}
         <div className="flex flex-col gap-4 md:col-span-2">
-          <div className="bg-surface-card border border-neutral-200/60 dark:border-neutral-800/60 rounded-3xl p-5 shadow-xs transition-all">
+          <div className="bg-surface-card border border-amber-500/20 dark:border-amber-500/30 rounded-3xl p-5 shadow-xs transition-all">
             <div 
               className="flex items-center justify-between cursor-pointer group"
               onClick={() => setIsKaffarahActive(!isKaffarahActive)}
@@ -487,7 +487,7 @@ export const FastingPage: React.FC<{
           isStickyVisible ? 'translate-y-0' : 'translate-y-[150%]'
         }`}
       >
-        <Card className="p-3.5 sm:p-4 border border-neutral-200/90 dark:border-neutral-800/80 shadow-lg md:shadow-xs md:mt-6">
+        <Card className="p-3.5 sm:p-4 border border-amber-500/20 dark:border-amber-500/30 shadow-lg md:shadow-xs md:mt-6">
           <div className="grid grid-cols-3 items-center divide-x divide-x-reverse divide-neutral-200 dark:divide-neutral-800">
             {/* SECTION 1 (RIGHT in RTL): کل باقیمانده */}
           <div className="flex items-center gap-2.5 sm:gap-3 justify-start pr-1 sm:pr-3">
@@ -824,9 +824,17 @@ export const FastingPage: React.FC<{
               className="absolute inset-0 bg-black/40 backdrop-blur-xs"
             />
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
+              initial={{ opacity: 0, scale: 0.75 }}
+              animate={{ 
+                opacity: [0, 1, 1, 1], 
+                scale: [0.75, 1.05, 0.97, 1],
+                transition: { duration: 0.45, ease: [0.175, 0.885, 0.32, 1.275], times: [0, 0.65, 0.85, 1] }
+              }}
+              exit={{ 
+                opacity: [1, 1, 0], 
+                scale: [1, 1.06, 0.7],
+                transition: { duration: 0.35, ease: [0.6, -0.28, 0.735, 0.045], times: [0, 0.3, 1] }
+              }}
               className="relative w-full max-w-sm bg-surface-card rounded-3xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-xl"
             >
               <div className="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-4">

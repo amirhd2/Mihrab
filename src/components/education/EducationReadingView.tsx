@@ -9,7 +9,6 @@ interface EducationReadingViewProps {
   onEdit: (item: EducationContentRecord) => void;
   onDelete: (item: EducationContentRecord) => void;
   onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning') => void;
-  isPopStateBack?: boolean;
 }
 
 export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
@@ -18,13 +17,21 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
   onEdit,
   onDelete,
   onShowToast,
-  isPopStateBack = false,
 }) => {
+  const [isClosing, setIsClosing] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showTopBar, setShowTopBar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleBack = () => {
+    if (isClosing) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      onBack();
+    }, 180);
+  };
 
   // Close menu on click outside
   useEffect(() => {
@@ -133,8 +140,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={isPopStateBack ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 16 }}
+      animate={isClosing ? { opacity: 0, y: 16 } : { opacity: 1, y: 0 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
       className="fixed inset-0 z-50 bg-neutral-50 dark:bg-neutral-900 overflow-hidden"
       dir="rtl"
@@ -147,7 +153,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
       >
         <button
           type="button"
-          onClick={onBack}
+          onClick={handleBack}
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors active:scale-95"
         >
           <ArrowRight className="w-4 h-4" />

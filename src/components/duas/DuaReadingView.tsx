@@ -9,7 +9,6 @@ interface DuaReadingViewProps {
   onEdit: (dua: DuaRecord) => void;
   onDelete: (id: number) => void;
   onToggleFavorite: (id: number) => void;
-  isPopStateBack?: boolean;
 }
 
 type TextSize = 'sm' | 'base' | 'lg' | 'xl';
@@ -20,14 +19,22 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
   onEdit,
   onDelete,
   onToggleFavorite,
-  isPopStateBack = false,
 }) => {
+  const [isClosing, setIsClosing] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showTextSize, setShowTextSize] = useState(false);
   const [textSize, setTextSize] = useState<TextSize>('base');
   const [showTopBar, setShowTopBar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleBack = () => {
+    if (isClosing) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 180);
+  };
 
   // Close menus on click outside
   useEffect(() => {
@@ -99,8 +106,7 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={isPopStateBack ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 16 }}
+      animate={isClosing ? { opacity: 0, y: 16 } : { opacity: 1, y: 0 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
       className="fixed inset-0 z-50 bg-neutral-50 dark:bg-neutral-900 overflow-hidden"
       dir="rtl"
@@ -113,7 +119,7 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleBack}
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors active:scale-95"
         >
           <ArrowRight className="w-4 h-4" />

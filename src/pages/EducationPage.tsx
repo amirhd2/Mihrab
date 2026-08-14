@@ -50,20 +50,6 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<EducationContentRecord | null>(null);
   const [loading, setLoading] = useState(true);
-  const isPopStateBack = useRef(false);
-
-  // Listen for browser popstate (e.g. swipe-back or back button) to suppress exit animation
-  useEffect(() => {
-    const handlePopState = () => {
-      isPopStateBack.current = true;
-      setTimeout(() => {
-        isPopStateBack.current = false;
-      }, 400);
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
 
   // Derived active reading item based on URL article search param
   const activeReadingItem = useMemo(() => {
@@ -352,21 +338,15 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
       </button>
 
       {/* Reading View Overlay */}
-      <AnimatePresence>
-        {activeReadingItem && (
-          <EducationReadingView
-            item={activeReadingItem}
-            isPopStateBack={isPopStateBack.current}
-            onBack={() => {
-              isPopStateBack.current = false;
-              setSearchParams({}, { replace: true });
-            }}
-            onEdit={(item) => handleOpenEditForm(item)}
-            onDelete={(item) => handleDeleteContent(item)}
-            onShowToast={(msg, type) => onShowToast && onShowToast(msg, type)}
-          />
-        )}
-      </AnimatePresence>
+      {activeReadingItem && (
+        <EducationReadingView
+          item={activeReadingItem}
+          onBack={() => setSearchParams({}, { replace: true })}
+          onEdit={(item) => handleOpenEditForm(item)}
+          onDelete={(item) => handleDeleteContent(item)}
+          onShowToast={(msg, type) => onShowToast && onShowToast(msg, type)}
+        />
+      )}
 
       {/* Add / Edit Form Modal */}
       <EducationFormModal

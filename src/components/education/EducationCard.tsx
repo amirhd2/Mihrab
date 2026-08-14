@@ -10,40 +10,36 @@ interface EducationCardProps {
 }
 
 export const EducationCard: React.FC<EducationCardProps> = ({ item, onSelect, onDelete }) => {
-  // Truncate text to max 80 characters as requested
-  const textSnippet = item.text.length > 80
-    ? item.text.slice(0, 80).trim() + '...'
-    : item.text;
-
   return (
     <div className="relative h-[190px] sm:h-[200px] w-full">
       <SwipeToDeleteItem
         id={item.id!}
         onDelete={() => onDelete(item)}
         className="h-full w-full"
+        cardClassName="bg-gradient-to-br from-blue-500/[0.06] via-surface-card to-surface-card border border-blue-500/15 dark:border-blue-500/20 hover:border-blue-500/35 dark:hover:border-blue-500/40"
       >
         <div
           onClick={() => onSelect(item)}
           className="w-full h-full p-4 sm:p-5 transition-all duration-200 cursor-pointer group flex flex-col justify-between"
         >
-          {/* Top Section: Header at Top-Right & 80-char Text Snippet */}
+          {/* Top Section: Header at Top-Right & Text Snippet (up to 2 lines) */}
           <div>
             {/* Header (Top Right) */}
             <div className="flex items-start justify-between gap-2 mb-2">
-              <h3 className="text-base sm:text-lg font-bold text-primary-theme text-right group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1 flex-1">
+              <h3 className="text-base sm:text-lg font-bold text-primary-theme text-right group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1 flex-1">
                 {item.title}
               </h3>
-              <ChevronLeft className="w-4 h-4 text-muted-theme group-hover:text-emerald-500 group-hover:-translate-x-1 transition-all shrink-0 mt-1" />
+              <ChevronLeft className="w-4 h-4 text-muted-theme group-hover:text-blue-500 group-hover:-translate-x-1 transition-all shrink-0 mt-1" />
             </div>
 
-            {/* Snippet Preview (Max 80 chars) */}
-            <p className="text-xs sm:text-sm text-secondary-theme leading-relaxed text-right line-clamp-3">
-              {textSnippet}
+            {/* Snippet Preview (Up to 2 lines) */}
+            <p className="text-xs sm:text-sm text-secondary-theme leading-relaxed text-right line-clamp-2">
+              {item.text}
             </p>
           </div>
 
           {/* Footer: Source on Right, Tags on Bottom Left (Left Aligned) */}
-          <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-neutral-100 dark:border-neutral-800/80 mt-auto">
+          <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-blue-500/10 dark:border-blue-500/15 mt-auto">
             {/* Right Side: Source */}
             <div className="truncate flex-1 text-right">
               {item.source ? (
@@ -58,7 +54,7 @@ export const EducationCard: React.FC<EducationCardProps> = ({ item, onSelect, on
               {item.tags && item.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-0.5 rounded-lg text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 whitespace-nowrap"
+                  className="px-2 py-0.5 rounded-lg text-[11px] font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 whitespace-nowrap"
                 >
                   {tag}
                 </span>

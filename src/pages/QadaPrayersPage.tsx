@@ -527,9 +527,17 @@ export const QadaPrayersPage: React.FC<{
               className="absolute inset-0 bg-black/40 backdrop-blur-xs"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.75 }}
+              animate={{ 
+                opacity: [0, 1, 1, 1], 
+                scale: [0.75, 1.05, 0.97, 1],
+                transition: { duration: 0.45, ease: [0.175, 0.885, 0.32, 1.275], times: [0, 0.65, 0.85, 1] }
+              }}
+              exit={{ 
+                opacity: [1, 1, 0], 
+                scale: [1, 1.06, 0.7],
+                transition: { duration: 0.35, ease: [0.6, -0.28, 0.735, 0.045], times: [0, 0.3, 1] }
+              }}
               className="relative w-full max-w-md bg-surface-card rounded-3xl border border-neutral-200 dark:border-neutral-800 p-5 sm:p-6 shadow-xl z-10 space-y-4"
             >
               <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80 dark:border-neutral-800/80">
@@ -589,9 +597,17 @@ export const QadaPrayersPage: React.FC<{
               className="absolute inset-0 bg-black/40 backdrop-blur-xs"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.75 }}
+              animate={{ 
+                opacity: [0, 1, 1, 1], 
+                scale: [0.75, 1.05, 0.97, 1],
+                transition: { duration: 0.45, ease: [0.175, 0.885, 0.32, 1.275], times: [0, 0.65, 0.85, 1] }
+              }}
+              exit={{ 
+                opacity: [1, 1, 0], 
+                scale: [1, 1.06, 0.7],
+                transition: { duration: 0.35, ease: [0.6, -0.28, 0.735, 0.045], times: [0, 0.3, 1] }
+              }}
               className="relative w-full max-w-sm bg-surface-card rounded-3xl border border-neutral-200 dark:border-neutral-800 p-5 shadow-xl z-10 text-center space-y-4"
             >
               <div className="w-12 h-12 rounded-full bg-rose-500/10 text-rose-600 flex items-center justify-center mx-auto">
@@ -636,9 +652,17 @@ export const QadaPrayersPage: React.FC<{
               className="absolute inset-0 bg-black/50 backdrop-blur-xs"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.75 }}
+              animate={{ 
+                opacity: [0, 1, 1, 1], 
+                scale: [0.75, 1.05, 0.97, 1],
+                transition: { duration: 0.45, ease: [0.175, 0.885, 0.32, 1.275], times: [0, 0.65, 0.85, 1] }
+              }}
+              exit={{ 
+                opacity: [1, 1, 0], 
+                scale: [1, 1.06, 0.7],
+                transition: { duration: 0.35, ease: [0.6, -0.28, 0.735, 0.045], times: [0, 0.3, 1] }
+              }}
               className="relative w-full max-w-md bg-surface-card rounded-3xl border border-emerald-500/30 p-6 shadow-2xl z-10 text-center space-y-4"
             >
               <div className="w-16 h-16 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto ring-8 ring-emerald-500/10">

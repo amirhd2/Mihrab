@@ -31,6 +31,7 @@ export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => 
         id={dua.id!}
         onDelete={() => onDelete(dua)}
         className="h-full w-full"
+        cardClassName="bg-gradient-to-br from-purple-500/[0.06] via-surface-card to-surface-card border border-purple-500/15 dark:border-purple-500/20 hover:border-purple-500/35 dark:hover:border-purple-500/40"
       >
         <div
           onClick={() => onSelect(dua)}
@@ -41,14 +42,14 @@ export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => 
             {/* Header (Top Right) */}
             <div className="flex items-start justify-between gap-2 mb-3">
               <div className="flex items-center gap-1 flex-1 min-w-0">
-                <h3 className="text-base sm:text-lg font-bold text-primary-theme text-right group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1 truncate">
+                <h3 className="text-base sm:text-lg font-bold text-primary-theme text-right group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-1 truncate">
                   {dua.title}
                 </h3>
                 {dua.isFavorite && (
                   <Star className="w-4 h-4 text-amber-500 shrink-0 fill-current" />
                 )}
               </div>
-              <ChevronLeft className="w-4 h-4 text-muted-theme group-hover:text-emerald-500 group-hover:-translate-x-1 transition-all shrink-0 mt-1" />
+              <ChevronLeft className="w-4 h-4 text-muted-theme group-hover:text-purple-500 group-hover:-translate-x-1 transition-all shrink-0 mt-1" />
             </div>
 
             {/* Snippet Preview */}
@@ -71,7 +72,7 @@ export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => 
           </div>
 
           {/* Footer: Source on Right, Tags on Bottom Left (Left Aligned) */}
-          <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-neutral-100 dark:border-neutral-800/80 mt-auto">
+          <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-purple-500/10 dark:border-purple-500/15 mt-auto">
             {/* Right Side: Source */}
             <div className="truncate flex-1 text-right">
               {dua.source ? (
@@ -86,7 +87,7 @@ export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => 
               {dua.tags && dua.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-0.5 rounded-lg text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 whitespace-nowrap"
+                  className="px-2 py-0.5 rounded-lg text-[11px] font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400 whitespace-nowrap"
                 >
                   {tag}
                 </span>

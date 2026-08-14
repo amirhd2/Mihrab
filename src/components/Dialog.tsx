@@ -43,19 +43,25 @@ export const Dialog: React.FC<DialogProps> = ({
         >
           <motion.div
             key="dialog-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
+                                    initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.3, ease: "easeOut" } }}
+            exit={{ opacity: 0, transition: { duration: 0.3, ease: "easeIn" } }}
             className="absolute inset-0 bg-slate-900/60"
             onClick={onClose}
           />
           <motion.div
             key="dialog-card"
-            initial={{ opacity: 0, scale: 0.92, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 8 }}
-            transition={{ duration: 0.18, ease: "easeInOut" }}
+            initial={{ opacity: 0, scale: 0.75 }}
+              animate={{ 
+                opacity: [0, 1, 1, 1], 
+                scale: [0.75, 1.05, 0.97, 1],
+                transition: { duration: 0.45, ease: [0.175, 0.885, 0.32, 1.275], times: [0, 0.65, 0.85, 1] }
+              }}
+              exit={{ 
+                opacity: [1, 1, 0], 
+                scale: [1, 1.06, 0.7],
+                transition: { duration: 0.35, ease: [0.6, -0.28, 0.735, 0.045], times: [0, 0.3, 1] }
+              }}
             className="relative w-full max-w-md bg-surface-card border border-theme rounded-2xl shadow-xl overflow-hidden p-5 sm:p-6 text-right"
             onClick={(e) => e.stopPropagation()}
           >

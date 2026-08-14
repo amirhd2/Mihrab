@@ -22,7 +22,6 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
   const [source, setSource] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
-  const [showTagSelector, setShowTagSelector] = useState(false);
 
   const availableTags = useLiveQuery(() => db.duaTags.toArray()) || [];
 
@@ -41,7 +40,6 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
         setSource('');
         setSelectedTags([]);
       }
-      setShowTagSelector(false);
       setNewTag('');
     }
   }, [dua, isOpen]);
@@ -96,19 +94,25 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
         >
           <motion.div
             key="add-edit-dua-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
+                                    initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.3, ease: "easeOut" } }}
+            exit={{ opacity: 0, transition: { duration: 0.3, ease: "easeIn" } }}
             className="absolute inset-0 bg-neutral-900/50"
             onClick={onClose}
           />
           <motion.div
             key="add-edit-dua-card"
-            initial={{ opacity: 0, scale: 0.92, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 8 }}
-            transition={{ duration: 0.18, ease: "easeInOut" }}
+            initial={{ opacity: 0, scale: 0.75 }}
+              animate={{ 
+                opacity: [0, 1, 1, 1], 
+                scale: [0.75, 1.05, 0.97, 1],
+                transition: { duration: 0.45, ease: [0.175, 0.885, 0.32, 1.275], times: [0, 0.65, 0.85, 1] }
+              }}
+              exit={{ 
+                opacity: [1, 1, 0], 
+                scale: [1, 1.06, 0.7],
+                transition: { duration: 0.35, ease: [0.6, -0.28, 0.735, 0.045], times: [0, 0.3, 1] }
+              }}
             className="relative bg-surface-card w-[calc(100%-1.75rem)] max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[85vh] my-auto overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
@@ -169,17 +173,8 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
             />
           </div>
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">تگ‌ها</label>
-              <button
-                type="button"
-                onClick={() => setShowTagSelector(!showTagSelector)}
-                className="text-xs text-emerald-600 font-medium hover:text-emerald-700"
-              >
-                {showTagSelector ? 'بستن انتخاب تگ' : 'انتخاب از تگ‌های موجود'}
-              </button>
-            </div>
+          <div className="space-y-2.5">
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 block">تگ‌ها</label>
 
             {selectedTags.length > 0 && (
               <div className="flex flex-wrap gap-2">
@@ -194,52 +189,50 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
               </div>
             )}
 
-            {showTagSelector && (
-              <div className="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl p-3 space-y-3">
-                {availableTags.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {availableTags.map(tag => {
-                      const isSelected = selectedTags.includes(tag.name);
-                      return (
-                        <button
-                          key={tag.id}
-                          type="button"
-                          onClick={() => toggleTag(tag.name)}
-                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border transition-colors ${
-                            isSelected 
-                              ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 border-emerald-200 dark:border-emerald-800' 
-                              : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300'
-                          }`}
-                        >
-                          {isSelected && <Check className="w-3.5 h-3.5" />}
-                          {tag.name}
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="text-xs text-neutral-500 text-center py-2">هیچ تگی وجود ندارد.</p>
-                )}
-                <div className="flex items-center gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-700">
-                  <input
-                    type="text"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddNewTag(); } }}
-                    placeholder="ایجاد تگ جدید..."
-                    className="flex-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddNewTag}
-                    disabled={!newTag.trim()}
-                    className="p-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 rounded-lg hover:bg-neutral-200 disabled:opacity-50 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+            <div className="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl p-3 space-y-3">
+              {availableTags.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {availableTags.map(tag => {
+                    const isSelected = selectedTags.includes(tag.name);
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => toggleTag(tag.name)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                          isSelected 
+                            ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 border-emerald-200 dark:border-emerald-800' 
+                            : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300'
+                        }`}
+                      >
+                        {isSelected && <Check className="w-3.5 h-3.5" />}
+                        {tag.name}
+                      </button>
+                    );
+                  })}
                 </div>
+              ) : (
+                <p className="text-xs text-neutral-500 text-center py-1">هیچ تگی وجود ندارد.</p>
+              )}
+              <div className="flex items-center gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-700">
+                <input
+                  type="text"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddNewTag(); } }}
+                  placeholder="ایجاد تگ جدید..."
+                  className="flex-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddNewTag}
+                  disabled={!newTag.trim()}
+                  className="p-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 rounded-lg hover:bg-neutral-200 disabled:opacity-50 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
               </div>
-            )}
+            </div>
           </div>
         </div>
 

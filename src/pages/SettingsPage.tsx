@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { PageHeader } from '../components/PageHeader';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
@@ -37,10 +38,20 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۱.۳.۰',
+    version: 'نسخه ۱.۴.۰',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'نمایش دوخطی متن اصلی در کارت‌های بخش آموزش و احکام',
+      'دسترسی دائمی و سریع به تگ‌های موجود در فرم‌های ثبت و ویرایش احکام و ادعیه',
+      'هماهنگی دقیق رنگ‌بندی حاشیه کارت‌های روزه با داشبورد',
+      'بهینه‌سازی کلی رابط کاربری و بهبود کارایی',
+    ],
+  },
+  {
+    version: 'نسخه ۱.۳.۰',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'هوشمندسازی دکمه‌های شناور (FAB) در تمامی صفحات (حذف هنگام اسکرول به پایین و نمایش با اسکرول به بالا)',
       'تکمیل و بهبود سیستم پشتیبان‌گیری، بازیابی و حذف اطلاعات برای سازگاری کامل با تمامی داده‌ها',
@@ -465,7 +476,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
       {/* Version Number Footnote */}
       <div className="text-center pt-2">
         <span className="text-xs font-semibold text-secondary-theme/70">
-          نسخه ۱.۳.۰ (۱۳۰)
+          نسخه ۱.۴.۰ (۱۴۰)
         </span>
       </div>
 
@@ -597,26 +608,37 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
                     </span>
                   </div>
 
-                  <div className="w-7 h-7 rounded-lg bg-surface-elevated flex items-center justify-center shrink-0 text-secondary-theme">
-                    {isOpen ? (
-                      <ChevronUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4" />
-                    )}
-                  </div>
+                  <motion.div 
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={{ duration: 0.22, ease: "easeInOut" }}
+                    className="w-7 h-7 rounded-lg bg-surface-elevated flex items-center justify-center shrink-0 text-secondary-theme"
+                  >
+                    <ChevronDown className={`w-4 h-4 ${isOpen ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
+                  </motion.div>
                 </button>
 
-                {isOpen && (
-                  <div className="px-4 pb-4 pt-2 border-t border-theme/30 animate-in fade-in duration-200">
-                    <ul className="text-xs text-secondary-theme space-y-2 list-disc list-inside leading-relaxed pr-1">
-                      {rel.changes.map((change, cIdx) => (
-                        <li key={cIdx} className="text-primary-theme/90">
-                          <span>{change}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      key={`release-content-${rel.version}`}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-4 pb-4 pt-2 border-t border-theme/30">
+                        <ul className="text-xs text-secondary-theme space-y-2 list-disc list-inside leading-relaxed pr-1">
+                          {rel.changes.map((change, cIdx) => (
+                            <li key={cIdx} className="text-primary-theme/90">
+                              <span>{change}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}
