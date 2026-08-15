@@ -1,42 +1,6 @@
-import React, { createContext, useContext, useRef, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useRef, useState, useCallback } from 'react';
 import { useNavigate, useLocation, Location } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-
-// Swipe detection logic to prevent duplicate animation on native/gesture swipe back
-let lastEdgeSwipeTime = 0;
-let isTouchingEdge = false;
-
-if (typeof window !== 'undefined') {
-  window.addEventListener(
-    'touchstart',
-    (e) => {
-      if (e.touches && e.touches.length > 0) {
-        const x = e.touches[0].clientX;
-        // Edge touch: within 50px of either edge
-        if (x < 50 || x > window.innerWidth - 50) {
-          isTouchingEdge = true;
-          lastEdgeSwipeTime = Date.now();
-        }
-      }
-    },
-    { passive: true }
-  );
-
-  window.addEventListener('touchmove', () => {
-    if (isTouchingEdge) lastEdgeSwipeTime = Date.now();
-  }, { passive: true });
-
-  window.addEventListener('touchend', () => {
-    if (isTouchingEdge) {
-      lastEdgeSwipeTime = Date.now();
-      setTimeout(() => { isTouchingEdge = false; }, 500);
-    }
-  }, { passive: true });
-
-  window.addEventListener('popstate', () => {
-    if (Date.now() - lastEdgeSwipeTime < 600) lastEdgeSwipeTime = Date.now();
-  });
-}
 
 export type Direction = 'forward' | 'back' | 'none';
 
@@ -56,31 +20,54 @@ export const useAppNavigate = () => {
   return ctx?.navigateTo || routerNavigate;
 };
 
-// Smooth, native-feeling transition variables
+// Faster, snappier native-feeling transition variables
 const pageVariants = {
-  initial: (direction: Direction) => ({
-    x: direction === 'forward' ? 30 : direction === 'back' ? -30 : 0,
-    opacity: 0,
-    scale: 0.98,
-  }),
-  animate: {
-    x: 0,
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.35,
-      ease: [0.22, 1, 0.36, 1], // smooth deceleration
-    },
+  initial: (direction: Direction) => {
+    if (direction === 'none') return { x: 0, opacity: 1, scale: 1 };
+    return {
+      x: direction === 'forward' ? 25 : direction === 'back' ? -25 : 0,
+      opacity: 0,
+      scale: 0.99,
+    };
   },
-  exit: (direction: Direction) => ({
-    x: direction === 'forward' ? -30 : direction === 'back' ? 30 : 0,
-    opacity: 0,
-    scale: 0.98,
-    transition: {
-      duration: 0.25,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  }),
+  animate: (direction: Direction) => {
+    if (direction === 'none') {
+      return {
+        x: 0,
+        opacity: 1,
+        scale: 1,
+        transition: { duration: 0 },
+      };
+    }
+    return {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.25,
+        ease: [0.22, 1, 0.36, 1], // smooth deceleration
+      },
+    };
+  },
+  exit: (direction: Direction) => {
+    if (direction === 'none') {
+      return {
+        x: 0,
+        opacity: 1,
+        scale: 1,
+        transition: { duration: 0 },
+      };
+    }
+    return {
+      x: direction === 'forward' ? -20 : direction === 'back' ? 20 : 0,
+      opacity: 0,
+      scale: 0.99,
+      transition: {
+        duration: 0.15, // fast exit so mode="wait" doesn't feel like lag
+        ease: [0.22, 1, 0.36, 1],
+      },
+    };
+  },
 };
 
 export const PageTransition: React.FC<{
@@ -88,20 +75,34 @@ export const PageTransition: React.FC<{
   location: Location;
 }> = ({ children, location }) => {
   const routerNavigate = useNavigate();
+  const [directionState, setDirectionState] = useState<Direction>('forward');
   const prevPathRef = useRef(location.pathname);
-  const [direction, setDirection] = useState<Direction>('none');
   const explicitDirectionRef = useRef<Direction | null>(null);
 
-  const determineDirection = useCallback((fromPath: string, toPath: string): Direction => {
+  // Synchronously calculate direction during render to prevent 1-frame lag/mismatches
+  let currentDirection = directionState;
+  
+  if (prevPathRef.current !== location.pathname) {
+    const fromPath = prevPathRef.current;
+    const toPath = location.pathname;
+    
     if (explicitDirectionRef.current) {
-      const d = explicitDirectionRef.current;
+      currentDirection = explicitDirectionRef.current;
       explicitDirectionRef.current = null;
-      return d;
+    } else {
+      // If navigation happens without explicit UI interaction (e.g. native swipe-to-back, browser back button)
+      // we disable our JS animation to avoid conflicting with the browser's native snapshot animation
+      currentDirection = 'none';
     }
-    if (toPath === '/' && fromPath !== '/') return 'back';
-    if (fromPath === '/' && toPath !== '/') return 'forward';
-    return 'forward';
-  }, []);
+    
+    setDirectionState(currentDirection);
+    prevPathRef.current = toPath;
+    
+    // Quick scroll restore
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
+  }
 
   const navigateTo = useCallback(
     (to: string | number, options?: { isBack?: boolean }) => {
@@ -111,7 +112,6 @@ export const PageTransition: React.FC<{
       const isBack = options?.isBack !== undefined ? options.isBack : (typeof to === 'number' ? to < 0 : to === '/');
       const dir: Direction = isBack ? 'back' : 'forward';
       explicitDirectionRef.current = dir;
-      setDirection(dir);
 
       if (typeof to === 'number') {
         routerNavigate(to);
@@ -122,32 +122,16 @@ export const PageTransition: React.FC<{
     [location.pathname, routerNavigate]
   );
 
-  useEffect(() => {
-    const prevPath = prevPathRef.current;
-    const currentPath = location.pathname;
-
-    if (prevPath !== currentPath) {
-      const dir = determineDirection(prevPath, currentPath);
-      setDirection(dir);
-      prevPathRef.current = currentPath;
-      window.scrollTo(0, 0);
-    }
-  }, [location.pathname, determineDirection]);
-
-  const isSwiped = Date.now() - lastEdgeSwipeTime < 600;
-  // If swiped back via native gesture, disable animation
-  const currentDirection = isSwiped ? 'none' : direction;
-
   return (
-    <NavigationContext.Provider value={{ navigateTo, direction }}>
-      <AnimatePresence mode="wait" initial={false} custom={currentDirection}>
+    <NavigationContext.Provider value={{ navigateTo, direction: currentDirection }}>
+      <AnimatePresence mode="wait" custom={currentDirection}>
         <motion.div
           key={location.pathname}
           custom={currentDirection}
           variants={pageVariants}
-          initial={currentDirection === 'none' ? false : "initial"}
+          initial="initial"
           animate="animate"
-          exit={currentDirection === 'none' ? false : "exit"}
+          exit="exit"
           className="w-full will-change-transform"
         >
           {children}
