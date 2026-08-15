@@ -1,3 +1,4 @@
+import { Portal } from "../components/Portal";
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from "react-router-dom";
 import { useAppNavigate } from '../components/PageTransition';
@@ -273,7 +274,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
         onSave={handleSaveDua}
       />
 
-      <AnimatePresence>
+      <Portal><AnimatePresence>
         {isTagManagerOpen && (
           <div 
             key="duas-tag-manager"
@@ -311,7 +312,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+      </AnimatePresence></Portal>
 
       {/* Delete Confirmation Dialog */}
       <Dialog

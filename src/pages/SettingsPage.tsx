@@ -38,10 +38,19 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۳.۰.۰',
+    version: 'نسخه ۳.۰.۱',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'حل مشکل نمایش ماژول‌های پاپ‌آپ (مانند تایید حذف و جشن اتمام نماز قضا) در حالت اسکرول',
+      'تثبیت پس‌زمینه تیره کادر پیام‌ها در مرکز صفحه برای تمام بخش‌ها (پورتال هوشمند)',
+      'بهبود و هماهنگی کامل کادر پیام با انیمیشن‌های سیستم',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۰.۰',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'بازنویسی کامل سیستم انیمیشن‌ها با فریم‌ورک Motion جهت اجرای روان‌تر و حس Native',
       'رفع کامل مشکل اسکیپ (پرش) در هنگام سوایپ (Gesture Back) گوشی',
@@ -503,7 +512,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
       {/* Version Number Footnote */}
       <div className="text-center pt-2">
         <span className="text-xs font-semibold text-secondary-theme/70">
-          نسخه ۳.۰.۰ (۳۰۰)
+          نسخه ۳.۰.۱ (۳۰۱)
         </span>
       </div>
 

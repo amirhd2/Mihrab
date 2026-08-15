@@ -1,3 +1,4 @@
+import { Portal } from "../components/Portal";
 import { usePreventBodyScroll } from '../hooks/usePreventBodyScroll';
 import React, { useState } from 'react';
 import { useAppNavigate } from '../components/PageTransition';
@@ -516,7 +517,7 @@ export const QadaPrayersPage: React.FC<{
       />
 
       {/* MORE MENU GUIDE DIALOG */}
-      <AnimatePresence>
+      <Portal><AnimatePresence>
         {isGuideOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
@@ -583,10 +584,10 @@ export const QadaPrayersPage: React.FC<{
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+      </AnimatePresence></Portal>
 
       {/* CONFIRM RESET ALL COUNTERS MODAL */}
-      <AnimatePresence>
+      <Portal><AnimatePresence>
         {isResetConfirmOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
@@ -638,10 +639,10 @@ export const QadaPrayersPage: React.FC<{
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+      </AnimatePresence></Portal>
 
       {/* ALL PRAYERS COMPLETED GRAND CELEBRATION MODAL */}
-      <AnimatePresence>
+      <Portal><AnimatePresence>
         {showAllCompletedModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
@@ -691,7 +692,7 @@ export const QadaPrayersPage: React.FC<{
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+      </AnimatePresence></Portal>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { Portal } from "./Portal";
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -32,7 +33,7 @@ export const Dialog: React.FC<DialogProps> = ({
   }, [isOpen, onClose]);
 
   return (
-    <AnimatePresence>
+    <Portal><AnimatePresence>
       {isOpen && (
         <div 
           key="dialog-container"
@@ -93,7 +94,7 @@ export const Dialog: React.FC<DialogProps> = ({
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence></Portal>
   );
 };
 

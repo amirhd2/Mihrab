@@ -1,3 +1,4 @@
+import { Portal } from "../components/Portal";
 import { usePreventBodyScroll } from '../hooks/usePreventBodyScroll';
 import React, { useState, useEffect } from 'react';
 import { useAppNavigate } from '../components/PageTransition';
