@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useAppNavigate } from '../components/PageTransition';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageHeader } from '../components/PageHeader';
 import { Search, Plus, Tag as TagIcon, SlidersHorizontal, SearchX, FileText } from 'lucide-react';
@@ -23,7 +24,7 @@ interface DuasPageProps {
 export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
   const isStickyVisible = useMobileStickyScroll();
   const [searchQuery, setSearchQuery] = useState('');
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const [activeTag, setActiveTag] = useState<string>('all');
   
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from './PageTransition';
 import { ChevronRight } from 'lucide-react';
 
 interface BackButtonProps {
@@ -13,13 +13,13 @@ export const BackButton: React.FC<BackButtonProps> = ({
   onClick,
   className = '',
 }) => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
   const handleClick = () => {
     if (onClick) {
       onClick();
     } else {
-      navigate(-1);
+      navigate(-1, { isBack: true });
     }
   };
 

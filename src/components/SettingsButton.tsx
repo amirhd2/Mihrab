@@ -1,9 +1,10 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useAppNavigate } from './PageTransition';
 import { Settings } from 'lucide-react';
 
 export const SettingsButton: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const location = useLocation();
   const isSettingsActive = location.pathname === '/settings';
 

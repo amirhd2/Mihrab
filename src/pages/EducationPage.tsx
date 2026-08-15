@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { useAppNavigate } from '../components/PageTransition';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageHeader } from '../components/PageHeader';
 import { SearchField } from '../components/SearchField';
@@ -33,7 +34,7 @@ const normalizePersian = (str: string) => {
 
 export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => {
   const isStickyVisible = useMobileStickyScroll();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const articleId = searchParams.get('article');
 

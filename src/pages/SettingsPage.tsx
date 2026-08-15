@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '../components/PageTransition';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageHeader } from '../components/PageHeader';
 import { Card } from '../components/Card';
@@ -121,7 +121,7 @@ interface SettingsPageProps {
 }
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { mode, setMode } = useTheme();
   const { isInstallable, installPWA } = usePWA();
 

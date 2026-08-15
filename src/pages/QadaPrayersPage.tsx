@@ -1,6 +1,6 @@
 import { usePreventBodyScroll } from '../hooks/usePreventBodyScroll';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '../components/PageTransition';
 import { useLiveQuery } from 'dexie-react-hooks';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'motion/react';
@@ -37,7 +37,7 @@ const PRAYER_TITLES: Record<PrayerType, string> = {
 export const QadaPrayersPage: React.FC<{
   onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning', duration?: number, action?: any) => void;
 }> = ({ onShowToast }) => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const isStickyVisible = useMobileStickyScroll();
 
   // Modal & Sheet States

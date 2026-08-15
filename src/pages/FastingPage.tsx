@@ -1,5 +1,6 @@
 import { usePreventBodyScroll } from '../hooks/usePreventBodyScroll';
 import React, { useState, useEffect } from 'react';
+import { useAppNavigate } from '../components/PageTransition';
 import { motion, AnimatePresence } from 'motion/react';
 import { Check, CalendarCheck, Clock, List, ListFilter, X, Wheat, RotateCcw, Trash2, Calendar } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -16,6 +17,7 @@ import { SwipeToDeleteItem } from '../components/SwipeToDeleteItem';
 export const FastingPage: React.FC<{
   onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning', duration?: number, action?: any) => void;
 }> = ({ onShowToast }) => {
+  const navigate = useAppNavigate();
   const isStickyVisible = useMobileStickyScroll();
   // State for Qaza Fasting
   const [qazaCount, setQazaCount] = useState(0);
@@ -227,6 +229,7 @@ export const FastingPage: React.FC<{
         titleFa="روزه‌های قضا"
         subtitleFa="مدیریت روزه‌های قضا و کفاره"
         showBack
+        onBackClick={() => navigate('/')}
         centered
       />
 

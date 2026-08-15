@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AppShell } from './components/AppShell';
 import { Snackbar } from './components/Snackbar';
@@ -14,9 +14,11 @@ import { SettingsPage } from './pages/SettingsPage';
 import { PageTransition } from './components/PageTransition';
 
 function AppRoutes({ showToast }: { showToast: any }) {
+  const location = useLocation();
+
   return (
-    <PageTransition>
-      <Routes>
+    <PageTransition location={location}>
+      <Routes location={location} key={location.pathname}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/prayers" element={<QadaPrayersPage onShowToast={showToast} />} />
         <Route path="/fasting" element={<FastingPage onShowToast={showToast} />} />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '../components/PageTransition';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
 import { toPersianDigits } from '../utils/persianUtils';
@@ -75,7 +75,7 @@ const OliveFlourish: React.FC<{ className?: string }> = ({ className = 'w-7 h-7'
 );
 
 export const DashboardPage: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { isOffline } = usePWA();
 
   // Query live count data from IndexedDB
