@@ -1,3 +1,4 @@
+import { Portal } from "../Portal";
 import { usePreventBodyScroll } from '../../hooks/usePreventBodyScroll';
 import React, { useState } from 'react';
 import { X, Plus, Edit2, Check, Tag as TagIcon, Layers } from 'lucide-react';
@@ -76,7 +77,7 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
 
   return (
     <>
-      <AnimatePresence>
+      <Portal><AnimatePresence>
         {isOpen && (
           <div 
             key="education-tag-manager"
@@ -254,7 +255,7 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+      </AnimatePresence></Portal>
 
       {/* Standard Delete Confirmation Popup */}
       <Dialog

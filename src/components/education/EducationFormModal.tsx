@@ -1,3 +1,4 @@
+import { Portal } from "../Portal";
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -91,7 +92,7 @@ export const EducationFormModal: React.FC<EducationFormModalProps> = ({
   };
 
   return (
-    <AnimatePresence>
+    <Portal><AnimatePresence>
       {isOpen && (
         <div 
           key="education-form-container"
@@ -257,6 +258,6 @@ export const EducationFormModal: React.FC<EducationFormModalProps> = ({
       </motion.div>
     </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence></Portal>
   );
 };

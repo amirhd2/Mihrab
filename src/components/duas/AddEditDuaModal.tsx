@@ -1,3 +1,4 @@
+import { Portal } from "../Portal";
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -85,7 +86,7 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
   };
 
   return (
-    <AnimatePresence>
+    <Portal><AnimatePresence>
       {isOpen && (
         <div 
           key="add-edit-dua-container"
@@ -249,6 +250,6 @@ export const AddEditDuaModal: React.FC<AddEditDuaModalProps> = ({ isOpen, dua, o
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence></Portal>
   );
 };

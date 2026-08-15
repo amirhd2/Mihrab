@@ -1,3 +1,4 @@
+import { Portal } from "../Portal";
 import React, { useState, useRef, useEffect, UIEvent } from 'react';
 import { ArrowRight, MoreVertical, Star, Edit, Trash2, Copy, Share2, Heart, Type } from 'lucide-react';
 import { DuaRecord, DuaTagRecord } from '../../types/db';
@@ -117,13 +118,14 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
   const { arabic, persian } = getTextSizeClass(textSize);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={isClosing ? { opacity: 0, y: 16 } : { opacity: 1, y: 0 }}
-      transition={{ duration: 0.18, ease: "easeOut" }}
-      className="fixed inset-0 z-50 bg-neutral-50 dark:bg-neutral-900 overflow-hidden"
-      dir="rtl"
-    >
+    <Portal>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={isClosing ? { opacity: 0, y: 16 } : { opacity: 1, y: 0 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
+        className="fixed inset-0 z-50 bg-neutral-50 dark:bg-neutral-900 overflow-hidden"
+        dir="rtl"
+      >
       {/* iOS-Inspired Reading Top Bar */}
       <div 
         className={`absolute top-0 left-0 right-0 bg-surface-bg border-b border-neutral-200/80 dark:border-neutral-800 px-4 pt-2 pb-4 flex items-center justify-between z-20 transition-transform duration-300 ${
@@ -282,5 +284,6 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
 
       {/* Bottom Floating Bar removed to match EducationReadingView style */}
     </motion.div>
+    </Portal>
   );
 };

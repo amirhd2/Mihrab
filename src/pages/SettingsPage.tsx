@@ -38,10 +38,19 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۳.۰.۱',
+    version: 'نسخه ۳.۰.۲',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'اصلاح موقعیت و عملکرد دکمه شناور (FAB) در صفحات دعا و احکام',
+      'نمایش صحیح دکمه شناور در پایین صفحه با قابلیت مخفی شدن هنگام اسکرول به پایین',
+      'مرکزیت کامل مودال‌ها (افزودن و ویرایش) و پرده‌های شفاف در تمامی صفحات با استفاده از پورتال',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۰.۱',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'حل مشکل نمایش ماژول‌های پاپ‌آپ (مانند تایید حذف و جشن اتمام نماز قضا) در حالت اسکرول',
       'تثبیت پس‌زمینه تیره کادر پیام‌ها در مرکز صفحه برای تمام بخش‌ها (پورتال هوشمند)',
@@ -512,7 +521,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
       {/* Version Number Footnote */}
       <div className="text-center pt-2">
         <span className="text-xs font-semibold text-secondary-theme/70">
-          نسخه ۳.۰.۱ (۳۰۱)
+          نسخه ۳.۰.۲ (۳۰۲)
         </span>
       </div>
 

@@ -1,3 +1,4 @@
+import { Portal } from "../Portal";
 import React, { useState, useRef, useEffect, UIEvent } from 'react';
 import { ArrowRight, MoreVertical, Edit, Trash2, Copy, Share2, Tag as TagIcon, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -151,6 +152,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
   };
 
   return (
+    <Portal>
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={isClosing ? { opacity: 0, y: 16 } : { opacity: 1, y: 0 }}
@@ -294,5 +296,6 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
         </div>
       </div>
     </motion.div>
+    </Portal>
   );
 };

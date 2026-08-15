@@ -257,14 +257,16 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
       </div>
 
       {/* FAB */}
-      <button
-        onClick={() => { setEditingDua(null); setIsAddEditModalOpen(true); }}
-        className={`fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg shadow-purple-600/30 hover:shadow-xl transition-all duration-300 ease-in-out active:scale-90 flex items-center justify-center shrink-0 ${
-          isStickyVisible ? 'translate-y-0 opacity-100' : 'translate-y-[150%] opacity-0'
-        }`}
-      >
-        <Plus className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
-      </button>
+      <Portal>
+        <button
+          onClick={() => { setEditingDua(null); setIsAddEditModalOpen(true); }}
+          className={`fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg shadow-purple-600/30 hover:shadow-xl transition-all duration-300 ease-in-out active:scale-90 flex items-center justify-center shrink-0 ${
+            isStickyVisible ? 'translate-y-0 opacity-100' : 'translate-y-[150%] opacity-0'
+          }`}
+        >
+          <Plus className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
+        </button>
+      </Portal>
 
       {/* Modals */}
       <AddEditDuaModal

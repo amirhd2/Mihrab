@@ -1,3 +1,4 @@
+import { Portal } from "../components/Portal";
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppNavigate } from '../components/PageTransition';
@@ -326,17 +327,19 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
       )}
 
       {/* Floating Action Button (FAB) for Adding New Content */}
-      <button
-        type="button"
-        onClick={handleOpenAddForm}
-        aria-label="افزودن مطلب جدید"
-        title="افزودن مطلب جدید"
-        className={`fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg shadow-blue-600/30 hover:shadow-xl transition-all duration-300 ease-in-out active:scale-90 flex items-center justify-center shrink-0 ${
-          isStickyVisible ? 'translate-y-0 opacity-100' : 'translate-y-[150%] opacity-0'
-        }`}
-      >
-        <Plus className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
-      </button>
+      <Portal>
+        <button
+          type="button"
+          onClick={handleOpenAddForm}
+          aria-label="افزودن مطلب جدید"
+          title="افزودن مطلب جدید"
+          className={`fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg shadow-blue-600/30 hover:shadow-xl transition-all duration-300 ease-in-out active:scale-90 flex items-center justify-center shrink-0 ${
+            isStickyVisible ? 'translate-y-0 opacity-100' : 'translate-y-[150%] opacity-0'
+          }`}
+        >
+          <Plus className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
+        </button>
+      </Portal>
 
       {/* Reading View Overlay */}
       {activeReadingItem && (
