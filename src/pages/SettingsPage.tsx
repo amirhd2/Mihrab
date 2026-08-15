@@ -38,10 +38,20 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۱.۵.۰',
+    version: 'نسخه ۲.۰.۰',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'پیاده‌سازی دقیق انیمیشن‌های جابجایی بین صفحات پیش‌خوان، چهار کارت اصلی عبادات و تنظیمات',
+      'انیمیشن‌های روان اسلاید به چپ و راست مطابق مشخصات طراحی',
+      'مدیریت هوشمند ژست بازگشت (Swipe to Back) و جلوگیری کامل از تکرار یا پرش انیمیشن',
+      'بهینه‌سازی کارایی و ارتقاء به نسخه ۲.۰.۰',
+    ],
+  },
+  {
+    version: 'نسخه ۱.۵.۰',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'یکپارچه‌سازی و اختصاص پالت رنگی نارنجی به تمامی المان‌ها، دکمه‌ها و فرم‌های صفحه روزه',
       'هماهنگی کامل پالت صفحه روزه و کفارات با تم پیش‌خوان',
@@ -485,7 +495,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
       {/* Version Number Footnote */}
       <div className="text-center pt-2">
         <span className="text-xs font-semibold text-secondary-theme/70">
-          نسخه ۱.۵.۰ (۱۵۰)
+          نسخه ۲.۰.۰ (۲۰۰)
         </span>
       </div>
 

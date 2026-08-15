@@ -11,10 +11,11 @@ import { FastingPage } from './pages/FastingPage';
 import { DuasPage } from './pages/DuasPage';
 import { EducationPage } from './pages/EducationPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { PageTransition } from './components/PageTransition';
 
 function AppRoutes({ showToast }: { showToast: any }) {
   return (
-    <div className="w-full">
+    <PageTransition>
       <Routes>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/prayers" element={<QadaPrayersPage onShowToast={showToast} />} />
@@ -29,7 +30,7 @@ function AppRoutes({ showToast }: { showToast: any }) {
         {/* Catch-all fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </div>
+    </PageTransition>
   );
 }
 

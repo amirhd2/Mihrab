@@ -36,6 +36,19 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
     }, 180);
   };
 
+  // Prevent background page from scrolling while reading view is open
+  useEffect(() => {
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+    };
+  }, []);
+
   // Close menus on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -216,7 +229,7 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
 
       {/* Main Reading Area */}
       <div 
-        className="w-full h-full overflow-y-auto bg-amber-50/30 dark:bg-neutral-900 px-4 pt-[76px] pb-12 flex justify-center"
+        className="w-full h-full overflow-y-auto overscroll-contain bg-amber-50/30 dark:bg-neutral-900 px-4 pt-[76px] pb-12 flex justify-center"
         onScroll={handleScroll}
       >
         {/* Book Page Container */}

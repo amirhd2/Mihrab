@@ -234,40 +234,44 @@ export const FastingPage: React.FC<{
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         
         {/* Column 1: Qaza Fasting */}
-        <div className="flex flex-col gap-4">
-          <div className="bg-surface-card border border-orange-500/20 dark:border-orange-500/30 rounded-3xl p-5 shadow-xs relative overflow-hidden">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-base font-extrabold text-primary-theme">روزه‌های قضا</h2>
-                <p className="text-[11px] text-secondary-theme">تعداد روزهای باقی‌مانده</p>
-              </div>
-              <div className="w-10 h-10 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
-                 <CalendarCheck className="w-5 h-5" />
+        <div className="flex flex-col gap-4 h-full">
+          <div className="bg-surface-card border border-orange-500/20 dark:border-orange-500/30 rounded-3xl p-5 shadow-xs relative overflow-hidden flex-1 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-base font-extrabold text-primary-theme">روزه‌های قضا</h2>
+                  <p className="text-[11px] text-secondary-theme">تعداد روزهای باقی‌مانده</p>
+                </div>
+                <div className="w-10 h-10 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                   <CalendarCheck className="w-5 h-5" />
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between mt-6 bg-slate-100/90 dark:bg-slate-800/90 rounded-2xl p-4 border border-slate-200 dark:border-slate-700/80 shadow-xs dark:shadow-md dark:shadow-black/25">
-              <div className="flex-1 flex justify-start">
-                <CounterControl
-                  count={qazaCount}
-                  onIncrement={() => saveQazaCount(qazaCount + 1)}
-                  onDecrement={() => saveQazaCount(qazaCount - 1)}
-                  onSetCount={(c) => saveQazaCount(c)}
-                />
-              </div>
-              <div className="shrink-0 relative">
-                <button
-                  type="button"
-                  onClick={handleQazaComplete}
-                  disabled={qazaCount <= 0}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center text-white transition-all shadow-sm active:scale-90 disabled:opacity-30 ${
-                    isQazaAnimating
-                      ? 'bg-orange-500 scale-110 ring-4 ring-orange-500/30'
-                      : 'bg-orange-600 hover:bg-orange-700'
-                  }`}
-                >
-                  <Check className="w-6 h-6 stroke-[2.5]" />
-                </button>
+            <div className="my-auto py-2">
+              <div className="flex items-center justify-between bg-slate-100/90 dark:bg-slate-800/90 rounded-2xl p-4 border border-slate-200 dark:border-slate-700/80 shadow-xs dark:shadow-md dark:shadow-black/25">
+                <div className="flex-1 flex justify-start">
+                  <CounterControl
+                    count={qazaCount}
+                    onIncrement={() => saveQazaCount(qazaCount + 1)}
+                    onDecrement={() => saveQazaCount(qazaCount - 1)}
+                    onSetCount={(c) => saveQazaCount(c)}
+                  />
+                </div>
+                <div className="shrink-0 relative">
+                  <button
+                    type="button"
+                    onClick={handleQazaComplete}
+                    disabled={qazaCount <= 0}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white transition-all shadow-sm active:scale-90 disabled:opacity-30 ${
+                      isQazaAnimating
+                        ? 'bg-orange-500 scale-110 ring-4 ring-orange-500/30'
+                        : 'bg-orange-600 hover:bg-orange-700'
+                    }`}
+                  >
+                    <Check className="w-6 h-6 stroke-[2.5]" />
+                  </button>
+                </div>
               </div>
             </div>
             
@@ -278,53 +282,57 @@ export const FastingPage: React.FC<{
         </div>
 
         {/* Column 2: Fitriya */}
-        <div className="flex flex-col gap-4">
-          <div className="bg-surface-card border border-orange-500/20 dark:border-orange-500/30 rounded-3xl p-5 shadow-xs">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-base font-extrabold text-primary-theme">فطریه ۱۴۰۵</h2>
+        <div className="flex flex-col gap-4 h-full">
+          <div className="bg-surface-card border border-orange-500/20 dark:border-orange-500/30 rounded-3xl p-5 shadow-xs flex-1 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-base font-extrabold text-primary-theme">فطریه ۱۴۰۵</h2>
+                </div>
+                <div className="w-10 h-10 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                   <Wheat className="w-5 h-5" />
+                </div>
               </div>
-              <div className="w-10 h-10 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
-                 <Wheat className="w-5 h-5" />
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-secondary-theme">تعداد نفرات</span>
+                  <CounterControl
+                    count={fitriyaPeople}
+                    onIncrement={() => setFitriyaPeople(p => p + 1)}
+                    onDecrement={() => setFitriyaPeople(p => Math.max(1, p - 1))}
+                    onSetCount={setFitriyaPeople}
+                    min={1}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between border-t border-theme/30 pt-4">
+                  <span className="text-sm font-bold text-secondary-theme">فطریه هر نفر (تومان)</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={fitriyaAmountPerPerson.toLocaleString('fa-IR')}
+                    onChange={(e) => {
+                      const str = e.target.value.replace(/[۰-۹]/g, d => '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)]).replace(/\D/g, '');
+                      const val = parseInt(str) || 0;
+                      setFitriyaAmountPerPerson(val);
+                    }}
+                    onFocus={(e) => e.target.select()}
+                    className="bg-transparent text-left font-bold text-base text-primary-theme w-24 outline-none border-b border-neutral-300 dark:border-neutral-700 focus:border-orange-500"
+                    dir="ltr"
+                  />
+                </div>
+                
+                <div className="flex flex-col items-center justify-center pt-4 pb-2">
+                  <span className="text-[11px] text-secondary-theme font-medium mb-1">مبلغ قابل پرداخت</span>
+                  <span className="text-xl font-extrabold text-orange-600 dark:text-orange-400">
+                    {fitriyaTotal.toLocaleString('fa-IR')} تومان
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-secondary-theme">تعداد نفرات</span>
-                <CounterControl
-                  count={fitriyaPeople}
-                  onIncrement={() => setFitriyaPeople(p => p + 1)}
-                  onDecrement={() => setFitriyaPeople(p => Math.max(1, p - 1))}
-                  onSetCount={setFitriyaPeople}
-                  min={1}
-                />
-              </div>
-
-              <div className="flex items-center justify-between border-t border-theme/30 pt-4">
-                <span className="text-sm font-bold text-secondary-theme">فطریه هر نفر (تومان)</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={fitriyaAmountPerPerson.toLocaleString('fa-IR')}
-                  onChange={(e) => {
-                    const str = e.target.value.replace(/[۰-۹]/g, d => '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)]).replace(/\D/g, '');
-                    const val = parseInt(str) || 0;
-                    setFitriyaAmountPerPerson(val);
-                  }}
-                  onFocus={(e) => e.target.select()}
-                  className="bg-transparent text-left font-bold text-base text-primary-theme w-24 outline-none border-b border-neutral-300 dark:border-neutral-700 focus:border-orange-500"
-                  dir="ltr"
-                />
-              </div>
-              
-              <div className="flex flex-col items-center justify-center pt-4 pb-2">
-                <span className="text-[11px] text-secondary-theme font-medium mb-1">مبلغ قابل پرداخت</span>
-                <span className="text-xl font-extrabold text-orange-600 dark:text-orange-400">
-                  {fitriyaTotal.toLocaleString('fa-IR')} تومان
-                </span>
-              </div>
-
+            <div className="pt-2">
               {!isFitriyaPaid ? (
                 <button
                   type="button"

@@ -33,6 +33,19 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
     }, 180);
   };
 
+  // Prevent background page from scrolling while reading view is open
+  useEffect(() => {
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+    };
+  }, []);
+
   // Close menu on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -233,7 +246,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
 
       {/* Main Reading Area */}
       <div 
-        className="w-full h-full overflow-y-auto bg-neutral-50/50 dark:bg-neutral-900 px-4 pt-[76px] pb-12 flex justify-center"
+        className="w-full h-full overflow-y-auto overscroll-contain bg-neutral-50/50 dark:bg-neutral-900 px-4 pt-[76px] pb-12 flex justify-center"
         onScroll={handleScroll}
       >
         {/* Reading Article Body Container */}
