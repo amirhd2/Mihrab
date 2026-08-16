@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useRef, useState, useCallback } from 'react';
-import { useNavigate, useLocation, Location } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate, Location } from 'react-router-dom';
+import { motion, AnimatePresence, type Variants } from 'motion/react';
 
 export type Direction = 'forward' | 'back' | 'none';
 
@@ -21,7 +21,7 @@ export const useAppNavigate = () => {
 };
 
 // Faster, snappier native-feeling transition variables
-const pageVariants = {
+const pageVariants: Variants = {
   initial: (direction: Direction) => {
     if (direction === 'none') return { x: 0, opacity: 1, scale: 1 };
     return {
@@ -45,7 +45,7 @@ const pageVariants = {
       scale: 1,
       transition: {
         duration: 0.25,
-        ease: [0.22, 1, 0.36, 1], // smooth deceleration
+        ease: 'easeOut',
       },
     };
   },
@@ -63,8 +63,8 @@ const pageVariants = {
       opacity: 0,
       scale: 0.99,
       transition: {
-        duration: 0.15, // fast exit so mode="wait" doesn't feel like lag
-        ease: [0.22, 1, 0.36, 1],
+        duration: 0.15,
+        ease: 'easeIn',
       },
     };
   },
@@ -83,7 +83,6 @@ export const PageTransition: React.FC<{
   let currentDirection = directionState;
   
   if (prevPathRef.current !== location.pathname) {
-    const fromPath = prevPathRef.current;
     const toPath = location.pathname;
     
     if (explicitDirectionRef.current) {
