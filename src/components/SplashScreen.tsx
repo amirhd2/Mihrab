@@ -22,10 +22,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
 
     mediaQuery.addEventListener('change', handleMediaChange);
 
-    // Total splash sequence duration ~ 900-1000ms
+    // Total splash sequence duration ~ 1950-2000ms (increased by 1s)
     const timer = setTimeout(() => {
       setIsVisible(false);
-    }, mediaQuery.matches ? 400 : 950);
+    }, mediaQuery.matches ? 1000 : 1950);
 
     return () => {
       clearTimeout(timer);

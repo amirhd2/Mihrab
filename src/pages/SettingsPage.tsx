@@ -38,10 +38,18 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۳.۰.۴',
+    version: 'نسخه ۳.۰.۵',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'افزایش زمان نمایش اسپلش اسکرین جهت نمایش زیباتر و کامل‌تر آرت‌ورک محراب',
+      'بهینه‌سازی تایمر ترنزیشن و ورود نرم به صفحه اصلی برنامه',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۰.۴',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'طراحی آکاردیونی بخش‌های تنظیمات (ظاهر، داده‌ها و درباره محراب) با قابلیت باز و بسته شدن روان',
       'نمایش شکیل شماره نسخه در سمت چپ نوار بخش «درباره محراب» و حذف نشانگر انتهای صفحه',
@@ -558,7 +566,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
 
           <div className="flex items-center gap-2.5">
             <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-persian shrink-0">
-              نسخه ۳.۰.۴
+              نسخه ۳.۰.۵
             </span>
             <motion.div
               animate={{ rotate: openSection3 ? 180 : 0 }}
