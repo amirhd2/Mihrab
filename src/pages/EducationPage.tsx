@@ -12,7 +12,7 @@ import { EducationReadingView } from '../components/education/EducationReadingVi
 import { EducationFormModal } from '../components/education/EducationFormModal';
 import { TagManagerModal } from '../components/education/TagManagerModal';
 import { Dialog } from '../components/Dialog';
-import { Plus, Tag as TagIcon, BookOpen, SlidersHorizontal, FileText, SearchX } from 'lucide-react';
+import { Plus, Tag as TagIcon, BookOpen, SlidersHorizontal, FileText, SearchX, Star } from 'lucide-react';
 import { ToastAction, ToastType } from '../hooks/useToast';
 import { useMobileStickyScroll } from '../hooks/useMobileStickyScroll';
 
@@ -86,7 +86,11 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
 
     return contents.filter((item) => {
       // 1. Tag Filter
-      if (selectedTag !== 'همه') {
+      if (selectedTag === 'starred') {
+        if (!item.isFavorite) {
+          return false;
+        }
+      } else if (selectedTag !== 'همه') {
         if (!item.tags || !item.tags.includes(selectedTag)) {
           return false;
         }
@@ -122,6 +126,23 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
     }
     setEditingItem(null);
     await loadData();
+  };
+
+  // Toggle Favorite Status
+  const handleToggleFavorite = async (item: EducationContentRecord) => {
+    if (!item.id) return;
+    try {
+      const isFav = await EducationService.toggleFavorite(item.id);
+      await loadData();
+      if (onShowToast) {
+        onShowToast(
+          isFav ? 'به نشان‌شده‌ها اضافه شد' : 'از نشان‌شده‌ها حذف شد',
+          'success'
+        );
+      }
+    } catch (err) {
+      console.error('Error toggling favorite:', err);
+    }
   };
 
   // Confirm and delete item with undo toast
@@ -230,11 +251,26 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
         {/* Vertical Divider */}
         <div className="w-px h-5 bg-neutral-200 dark:bg-neutral-700 shrink-0 mx-1" />
 
+        {/* Starred Filter Button (Icon only) */}
+        <button
+          type="button"
+          onClick={() => setSelectedTag(selectedTag === 'starred' ? 'همه' : 'starred')}
+          className={`px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border flex items-center justify-center cursor-pointer ${
+            selectedTag === 'starred'
+              ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
+              : 'bg-surface-card text-amber-600 dark:text-amber-400 border-neutral-200/80 dark:border-neutral-800 hover:border-amber-300 dark:hover:border-amber-700'
+          }`}
+          title="نشان‌شده‌ها (ستاره‌دار)"
+          aria-label="نشان‌شده‌ها (ستاره‌دار)"
+        >
+          <Star className={`w-3.5 h-3.5 ${selectedTag === 'starred' ? 'fill-white' : 'fill-amber-500/20'}`} />
+        </button>
+
         {/* Scrollable Filter Chips */}
         <button
           type="button"
           onClick={() => setSelectedTag('همه')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 border ${
+          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 border cursor-pointer ${
             selectedTag === 'همه'
               ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
               : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
@@ -250,7 +286,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
               key={tag.id || tag.name}
               type="button"
               onClick={() => setSelectedTag(tag.name)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border cursor-pointer ${
                 isSelected
                   ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                   : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
@@ -289,6 +325,8 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
           <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto">
             {searchQuery ? (
               <SearchX className="w-6 h-6" />
+            ) : selectedTag === 'starred' ? (
+              <Star className="w-6 h-6 text-amber-500 fill-amber-500/20" />
             ) : selectedTag !== 'همه' ? (
               <TagIcon className="w-6 h-6" />
             ) : (
@@ -300,6 +338,8 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
             <h3 className="text-base font-bold text-primary-theme">
               {searchQuery
                 ? 'مطلبی پیدا نشد'
+                : selectedTag === 'starred'
+                ? 'هیچ مطلبی در لیست ستاره‌دار وجود ندارد'
                 : selectedTag !== 'همه'
                 ? `هیچ مطلبی با تگ «${selectedTag}» یافت نشد`
                 : 'هنوز مطلبی اضافه نشده'}
@@ -307,6 +347,8 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
             <p className="text-xs text-secondary-theme leading-relaxed">
               {searchQuery
                 ? 'عبارت دیگری را جستجو کنید یا فیلترها را تغییر دهید.'
+                : selectedTag === 'starred'
+                ? 'می‌توانید با انتخاب آیکون ستاره در صفحه خواندن هر مطلب، آن را به این لیست اضافه کنید.'
                 : selectedTag !== 'همه'
                 ? 'می‌توانید تگ دیگری را انتخاب کرده یا مطلب جدیدی اضافه کنید.'
                 : 'با استفاده از دکمه افزودن مطلب، اولین آموزش یا حکم شرعی را ثبت کنید.'}
@@ -348,6 +390,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
           onBack={() => setSearchParams({}, { replace: true })}
           onEdit={(item) => handleOpenEditForm(item)}
           onDelete={(item) => handleDeleteContent(item)}
+          onToggleFavorite={(item) => handleToggleFavorite(item)}
           onShowToast={(msg, type) => onShowToast && onShowToast(msg, type)}
         />
       )}

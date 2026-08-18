@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Star } from 'lucide-react';
 import { EducationContentRecord } from '../../types/db';
 import { SwipeToDeleteItem } from '../SwipeToDeleteItem';
 
@@ -26,9 +26,14 @@ export const EducationCard: React.FC<EducationCardProps> = ({ item, onSelect, on
           <div>
             {/* Header (Top Right) */}
             <div className="flex items-start justify-between gap-2 mb-2">
-              <h3 className="text-base sm:text-lg font-bold text-primary-theme text-right group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1 flex-1">
-                {item.title}
-              </h3>
+              <div className="flex items-center gap-1 flex-1 min-w-0">
+                <h3 className="text-base sm:text-lg font-bold text-primary-theme text-right group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1 truncate">
+                  {item.title}
+                </h3>
+                {item.isFavorite && (
+                  <Star className="w-4 h-4 text-amber-500 shrink-0 fill-current" />
+                )}
+              </div>
               <ChevronLeft className="w-4 h-4 text-muted-theme group-hover:text-blue-500 group-hover:-translate-x-1 transition-all shrink-0 mt-1" />
             </div>
 

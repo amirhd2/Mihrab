@@ -1,6 +1,6 @@
 import { Portal } from "../Portal";
 import React, { useState, useRef, useEffect, UIEvent } from 'react';
-import { ArrowRight, MoreVertical, Edit, Trash2, Copy, Share2, Tag as TagIcon, Check } from 'lucide-react';
+import { ArrowRight, MoreVertical, Edit, Trash2, Copy, Share2, Tag as TagIcon, Check, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { EducationContentRecord } from '../../types/db';
 
@@ -9,6 +9,7 @@ interface EducationReadingViewProps {
   onBack: () => void;
   onEdit: (item: EducationContentRecord) => void;
   onDelete: (item: EducationContentRecord) => void;
+  onToggleFavorite?: (item: EducationContentRecord) => void;
   onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning') => void;
 }
 
@@ -17,6 +18,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
   onBack,
   onEdit,
   onDelete,
+  onToggleFavorite,
   onShowToast,
 }) => {
   const [isClosing, setIsClosing] = useState(false);
@@ -179,8 +181,23 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
           {item.title}
         </h1>
 
-        {/* Action Buttons: Edit Pencil + Three-Dot Menu */}
+        {/* Action Buttons: Star + Edit Pencil + Three-Dot Menu */}
         <div className="flex items-center gap-1 relative" ref={menuRef}>
+          {onToggleFavorite && (
+            <button
+              type="button"
+              onClick={() => onToggleFavorite(item)}
+              className={`p-2 rounded-xl transition-colors active:scale-95 ${
+                item.isFavorite
+                  ? 'text-amber-500 hover:bg-amber-500/10'
+                  : 'text-secondary-theme hover:text-amber-500 hover:bg-surface-elevated'
+              }`}
+              title={item.isFavorite ? 'حذف از نشان‌شده‌ها' : 'نشان کردن (ستاره‌دار)'}
+            >
+              <Star className={`w-5 h-5 ${item.isFavorite ? 'fill-current' : ''}`} />
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => onEdit(item)}

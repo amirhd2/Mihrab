@@ -131,7 +131,7 @@ export const PageTransition: React.FC<{
           initial="initial"
           animate="animate"
           exit="exit"
-          className="w-full will-change-transform"
+          className="w-full"
         >
           {children}
         </motion.div>

@@ -80,6 +80,20 @@ export class EducationService {
   }
 
   /**
+   * Toggles the favorite / starred status of an education item
+   */
+  static async toggleFavorite(id: number): Promise<boolean> {
+    const item = await db.educationContents.get(id);
+    if (!item) return false;
+    const newState = !item.isFavorite;
+    await db.educationContents.update(id, {
+      isFavorite: newState,
+      updatedAt: new Date().toISOString(),
+    });
+    return newState;
+  }
+
+  /**
    * Deletes a content item by ID
    */
   static async deleteContent(id: number): Promise<void> {

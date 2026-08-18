@@ -38,10 +38,30 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۳.۰.۲',
+    version: 'نسخه ۳.۰.۴',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'طراحی آکاردیونی بخش‌های تنظیمات (ظاهر، داده‌ها و درباره محراب) با قابلیت باز و بسته شدن روان',
+      'نمایش شکیل شماره نسخه در سمت چپ نوار بخش «درباره محراب» و حذف نشانگر انتهای صفحه',
+      'بهبود استایل و واکنش‌گرایی دکمه‌های سربرگ بخش‌های تنظیمات',
+      'رفع کامل مشکل بارگذاری آیکون در اسپلش اسکرین برنامه',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۰.۳',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'افزودن فیلتر نشان‌شده‌ها (آیکون ستاره) در نوار تگ‌های بالای صفحات ادعیه و احکام',
+      'امکان ستاره‌دار کردن و نشان‌گذاری مطالب و احکام شرعی جهت دسترسی سریع',
+      'بهینه‌سازی رفتار اسکرول و نمایش باکس استیکی شناور در صفحات نماز و روزه',
+      'اصلاح چیدمان و خطوط جداکننده عمودی در کارت آمار شناور پایین صفحه',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۰.۲',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'اصلاح موقعیت و عملکرد دکمه شناور (FAB) در صفحات دعا و احکام',
       'نمایش صحیح دکمه شناور در پایین صفحه با قابلیت مخفی شدن هنگام اسکرول به پایین',
@@ -162,6 +182,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
   const [openReleaseIndex, setOpenReleaseIndex] = useState<number | null>(0);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+
+  // Accordion Sections State (Section 1 open by default, 2 & 3 closed)
+  const [openSection1, setOpenSection1] = useState(true);
+  const [openSection2, setOpenSection2] = useState(false);
+  const [openSection3, setOpenSection3] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -302,228 +327,313 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
       )}
 
       {/* SECTION 1: ظاهر و تجربه کاربری */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center">
-            ۱
-          </span>
-          <span>ظاهر و تجربه کاربری</span>
-        </h2>
-
-        <Card className="p-4 sm:p-5 space-y-3">
-          <label className="block text-xs font-bold text-secondary-theme">
-            حالت نمایش
-          </label>
-
-          <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-            {/* Option 1: Light Mode */}
-            <button
-              type="button"
-              onClick={() => setMode('light')}
-              className={`flex flex-col items-center justify-center gap-2 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer text-center outline-none ${
-                mode === 'light'
-                  ? 'bg-emerald-500/10 border-emerald-600 dark:border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-xs'
-                  : 'bg-surface-elevated border-theme/60 text-secondary-theme hover:text-primary-theme hover:border-theme'
-              }`}
-            >
-              <Sun className={`w-5 h-5 ${mode === 'light' ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
-              <span className="text-xs sm:text-sm">روشن</span>
-            </button>
-
-            {/* Option 2: System Mode */}
-            <button
-              type="button"
-              onClick={() => setMode('system')}
-              className={`flex flex-col items-center justify-center gap-2 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer text-center outline-none ${
-                mode === 'system'
-                  ? 'bg-emerald-500/10 border-emerald-600 dark:border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-xs'
-                  : 'bg-surface-elevated border-theme/60 text-secondary-theme hover:text-primary-theme hover:border-theme'
-              }`}
-            >
-              <Monitor className={`w-5 h-5 ${mode === 'system' ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
-              <span className="text-xs sm:text-sm">سیستم</span>
-            </button>
-
-            {/* Option 3: Dark Mode */}
-            <button
-              type="button"
-              onClick={() => setMode('dark')}
-              className={`flex flex-col items-center justify-center gap-2 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer text-center outline-none ${
-                mode === 'dark'
-                  ? 'bg-emerald-500/10 border-emerald-600 dark:border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-xs'
-                  : 'bg-surface-elevated border-theme/60 text-secondary-theme hover:text-primary-theme hover:border-theme'
-              }`}
-            >
-              <Moon className={`w-5 h-5 ${mode === 'dark' ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
-              <span className="text-xs sm:text-sm">تاریک</span>
-            </button>
+      <section className="space-y-2.5">
+        <button
+          type="button"
+          onClick={() => setOpenSection1((prev) => !prev)}
+          aria-expanded={openSection1}
+          className="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-theme/60 bg-surface-card hover:bg-surface-elevated/70 transition-all cursor-pointer select-none text-right group shadow-2xs"
+        >
+          <div className="flex items-center gap-3">
+            <span className="w-6 h-6 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center shrink-0">
+              ۱
+            </span>
+            <span className="text-sm font-bold text-primary-theme group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
+              ظاهر و تجربه کاربری
+            </span>
           </div>
-        </Card>
+
+          <motion.div
+            animate={{ rotate: openSection1 ? 180 : 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="w-7 h-7 rounded-lg bg-surface-elevated flex items-center justify-center shrink-0 text-secondary-theme"
+          >
+            <ChevronDown className="w-4 h-4" />
+          </motion.div>
+        </button>
+
+        <AnimatePresence initial={false}>
+          {openSection1 && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className="overflow-hidden"
+            >
+              <Card className="p-4 sm:p-5 space-y-3">
+                <label className="block text-xs font-bold text-secondary-theme">
+                  حالت نمایش
+                </label>
+
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                  {/* Option 1: Light Mode */}
+                  <button
+                    type="button"
+                    onClick={() => setMode('light')}
+                    className={`flex flex-col items-center justify-center gap-2 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer text-center outline-none ${
+                      mode === 'light'
+                        ? 'bg-emerald-500/10 border-emerald-600 dark:border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-xs'
+                        : 'bg-surface-elevated border-theme/60 text-secondary-theme hover:text-primary-theme hover:border-theme'
+                    }`}
+                  >
+                    <Sun className={`w-5 h-5 ${mode === 'light' ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
+                    <span className="text-xs sm:text-sm">روشن</span>
+                  </button>
+
+                  {/* Option 2: System Mode */}
+                  <button
+                    type="button"
+                    onClick={() => setMode('system')}
+                    className={`flex flex-col items-center justify-center gap-2 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer text-center outline-none ${
+                      mode === 'system'
+                        ? 'bg-emerald-500/10 border-emerald-600 dark:border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-xs'
+                        : 'bg-surface-elevated border-theme/60 text-secondary-theme hover:text-primary-theme hover:border-theme'
+                    }`}
+                  >
+                    <Monitor className={`w-5 h-5 ${mode === 'system' ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
+                    <span className="text-xs sm:text-sm">سیستم</span>
+                  </button>
+
+                  {/* Option 3: Dark Mode */}
+                  <button
+                    type="button"
+                    onClick={() => setMode('dark')}
+                    className={`flex flex-col items-center justify-center gap-2 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer text-center outline-none ${
+                      mode === 'dark'
+                        ? 'bg-emerald-500/10 border-emerald-600 dark:border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-xs'
+                        : 'bg-surface-elevated border-theme/60 text-secondary-theme hover:text-primary-theme hover:border-theme'
+                    }`}
+                  >
+                    <Moon className={`w-5 h-5 ${mode === 'dark' ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
+                    <span className="text-xs sm:text-sm">تاریک</span>
+                  </button>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* SECTION 2: داده‌ها و پشتیبان‌گیری */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center">
-            ۲
-          </span>
-          <span>داده‌ها و پشتیبان‌گیری</span>
-        </h2>
-
-        <Card className="divide-y divide-theme/40 p-0 overflow-hidden">
-          {/* Action 1: Export Backup */}
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={handleExportBackup}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleExportBackup()}
-            aria-label="پشتیبان‌گیری - از اطلاعات برنامه نسخه پشتیبان تهیه کنید"
-            className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-surface-elevated/60 transition-colors cursor-pointer group"
-          >
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                <CloudUpload className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-primary-theme">
-                  پشتیبان‌گیری
-                </h3>
-                <p className="text-xs text-secondary-theme mt-0.5">
-                  از اطلاعات برنامه نسخه پشتیبان تهیه کنید.
-                </p>
-              </div>
-            </div>
-            <ChevronLeft className="w-5 h-5 text-secondary-theme/60 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:-translate-x-1 transition-all shrink-0" />
+      <section className="space-y-2.5">
+        <button
+          type="button"
+          onClick={() => setOpenSection2((prev) => !prev)}
+          aria-expanded={openSection2}
+          className="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-theme/60 bg-surface-card hover:bg-surface-elevated/70 transition-all cursor-pointer select-none text-right group shadow-2xs"
+        >
+          <div className="flex items-center gap-3">
+            <span className="w-6 h-6 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center shrink-0">
+              ۲
+            </span>
+            <span className="text-sm font-bold text-primary-theme group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
+              داده‌ها و پشتیبان‌گیری
+            </span>
           </div>
 
-          {/* Action 2: Restore Data */}
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => fileInputRef.current?.click()}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && fileInputRef.current?.click()}
-            aria-label="بازیابی اطلاعات - اطلاعات را از نسخه پشتیبان بازیابی کنید"
-            className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-surface-elevated/60 transition-colors cursor-pointer group"
+          <motion.div
+            animate={{ rotate: openSection2 ? 180 : 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="w-7 h-7 rounded-lg bg-surface-elevated flex items-center justify-center shrink-0 text-secondary-theme"
           >
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-                <RotateCcw className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-primary-theme">
-                  بازیابی اطلاعات
-                </h3>
-                <p className="text-xs text-secondary-theme mt-0.5">
-                  اطلاعات را از نسخه پشتیبان بازیابی کنید.
-                </p>
-              </div>
-            </div>
-            <ChevronLeft className="w-5 h-5 text-secondary-theme/60 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:-translate-x-1 transition-all shrink-0" />
-          </div>
+            <ChevronDown className="w-4 h-4" />
+          </motion.div>
+        </button>
 
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelected}
-            accept=".json,application/json"
-            className="hidden"
-          />
+        <AnimatePresence initial={false}>
+          {openSection2 && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className="overflow-hidden"
+            >
+              <Card className="divide-y divide-theme/40 p-0 overflow-hidden">
+                {/* Action 1: Export Backup */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={handleExportBackup}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleExportBackup()}
+                  aria-label="پشتیبان‌گیری - از اطلاعات برنامه نسخه پشتیبان تهیه کنید"
+                  className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-surface-elevated/60 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                      <CloudUpload className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-primary-theme">
+                        پشتیبان‌گیری
+                      </h3>
+                      <p className="text-xs text-secondary-theme mt-0.5">
+                        از اطلاعات برنامه نسخه پشتیبان تهیه کنید.
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 text-secondary-theme/60 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:-translate-x-1 transition-all shrink-0" />
+                </div>
 
-          {/* Action 3: Complete Data Wipe */}
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => setIsWipeDialogOpen(true)}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsWipeDialogOpen(true)}
-            aria-label="حذف کامل داده‌ها - تمام اطلاعات برنامه حذف خواهند شد"
-            className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-red-500/5 transition-colors cursor-pointer group"
-          >
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
-                <Trash2 className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-red-600 dark:text-red-400">
-                  حذف کامل داده‌ها
-                </h3>
-                <p className="text-xs text-red-500/80 dark:text-red-400/80 mt-0.5">
-                  تمام اطلاعات برنامه حذف خواهند شد.
-                </p>
-              </div>
-            </div>
-            <ChevronLeft className="w-5 h-5 text-red-400/60 group-hover:text-red-600 dark:group-hover:text-red-400 group-hover:-translate-x-1 transition-all shrink-0" />
-          </div>
-        </Card>
+                {/* Action 2: Restore Data */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && fileInputRef.current?.click()}
+                  aria-label="بازیابی اطلاعات - اطلاعات را از نسخه پشتیبان بازیابی کنید"
+                  className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-surface-elevated/60 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+                      <RotateCcw className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-primary-theme">
+                        بازیابی اطلاعات
+                      </h3>
+                      <p className="text-xs text-secondary-theme mt-0.5">
+                        اطلاعات را از نسخه پشتیبان بازیابی کنید.
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 text-secondary-theme/60 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:-translate-x-1 transition-all shrink-0" />
+                </div>
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelected}
+                  accept=".json,application/json"
+                  className="hidden"
+                />
+
+                {/* Action 3: Complete Data Wipe */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setIsWipeDialogOpen(true)}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsWipeDialogOpen(true)}
+                  aria-label="حذف کامل داده‌ها - تمام اطلاعات برنامه حذف خواهند شد"
+                  className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-red-500/5 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
+                      <Trash2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-red-600 dark:text-red-400">
+                        حذف کامل داده‌ها
+                      </h3>
+                      <p className="text-xs text-red-500/80 dark:text-red-400/80 mt-0.5">
+                        تمام اطلاعات برنامه حذف خواهند شد.
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 text-red-400/60 group-hover:text-red-600 dark:group-hover:text-red-400 group-hover:-translate-x-1 transition-all shrink-0" />
+                </div>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* SECTION 3: درباره Mihrab */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center">
-            ۳
-          </span>
-          <span>درباره Mihrab</span>
-        </h2>
-
-        <Card className="divide-y divide-theme/40 p-0 overflow-hidden">
-          {/* Action 1: Changelog */}
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => setIsChangelogOpen(true)}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsChangelogOpen(true)}
-            aria-label="تغییرات نسخه‌ها - مشاهده تغییرات و بهبودهای نسخه‌ها"
-            className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-surface-elevated/60 transition-colors cursor-pointer group"
-          >
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                <Star className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-primary-theme">
-                  تغییرات نسخه‌ها
-                </h3>
-                <p className="text-xs text-secondary-theme mt-0.5">
-                  مشاهده تغییرات و بهبودهای نسخه‌ها
-                </p>
-              </div>
-            </div>
-            <ChevronLeft className="w-5 h-5 text-secondary-theme/60 group-hover:text-amber-600 dark:group-hover:text-amber-400 group-hover:-translate-x-1 transition-all shrink-0" />
+      <section className="space-y-2.5">
+        <button
+          type="button"
+          onClick={() => setOpenSection3((prev) => !prev)}
+          aria-expanded={openSection3}
+          className="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-theme/60 bg-surface-card hover:bg-surface-elevated/70 transition-all cursor-pointer select-none text-right group shadow-2xs"
+        >
+          <div className="flex items-center gap-3">
+            <span className="w-6 h-6 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center shrink-0">
+              ۳
+            </span>
+            <span className="text-sm font-bold text-primary-theme group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
+              درباره Mihrab
+            </span>
           </div>
 
-          {/* Action 2: About Mihrab */}
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => setIsAboutOpen(true)}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsAboutOpen(true)}
-            aria-label="درباره Mihrab - اطلاعات برنامه، نسخه و ارتباط با ما"
-            className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-surface-elevated/60 transition-colors cursor-pointer group"
-          >
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                <Info className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-primary-theme">
-                  درباره Mihrab
-                </h3>
-                <p className="text-xs text-secondary-theme mt-0.5">
-                  اطلاعات برنامه، نسخه و ارتباط با ما
-                </p>
-              </div>
-            </div>
-            <ChevronLeft className="w-5 h-5 text-secondary-theme/60 group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:-translate-x-1 transition-all shrink-0" />
+          <div className="flex items-center gap-2.5">
+            <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-persian shrink-0">
+              نسخه ۳.۰.۴
+            </span>
+            <motion.div
+              animate={{ rotate: openSection3 ? 180 : 0 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="w-7 h-7 rounded-lg bg-surface-elevated flex items-center justify-center shrink-0 text-secondary-theme"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </motion.div>
           </div>
-        </Card>
+        </button>
+
+        <AnimatePresence initial={false}>
+          {openSection3 && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className="overflow-hidden"
+            >
+              <Card className="divide-y divide-theme/40 p-0 overflow-hidden">
+                {/* Action 1: Changelog */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setIsChangelogOpen(true)}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsChangelogOpen(true)}
+                  aria-label="تغییرات نسخه‌ها - مشاهده تغییرات و بهبودهای نسخه‌ها"
+                  className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-surface-elevated/60 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                      <Star className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-primary-theme">
+                        تغییرات نسخه‌ها
+                      </h3>
+                      <p className="text-xs text-secondary-theme mt-0.5">
+                        مشاهده تغییرات و بهبودهای نسخه‌ها
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 text-secondary-theme/60 group-hover:text-amber-600 dark:group-hover:text-amber-400 group-hover:-translate-x-1 transition-all shrink-0" />
+                </div>
+
+                {/* Action 2: About Mihrab */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setIsAboutOpen(true)}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsAboutOpen(true)}
+                  aria-label="درباره Mihrab - اطلاعات برنامه، نسخه و ارتباط با ما"
+                  className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-surface-elevated/60 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                      <Info className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-primary-theme">
+                        درباره Mihrab
+                      </h3>
+                      <p className="text-xs text-secondary-theme mt-0.5">
+                        اطلاعات برنامه، نسخه و ارتباط با ما
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 text-secondary-theme/60 group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:-translate-x-1 transition-all shrink-0" />
+                </div>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
-
-      {/* Version Number Footnote */}
-      <div className="text-center pt-2">
-        <span className="text-xs font-semibold text-secondary-theme/70">
-          نسخه ۳.۰.۲ (۳۰۲)
-        </span>
-      </div>
 
       {/* DIALOG 1: Confirmation for Restore Backup */}
       <Dialog

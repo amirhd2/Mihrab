@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useAppNavigate } from '../components/PageTransition';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageHeader } from '../components/PageHeader';
-import { Search, Plus, Tag as TagIcon, SlidersHorizontal, SearchX, FileText } from 'lucide-react';
+import { Search, Plus, Tag as TagIcon, SlidersHorizontal, SearchX, FileText, Star } from 'lucide-react';
 import { SearchField } from '../components/SearchField';
 import { db } from '../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -64,7 +64,9 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
       }
 
       // 2. Tag filter
-      if (activeTag !== 'all') {
+      if (activeTag === 'starred' || activeTag === 'favorites') {
+        if (!dua.isFavorite) return false;
+      } else if (activeTag !== 'all') {
         if (!dua.tags || !dua.tags.includes(activeTag)) return false;
       }
 
@@ -171,9 +173,26 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
 
         <div className="w-px h-5 bg-neutral-200 dark:bg-neutral-700 shrink-0 mx-1" />
 
+        {/* Starred Filter Button (Icon only) */}
         <button
+          type="button"
+          onClick={() => setActiveTag(activeTag === 'starred' ? 'all' : 'starred')}
+          className={`px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border flex items-center justify-center cursor-pointer ${
+            activeTag === 'starred'
+              ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
+              : 'bg-surface-card text-amber-600 dark:text-amber-400 border-neutral-200/80 dark:border-neutral-800 hover:border-amber-300 dark:hover:border-amber-700'
+          }`}
+          title="نشان‌شده‌ها (ستاره‌دار)"
+          aria-label="نشان‌شده‌ها (ستاره‌دار)"
+        >
+          <Star className={`w-3.5 h-3.5 ${activeTag === 'starred' ? 'fill-white' : 'fill-amber-500/20'}`} />
+        </button>
+
+        {/* All Tag */}
+        <button
+          type="button"
           onClick={() => setActiveTag('all')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border cursor-pointer ${
             activeTag === 'all'
               ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
               : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
@@ -185,8 +204,9 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
         {sortedTags.map(tag => (
           <button
             key={tag.id}
+            type="button"
             onClick={() => setActiveTag(tag.name)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 border cursor-pointer ${
               activeTag === tag.name
                 ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
                 : 'bg-surface-card text-secondary-theme border-neutral-200/80 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
@@ -203,7 +223,9 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
             <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mx-auto">
               {searchQuery ? (
                 <SearchX className="w-6 h-6" />
-              ) : activeTag !== 'all' && activeTag !== 'favorites' ? (
+              ) : activeTag === 'starred' || activeTag === 'favorites' ? (
+                <Star className="w-6 h-6 text-amber-500 fill-amber-500/20" />
+              ) : activeTag !== 'all' ? (
                 <TagIcon className="w-6 h-6" />
               ) : (
                 <FileText className="w-6 h-6" />
@@ -214,8 +236,8 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
               <h3 className="text-base font-bold text-primary-theme">
                 {searchQuery
                   ? 'دعایی پیدا نشد'
-                  : activeTag === 'favorites'
-                  ? 'هیچ دعایی در علاقه‌مندی‌ها نیست'
+                  : activeTag === 'starred' || activeTag === 'favorites'
+                  ? 'هیچ دعایی در لیست ستاره‌دار وجود ندارد'
                   : activeTag !== 'all'
                   ? `هیچ دعایی با تگ «${activeTag}» یافت نشد`
                   : 'هنوز دعایی اضافه نشده'}
@@ -223,8 +245,8 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
               <p className="text-xs text-secondary-theme leading-relaxed">
                 {searchQuery
                   ? 'عبارت دیگری را جستجو کنید یا فیلترها را تغییر دهید.'
-                  : activeTag === 'favorites'
-                  ? 'می‌توانید با انتخاب آیکون قلب، دعاها را به این لیست اضافه کنید.'
+                  : activeTag === 'starred' || activeTag === 'favorites'
+                  ? 'می‌توانید با انتخاب آیکون ستاره در صفحه خواندن هر دعا، آن را به این لیست اضافه کنید.'
                   : activeTag !== 'all'
                   ? 'می‌توانید تگ دیگری را انتخاب کرده یا دعای جدیدی اضافه کنید.'
                   : 'با استفاده از دکمه افزودن، اولین دعای خود را ثبت کنید.'}

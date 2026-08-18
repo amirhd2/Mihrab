@@ -493,60 +493,113 @@ export const FastingPage: React.FC<{
         </div>
       </div>
 
-      {/* MAIN STATUS SECTION AT BOTTOM */}
-      <div 
-        className={`md:static md:translate-y-0 fixed bottom-4 md:bottom-auto left-4 right-4 md:left-auto md:right-auto z-40 transition-transform duration-300 ease-in-out ${
-          isStickyVisible ? 'translate-y-0' : 'translate-y-[150%]'
-        }`}
-      >
-        <Card className="p-3.5 sm:p-4 border border-orange-500/20 dark:border-orange-500/30 shadow-lg md:shadow-xs md:mt-6">
-          <div className="grid grid-cols-3 items-center divide-x divide-x-reverse divide-neutral-200 dark:divide-neutral-800">
-            {/* SECTION 1 (RIGHT in RTL): کل باقیمانده */}
-          <div className="flex items-center gap-2.5 sm:gap-3 justify-start pr-1 sm:pr-3">
-            <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 items-center justify-center shrink-0">
-              <Check className="w-4 h-4 sm:w-5 sm:h-5" />
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-baseline gap-1">
-                <span className="text-base sm:text-xl font-extrabold text-orange-600 dark:text-orange-400 leading-none">
-                  {formatPersianNumber(qazaCount)}
-                </span>
-                <span className="text-[10px] sm:text-xs text-secondary-theme font-semibold">
-                  روزه قضا
-                </span>
+      {/* DESKTOP STATUS SECTION AT BOTTOM */}
+      <div className="hidden md:block mt-6">
+        <Card className="p-3.5 sm:p-4 border border-orange-500/20 dark:border-orange-500/30 shadow-xs">
+          <div className="grid grid-cols-3 items-center">
+            {/* SECTION 1 (RIGHT in RTL): تعداد روزه قضا */}
+            <div className="flex items-center gap-2.5 sm:gap-3 justify-start pr-1 sm:pr-3">
+              <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 items-center justify-center shrink-0">
+                <Check className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-base sm:text-xl font-extrabold text-orange-600 dark:text-orange-400 leading-none">
+                    {formatPersianNumber(qazaCount)}
+                  </span>
+                  <span className="text-[10px] sm:text-xs text-secondary-theme font-semibold">
+                    روزه قضا
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* SECTION 2 (CENTER in RTL): آخرین ثبت */}
-          <div className="flex items-center gap-2 sm:gap-3 justify-center px-1 sm:px-3 text-center">
-            <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 items-center justify-center shrink-0">
-              <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+            {/* SECTION 2 (CENTER in RTL): آخرین ثبت */}
+            <div className="flex items-center gap-2 sm:gap-3 justify-center px-1 sm:px-3 text-center border-x border-neutral-200 dark:border-neutral-800">
+              <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 items-center justify-center shrink-0">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] sm:text-xs text-secondary-theme font-medium">
+                  آخرین ثبت
+                </p>
+                <p className="text-xs sm:text-sm font-bold text-primary-theme mt-0.5">
+                  {formatLastRecordedTime(lastQazaCompletedAt)}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] sm:text-xs text-secondary-theme font-medium">
-                آخرین ثبت
-              </p>
-              <p className="text-xs sm:text-sm font-bold text-primary-theme mt-0.5">
-                {formatLastRecordedTime(lastQazaCompletedAt)}
-              </p>
-            </div>
-          </div>
 
-          {/* SECTION 3 (LEFT in RTL): تاریخچه Button */}
-          <div className="flex items-center justify-end pl-1 sm:pl-3">
-            <button
-              type="button"
-              onClick={() => setIsHistoryMenuOpen(true)}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-2xl bg-surface-elevated/70 hover:bg-surface-elevated active:scale-95 text-primary-theme font-bold text-xs sm:text-sm transition-all border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs"
-            >
-              <span>تاریخچه</span>
-              <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-            </button>
+            {/* SECTION 3 (LEFT in RTL): تاریخچه Button */}
+            <div className="flex items-center justify-end pl-1 sm:pl-3">
+              <button
+                type="button"
+                onClick={() => setIsHistoryMenuOpen(true)}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-2xl bg-surface-elevated/70 hover:bg-surface-elevated active:scale-95 text-primary-theme font-bold text-xs sm:text-sm transition-all border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs cursor-pointer"
+              >
+                <span>تاریخچه</span>
+                <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </button>
+            </div>
           </div>
-        </div>
         </Card>
       </div>
+
+      {/* MOBILE STICKY FLOATING STATUS SECTION VIA PORTAL */}
+      <Portal>
+        <div 
+          dir="rtl"
+          className={`fixed bottom-4 left-4 right-4 z-40 max-w-lg mx-auto md:hidden transition-all duration-300 ease-in-out font-persian ${
+            isStickyVisible 
+              ? 'translate-y-0 opacity-100 pointer-events-auto' 
+              : 'translate-y-28 opacity-0 pointer-events-none'
+          }`}
+        >
+          <Card className="p-3.5 border border-orange-500/20 dark:border-orange-500/30 shadow-xl bg-surface-card/95 backdrop-blur-md">
+            <div className="grid grid-cols-3 items-center">
+              {/* SECTION 1 (RIGHT in RTL): تعداد روزه قضا */}
+              <div className="flex items-center gap-2 justify-start pr-1">
+                <div className="w-9 h-9 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
+                  <Check className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-base font-extrabold text-orange-600 dark:text-orange-400 leading-none">
+                      {formatPersianNumber(qazaCount)}
+                    </span>
+                    <span className="text-[10px] text-secondary-theme font-semibold">
+                      روزه قضا
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2 (CENTER in RTL): آخرین ثبت */}
+              <div className="flex items-center gap-1.5 justify-center px-1 text-center border-x border-neutral-200 dark:border-neutral-800">
+                <div>
+                  <p className="text-[10px] text-secondary-theme font-medium">
+                    آخرین ثبت
+                  </p>
+                  <p className="text-xs font-bold text-primary-theme mt-0.5">
+                    {formatLastRecordedTime(lastQazaCompletedAt)}
+                  </p>
+                </div>
+              </div>
+
+              {/* SECTION 3 (LEFT in RTL): تاریخچه Button */}
+              <div className="flex items-center justify-end pl-1">
+                <button
+                  type="button"
+                  onClick={() => setIsHistoryMenuOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-surface-elevated/70 hover:bg-surface-elevated active:scale-95 text-primary-theme font-bold text-xs transition-all border border-neutral-200/80 dark:border-neutral-800/80 shadow-2xs cursor-pointer"
+                >
+                  <span>تاریخچه</span>
+                  <Clock className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
+                </button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </Portal>
 
       <DatePickerSheet
         isOpen={activeDatePicker !== null}

@@ -80,6 +80,7 @@ export interface EducationContentRecord {
   text: string;
   tags: string[];
   source?: string;
+  isFavorite?: boolean;
   createdAt: string;
   updatedAt: string;
 }

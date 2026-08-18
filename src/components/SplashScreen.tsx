@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import splashArtUrl from '../assets/images/mihrab_splash_art.png';
+
+const splashArtUrl = './favicon.png';
 
 interface SplashScreenProps {
   onComplete?: () => void;
