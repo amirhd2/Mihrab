@@ -457,16 +457,13 @@ export const QadaPrayersPage: React.FC<{
       >
         <Card className="p-3.5 sm:p-4 border border-neutral-200/90 dark:border-neutral-800/80 shadow-lg md:shadow-xs">
           <div className="grid grid-cols-3 items-center divide-x divide-x-reverse divide-neutral-200 dark:divide-neutral-800">
-            {/* SECTION 1 (RIGHT in RTL): کل باقیمانده */}
+            {/* SECTION 1 (RIGHT in RTL): تعداد نمازهای قضا */}
           <div className="flex items-center gap-2.5 sm:gap-3 justify-start pr-1 sm:pr-3">
             <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <p className="text-[10px] sm:text-xs text-secondary-theme font-medium">
-                کل باقیمانده
-              </p>
-              <div className="flex items-baseline gap-1 mt-0.5">
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1">
                 <span className="text-base sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 leading-none">
                   {formatPersianNumber(totalRemaining)}
                 </span>

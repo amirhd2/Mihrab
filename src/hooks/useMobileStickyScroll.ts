@@ -11,27 +11,34 @@ export function useMobileStickyScroll() {
       return;
     }
 
-    const currentScrollY = window.scrollY;
-    
-    // When near the top, always show
-    if (currentScrollY < 50) {
-      setIsVisible(true);
-      setLastScrollY(currentScrollY);
+    const currentScrollY =
+      window.scrollY ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0;
+
+    // Small buffer to avoid micro-jitter
+    if (Math.abs(currentScrollY - lastScrollY) < 3) {
       return;
     }
 
-    // Scroll down the page (current > last) -> HIDE
-    // Scroll up the page (current < last) -> SHOW
-    if (currentScrollY > lastScrollY + 2) {
-      // Scrolling down
-      setIsVisible(false);
-    } else if (currentScrollY < lastScrollY - 2) {
-      // Scrolling up
+    // Scroll up the page (currentScrollY < lastScrollY) -> HIDE
+    // Scroll down the page (currentScrollY > lastScrollY) -> SHOW
+    if (currentScrollY > lastScrollY) {
+      // Scrolling down -> show
       setIsVisible(true);
+    } else if (currentScrollY < lastScrollY) {
+      // Scrolling up -> hide
+      setIsVisible(false);
     }
 
-    // Check if at the absolute bottom of the page
-    if (window.innerHeight + currentScrollY >= document.body.offsetHeight - 50) {
+    // Check if at the absolute bottom of the page -> always show
+    const scrollHeight = Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+      document.body.offsetHeight
+    );
+    if (window.innerHeight + currentScrollY >= scrollHeight - 50) {
       setIsVisible(true);
     }
 
@@ -41,9 +48,6 @@ export function useMobileStickyScroll() {
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll, { passive: true });
-    
-    // Initial check
-    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -53,3 +57,4 @@ export function useMobileStickyScroll() {
 
   return isVisible;
 }
+
