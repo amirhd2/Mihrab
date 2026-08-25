@@ -488,7 +488,8 @@ export const TasbihModal: React.FC<{
     } else {
       if (currentStepTarget > 0 && nextCount >= currentStepTarget) {
         if (isDailyActive) {
-          setDailyDhikrCount(0);
+          // Keep daily dhikr count at or above target without resetting to 0
+          setDailyDhikrCount(nextCount);
         } else {
           setLocalCount(0);
         }
@@ -911,7 +912,11 @@ export const TasbihModal: React.FC<{
                           strokeDasharray="565.48"
                           strokeDashoffset={strokeDashoffset}
                           strokeLinecap="round"
-                          className="text-amber-600 dark:text-amber-400 transition-all duration-150"
+                          className={`transition-all duration-150 ${
+                            isDailyActive && count >= currentStepTarget
+                              ? 'text-emerald-600 dark:text-emerald-400'
+                              : 'text-amber-600 dark:text-amber-400'
+                          }`}
                         />
                       </svg>
 
@@ -922,9 +927,16 @@ export const TasbihModal: React.FC<{
                       <span className="text-xs text-secondary-theme font-medium mt-1">
                         از {toPersianDigits(currentStepTarget)} مرتبه
                       </span>
-                      <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold mt-2 bg-amber-500/10 px-2.5 py-0.5 rounded-full">
-                        لمس برای ذکر
-                      </span>
+                      {isDailyActive && count >= currentStepTarget ? (
+                        <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold mt-2 bg-emerald-500/15 dark:bg-emerald-500/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                          ذکر امروز انجام شد
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold mt-2 bg-amber-500/10 px-2.5 py-0.5 rounded-full">
+                          لمس برای ذکر
+                        </span>
+                      )}
                     </button>
                   </div>
 

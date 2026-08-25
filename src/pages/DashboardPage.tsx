@@ -19,6 +19,7 @@ import {
   Bookmark,
   Layers,
   Flame,
+  CheckCircle2,
 } from 'lucide-react';
 
 import iconDuas from '../assets/images/icon_duas_1787638395526.png';
@@ -112,6 +113,9 @@ export const DashboardPage: React.FC = () => {
   // Education counts
   const totalEducationCount = educationRecords?.length || 0;
 
+  // Daily Dhikr completion check
+  const isDailyCompleted = quickDhikrCount >= dailyTarget;
+
   // Handle Quick Dhikr Tap
   const handleQuickDhikrTap = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -123,7 +127,7 @@ export const DashboardPage: React.FC = () => {
             navigator.vibrate([60, 40, 100]);
           } catch {}
         }
-        return 0;
+        return next;
       }
       if (typeof window !== 'undefined' && navigator.vibrate) {
         try {
@@ -179,10 +183,18 @@ export const DashboardPage: React.FC = () => {
           }
         }}
         aria-label="اطلاعات روز و ذکرشمار"
-        className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-l from-amber-600/10 via-surface-card to-emerald-600/10 border border-amber-500/30 hover:border-amber-500/50 dark:border-amber-500/25 dark:hover:border-amber-500/40 shadow-xs hover:shadow-sm transition-all duration-200 cursor-pointer p-3 sm:p-4 md:p-5"
+        className={`group relative overflow-hidden rounded-2xl sm:rounded-3xl border shadow-xs hover:shadow-sm transition-all duration-200 cursor-pointer p-3 sm:p-4 md:p-5 ${
+          isDailyCompleted
+            ? 'bg-gradient-to-l from-emerald-600/15 via-surface-card to-emerald-700/10 border-emerald-500/40 hover:border-emerald-500/60 dark:border-emerald-500/30'
+            : 'bg-gradient-to-l from-amber-600/10 via-surface-card to-emerald-600/10 border-amber-500/30 hover:border-amber-500/50 dark:border-amber-500/25 dark:hover:border-amber-500/40'
+        }`}
       >
         {/* Subtle decorative arch watermark */}
-        <div className="absolute left-1 -bottom-5 w-28 h-28 sm:w-32 sm:h-32 opacity-[0.04] pointer-events-none text-amber-900 dark:text-amber-100">
+        <div
+          className={`absolute left-1 -bottom-5 w-28 h-28 sm:w-32 sm:h-32 opacity-[0.04] pointer-events-none ${
+            isDailyCompleted ? 'text-emerald-900 dark:text-emerald-100' : 'text-amber-900 dark:text-amber-100'
+          }`}
+        >
           <MosqueIcon className="w-full h-full" />
         </div>
 
@@ -190,13 +202,19 @@ export const DashboardPage: React.FC = () => {
           {/* Right Section: Calendar & Dhikr Info */}
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
             {/* Calendar Icon Badge */}
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <div
+              className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 transition-colors ${
+                isDailyCompleted
+                  ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
+                  : 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
+              }`}
+            >
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
 
             {/* Date & Dhikr texts */}
             <div className="flex flex-col min-w-0 text-right">
-              {/* Date String */}
+              {/* Date String + Completed Badge */}
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-xs sm:text-sm md:text-base font-black text-primary-theme">
                   {formattedDates.persianDayName}، {toPersianDigits(formattedDates.persianMonthDay)}
@@ -206,11 +224,23 @@ export const DashboardPage: React.FC = () => {
                     ({toPersianDigits(formattedDates.hijriDateStr)})
                   </span>
                 )}
+                {isDailyCompleted && (
+                  <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-500/15 dark:bg-emerald-500/20 px-2 py-0.5 rounded-md">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                    ذکر امروز انجام شد
+                  </span>
+                )}
               </div>
 
               {/* Arabic Dhikr Calligraphy with Virtue */}
               <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
-                <span className="text-xs sm:text-sm md:text-base font-extrabold text-amber-900 dark:text-amber-200 truncate font-persian">
+                <span
+                  className={`text-xs sm:text-sm md:text-base font-extrabold truncate font-persian ${
+                    isDailyCompleted
+                      ? 'text-emerald-950 dark:text-emerald-200'
+                      : 'text-amber-900 dark:text-amber-200'
+                  }`}
+                >
                   {todayDhikr.dhikrArabic}
                 </span>
                 <span className="hidden md:inline-flex text-[10px] bg-amber-500/15 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-md font-medium shrink-0">
@@ -226,26 +256,48 @@ export const DashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={handleQuickDhikrTap}
-              title="برای شمارش ذکر لمس کنید"
-              aria-label="شمارش ذکر امروز"
-              className="relative group/counter flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-600 text-white shadow-xs hover:shadow-md active:scale-90 transition-all duration-200 border border-amber-400/40"
+              title={isDailyCompleted ? 'ذکر امروز انجام شده است' : 'برای شمارش ذکر لمس کنید'}
+              aria-label={isDailyCompleted ? 'ذکر امروز انجام شده است' : 'شمارش ذکر امروز'}
+              className={`relative group/counter flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-white shadow-xs hover:shadow-md active:scale-90 transition-all duration-200 border ${
+                isDailyCompleted
+                  ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 border-emerald-400/50'
+                  : 'bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-600 border-amber-400/40'
+              }`}
             >
-              {/* Animated Beads Icon */}
-              <TasbihBeadsIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-100 group-hover/counter:rotate-45 transition-transform" />
+              {/* Animated Icon */}
+              {isDailyCompleted ? (
+                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-100 shrink-0" />
+              ) : (
+                <TasbihBeadsIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-100 group-hover/counter:rotate-45 transition-transform" />
+              )}
               
-              {/* Count Numbers */}
+              {/* Count Numbers or Completed Text */}
               <div className="flex items-baseline gap-1">
-                <span className="text-xs sm:text-sm font-black tracking-tight">
-                  {toPersianDigits(quickDhikrCount)}
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-normal text-amber-100/80">
-                  / {toPersianDigits(todayDhikr.targetCount)}
-                </span>
+                {isDailyCompleted ? (
+                  <span className="text-xs sm:text-sm font-black tracking-tight whitespace-nowrap">
+                    انجام شد
+                  </span>
+                ) : (
+                  <>
+                    <span className="text-xs sm:text-sm font-black tracking-tight">
+                      {toPersianDigits(quickDhikrCount)}
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] font-normal text-amber-100/80">
+                      / {toPersianDigits(dailyTarget)}
+                    </span>
+                  </>
+                )}
               </div>
             </button>
 
             {/* Navigation indicator arrow (matching other dashboard cards) */}
-            <div className="p-1 sm:p-1.5 text-secondary-theme/60 group-hover:text-amber-600 dark:group-hover:text-amber-400 group-hover:-translate-x-0.5 transition-all">
+            <div
+              className={`p-1 sm:p-1.5 text-secondary-theme/60 transition-all ${
+                isDailyCompleted
+                  ? 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:-translate-x-0.5'
+                  : 'group-hover:text-amber-600 dark:group-hover:text-amber-400 group-hover:-translate-x-0.5'
+              }`}
+            >
               <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
