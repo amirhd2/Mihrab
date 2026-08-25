@@ -147,3 +147,18 @@ export interface FinancialHistory {
   amountPerItem?: number;
   year?: number;
 }
+
+export interface CustomDhikrRecord {
+  id?: number;
+  key?: string; // e.g. 'daily', 'salawat', or unique uuid for custom
+  title: string;
+  arabic: string;
+  meaning?: string;
+  virtue?: string;
+  targetCount: number;
+  category?: 'daily' | 'fatima' | 'standard' | 'custom';
+  isCustom?: boolean;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}

@@ -14,12 +14,14 @@ import { db } from '../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useMobileStickyScroll } from '../hooks/useMobileStickyScroll';
 import { SwipeToDeleteItem } from '../components/SwipeToDeleteItem';
+import { usePendingChanges } from '../context/PendingChangesContext';
 
 export const FastingPage: React.FC<{
   onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning', duration?: number, action?: any) => void;
 }> = ({ onShowToast }) => {
   const navigate = useAppNavigate();
   const isStickyVisible = useMobileStickyScroll();
+  const { addChange } = usePendingChanges();
   // State for Qaza Fasting
   const [qazaCount, setQazaCount] = useState(0);
   const [lastQazaCompletedAt, setLastQazaCompletedAt] = useState<string | null>(null);
@@ -99,6 +101,9 @@ export const FastingPage: React.FC<{
         timestamp: now,
         remainingCount: validCount
       });
+      addChange(`ثبت یک روزه قضا به عنوان خوانده شده`, 'fasting', 'create');
+    } else {
+      addChange(`بروزرسانی تعداد روزه قضا به ${validCount}`, 'fasting', 'update');
     }
     
     await db.qadaFastingState.put({
@@ -143,11 +148,13 @@ export const FastingPage: React.FC<{
     if (record) {
       await db.qadaFastingHistory.delete(id);
       saveQazaCount(qazaCount + 1, false);
+      addChange('لغو ثبت یک روزه قضا', 'fasting', 'delete');
     }
   };
 
   const handleUndoFinancial = async (id: number) => {
     await db.financialHistory.delete(id);
+    addChange('حذف یک تراکنش مالی', 'fasting', 'delete');
   };
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -155,8 +162,10 @@ export const FastingPage: React.FC<{
   const handleConfirmClear = async () => {
     if (showHistorySheet === 'qaza') {
       await db.qadaFastingHistory.clear();
+      addChange('پاکسازی کل تاریخچه روزه‌های قضا', 'fasting', 'delete');
     } else if (showHistorySheet === 'financial') {
       await db.financialHistory.clear();
+      addChange('پاکسازی کل تاریخچه پرداخت‌های مالی', 'fasting', 'delete');
     }
     setIsConfirmOpen(false);
   };
@@ -173,6 +182,7 @@ export const FastingPage: React.FC<{
       amountPerItem: fitriyaAmountPerPerson,
       year: 1405
     });
+    addChange(`ثبت پرداخت زکات فطره به مبلغ ${fitriyaTotal}`, 'fasting', 'create');
   };
 
   const handleKaffarahPayment = async (date: Date) => {
@@ -186,6 +196,7 @@ export const FastingPage: React.FC<{
         quantity: intentionalKaffarahCount,
         amountPerItem: intentionalKaffarahAmount
       });
+      addChange(`ثبت پرداخت کفاره عمد به مبلغ ${intentionalKaffarahCount * intentionalKaffarahAmount}`, 'fasting', 'create');
     }
     if (unintentionalKaffarahCount > 0) {
       await db.financialHistory.add({
@@ -196,6 +207,7 @@ export const FastingPage: React.FC<{
         quantity: unintentionalKaffarahCount,
         amountPerItem: unintentionalKaffarahAmount
       });
+      addChange(`ثبت پرداخت کفاره عذر/غیرعمد به مبلغ ${unintentionalKaffarahCount * unintentionalKaffarahAmount}`, 'fasting', 'create');
     }
     setIsKaffarahActive(false);
   };

@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useAppNavigate } from '../components/PageTransition';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageHeader } from '../components/PageHeader';
-import { Search, Plus, Tag as TagIcon, SlidersHorizontal, SearchX, FileText, Star } from 'lucide-react';
+import { Search, Plus, Tag as TagIcon, SlidersHorizontal, SearchX, FileText, Star, RotateCcw } from 'lucide-react';
 import { SearchField } from '../components/SearchField';
 import { db } from '../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -17,6 +17,9 @@ import { SwipeToDeleteItem } from '../components/SwipeToDeleteItem';
 import { Dialog } from '../components/Dialog';
 import { useToastState } from '../hooks/useToast';
 import { useMobileStickyScroll } from '../hooks/useMobileStickyScroll';
+import { usePendingChanges } from '../context/PendingChangesContext';
+import { ResetService } from '../services/resetService';
+import { RestoreDefaultModal } from '../components/RestoreDefaultModal';
 
 interface DuasPageProps {
   onShowToast: (message: string, type?: 'info' | 'success' | 'error' | 'warning', duration?: number, action?: { label: string; onClick: () => void }) => void;
@@ -26,6 +29,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
   const isStickyVisible = useMobileStickyScroll();
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useAppNavigate();
+  const { addChange } = usePendingChanges();
   const [activeTag, setActiveTag] = useState<string>('all');
   
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
@@ -85,6 +89,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
         ...duaData,
         updatedAt: new Date().toISOString(),
       });
+      addChange(`ویرایش دعای "${duaData.title}"`, 'duas', 'update');
       
       // Update reading view if open
       if (readingDua && readingDua.id === editingDua.id) {
@@ -97,6 +102,7 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
+      addChange(`ایجاد دعای جدید "${duaData.title}"`, 'duas', 'create');
     }
     
     setIsAddEditModalOpen(false);
@@ -108,11 +114,13 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
     const deletedId = dua.id;
     
     await db.duaContents.delete(deletedId);
+    addChange(`حذف دعای "${dua.title}"`, 'duas', 'delete');
     
     onShowToast('دعا حذف شد', 'success', 4000, {
       label: 'بازگردانی',
       onClick: async () => {
         await db.duaContents.put(dua);
+        addChange(`بازگردانی دعای "${dua.title}"`, 'duas', 'create');
         onShowToast('دعا بازگردانده شد', 'success', 3500);
       }
     });
@@ -134,10 +142,16 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
     if (dua) {
       const newState = !dua.isFavorite;
       await db.duaContents.update(id, { isFavorite: newState });
+      addChange(newState ? `افزودن دعای "${dua.title}" به علاقه‌مندی‌ها` : `حذف دعای "${dua.title}" از علاقه‌مندی‌ها`, 'duas', 'update');
       if (readingDua?.id === id) {
         // State automatically re-evaluated from db query
       }
     }
+  };
+
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
+  const handleRestoreDefaults = () => {
+    setIsRestoreModalOpen(true);
   };
 
   return (
@@ -254,14 +268,24 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
             </div>
 
             {activeTag === 'all' && !searchQuery && (
-              <button
-                type="button"
-                onClick={() => { setEditingDua(null); setIsAddEditModalOpen(true); }}
-                className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-2xl shadow-md transition-all active:scale-95 inline-flex items-center gap-1.5"
-              >
-                <Plus className="w-4 h-4" />
-                افزودن دعای جدید
-              </button>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setEditingDua(null); setIsAddEditModalOpen(true); }}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-2xl shadow-md transition-all active:scale-95 inline-flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  افزودن دعای جدید
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRestoreDefaults}
+                  className="w-full sm:w-auto px-4 py-2.5 bg-surface-elevated hover:bg-neutral-200 dark:hover:bg-neutral-800 text-secondary-theme hover:text-primary-theme text-xs font-semibold rounded-2xl border border-theme transition-all active:scale-95 inline-flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  بارگذاری ادعیه پیش‌فرض
+                </button>
+              </div>
             )}
           </div>
         ) : (
@@ -382,6 +406,15 @@ export const DuasPage: React.FC<DuasPageProps> = ({ onShowToast }) => {
           onToggleFavorite={handleToggleFavorite}
         />
       )}
+
+      {/* Granular Restore Default Content Modal */}
+      <RestoreDefaultModal
+        isOpen={isRestoreModalOpen}
+        onClose={() => setIsRestoreModalOpen(false)}
+        initialSelections={{ duas: true, ahkam: false, dhikrs: false }}
+        onSuccess={(msg) => onShowToast(msg, 'success')}
+        onError={(msg) => onShowToast(msg, 'error')}
+      />
     </div>
   );
 };

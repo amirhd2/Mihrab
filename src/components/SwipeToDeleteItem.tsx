@@ -193,16 +193,20 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
 
       const x = getX(e);
       const y = getY(e);
-      const rawDeltaX = startX - x; // Swiping left = positive delta
+      const rawDeltaX = startX - x; // Swiping left = positive delta in RTL/LTR
       const rawDeltaY = startY - y;
+      const absDeltaX = Math.abs(rawDeltaX);
+      const absDeltaY = Math.abs(rawDeltaY);
 
       if (!isSlopPassed) {
-        if (Math.abs(rawDeltaY) > 8 && Math.abs(rawDeltaY) > Math.abs(rawDeltaX)) {
+        // If movement is predominantly vertical with significant distance, allow vertical page scroll
+        if (absDeltaY > 16 && absDeltaY > absDeltaX * 1.5) {
           isVerticalScrolling = true;
           return;
         }
 
-        if (Math.abs(rawDeltaX) > SLOP_THRESHOLD) {
+        // Horizontal swipe intent detected
+        if (absDeltaX > SLOP_THRESHOLD && absDeltaX >= absDeltaY) {
           isSlopPassed = true;
           startX = x + (rawDeltaX > 0 ? SLOP_THRESHOLD : -SLOP_THRESHOLD);
           card.classList.add('rounded-2xl', 'shadow-lg');
@@ -211,6 +215,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
         }
       }
 
+      // Once horizontal swipe is active, prevent vertical scroll interference
       if (e.cancelable) {
         e.preventDefault();
       }
@@ -220,7 +225,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
 
       // Elastic resistance when pulling right beyond 0
       if (calculatedX > 0) {
-        calculatedX = calculatedX * 0.15;
+        calculatedX = calculatedX * 0.2;
       }
 
       currentTranslateX = calculatedX;
@@ -306,15 +311,16 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
   return (
     <div
       ref={wrapperRef}
-      className={`relative w-full ios-item-wrapper select-none overflow-hidden ${className || 'min-h-[58px] my-1'}`}
+      className={`relative w-full ios-item-wrapper select-none overflow-hidden rounded-2xl ${className || 'min-h-[58px] my-1'}`}
       style={{ touchAction: 'pan-y' }}
     >
-      {/* Red Delete Button Background (flush right, gap on left) */}
+      {/* Red Delete Button Background (Revealed from underneath on swipe) */}
       <div className="absolute inset-0 flex items-center justify-start pointer-events-none p-0 z-0">
         <button
           ref={deleteBtnRef}
           type="button"
-          className="delete-btn h-[52px] bg-red-600 dark:bg-red-600 text-white flex items-center justify-center shadow-md pointer-events-auto overflow-hidden opacity-0 relative transition-colors active:bg-red-700"
+          aria-label="حذف"
+          className="delete-btn h-[52px] bg-red-600 dark:bg-red-600 text-white flex items-center justify-center pointer-events-auto overflow-hidden opacity-0 relative transition-colors active:bg-red-700"
           style={{
             width: `${BTN_BASE_SIZE}px`,
             borderRadius: '9999px',
@@ -335,11 +341,11 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
         </button>
       </div>
 
-      {/* Foreground Content Card */}
+      {/* Foreground Content Card (Solid opaque layer strictly on top of delete button) */}
       <div
         ref={cardRef}
-        className={`card-content relative z-10 w-full h-full rounded-2xl flex items-center justify-between cursor-grab active:cursor-grabbing shadow-2xs hover:shadow-md transition-colors transition-shadow duration-200 ${
-          cardClassName || 'bg-surface-card border border-neutral-200/80 dark:border-neutral-800/80'
+        className={`card-content relative z-10 w-full h-full rounded-2xl flex items-center justify-between cursor-grab active:cursor-grabbing shadow-2xs hover:shadow-md transition-colors transition-shadow duration-200 bg-surface-card ${
+          cardClassName || 'border border-neutral-200/80 dark:border-neutral-800/80'
         }`}
       >
         <div className="w-full h-full flex flex-col justify-between">{children}</div>

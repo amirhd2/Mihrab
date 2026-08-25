@@ -15,6 +15,7 @@ import {
   FinancialHistory,
   DuaRecord,
   DuaTagRecord,
+  CustomDhikrRecord,
 } from './db';
 
 export interface MihrabBackupData {
@@ -38,6 +39,7 @@ export interface MihrabBackupData {
     educationContents?: EducationContentRecord[];
     educationTags?: EducationTagRecord[];
     preferences?: AppPreference[];
+    customDhikrs?: CustomDhikrRecord[];
   };
 }
 
@@ -51,6 +53,7 @@ export interface BackupValidationResult {
     duaBookmarks: number;
     educationBookmarks: number;
     preferences: number;
+    customDhikrs?: number;
   };
   errorMessageFa?: string;
 }

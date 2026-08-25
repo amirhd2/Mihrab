@@ -16,7 +16,7 @@ export const EducationCard: React.FC<EducationCardProps> = ({ item, onSelect, on
         id={item.id!}
         onDelete={() => onDelete(item)}
         className="h-full w-full"
-        cardClassName="bg-gradient-to-br from-blue-500/[0.06] via-surface-card to-surface-card border border-blue-500/15 dark:border-blue-500/20 hover:border-blue-500/35 dark:hover:border-blue-500/40"
+        cardClassName="bg-surface-card bg-gradient-to-br from-blue-500/[0.08] to-blue-500/[0.02] border border-blue-500/20 dark:border-blue-500/25 hover:border-blue-500/40 dark:hover:border-blue-500/45"
       >
         <div
           onClick={() => onSelect(item)}

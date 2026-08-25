@@ -31,7 +31,7 @@ export const DuaCard: React.FC<DuaCardProps> = ({ dua, onSelect, onDelete }) => 
         id={dua.id!}
         onDelete={() => onDelete(dua)}
         className="h-full w-full"
-        cardClassName="bg-gradient-to-br from-purple-500/[0.06] via-surface-card to-surface-card border border-purple-500/15 dark:border-purple-500/20 hover:border-purple-500/35 dark:hover:border-purple-500/40"
+        cardClassName="bg-surface-card bg-gradient-to-br from-purple-500/[0.08] to-purple-500/[0.02] border border-purple-500/20 dark:border-purple-500/25 hover:border-purple-500/40 dark:hover:border-purple-500/45"
       >
         <div
           onClick={() => onSelect(dua)}

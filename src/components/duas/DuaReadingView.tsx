@@ -108,10 +108,10 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
 
   const getTextSizeClass = (size: TextSize) => {
     switch (size) {
-      case 'sm': return { arabic: 'text-2xl leading-[2.5]', persian: 'text-sm leading-7' };
-      case 'base': return { arabic: 'text-3xl leading-[2.5]', persian: 'text-base leading-8' };
-      case 'lg': return { arabic: 'text-4xl leading-[2.5]', persian: 'text-lg leading-9' };
-      case 'xl': return { arabic: 'text-5xl leading-[2.5]', persian: 'text-xl leading-10' };
+      case 'sm': return { arabic: 'text-xl sm:text-2xl leading-[2.2] sm:leading-[2.5]', persian: 'text-xs sm:text-sm leading-6 sm:leading-7' };
+      case 'base': return { arabic: 'text-2xl sm:text-3xl leading-[2.2] sm:leading-[2.5]', persian: 'text-sm sm:text-base leading-7 sm:leading-8' };
+      case 'lg': return { arabic: 'text-3xl sm:text-4xl leading-[2.2] sm:leading-[2.5]', persian: 'text-base sm:text-lg leading-8 sm:leading-9' };
+      case 'xl': return { arabic: 'text-4xl sm:text-5xl leading-[2.2] sm:leading-[2.5]', persian: 'text-lg sm:text-xl leading-9 sm:leading-10' };
     }
   };
 
@@ -123,14 +123,12 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
         initial={{ opacity: 0, y: 16 }}
         animate={isClosing ? { opacity: 0, y: 16 } : { opacity: 1, y: 0 }}
         transition={{ duration: 0.18, ease: "easeOut" }}
-        className="fixed inset-0 z-50 bg-neutral-50 dark:bg-neutral-900 overflow-hidden"
+        className="fixed inset-0 z-50 bg-[#fdfaf5] dark:bg-[#141a24] flex flex-col overflow-hidden"
         dir="rtl"
       >
       {/* iOS-Inspired Reading Top Bar */}
       <div 
-        className={`absolute top-0 left-0 right-0 bg-surface-bg border-b border-neutral-200/80 dark:border-neutral-800 px-4 pt-2 pb-4 flex items-center justify-between z-20 transition-transform duration-300 ${
-          showTopBar ? 'translate-y-0' : '-translate-y-[120%]'
-        }`}
+        className="shrink-0 w-full bg-[#fdfaf5]/95 dark:bg-[#141a24]/95 backdrop-blur-md border-b border-amber-200/60 dark:border-neutral-800 px-4 py-2.5 flex items-center justify-between z-20"
       >
         <button
           type="button"
@@ -178,7 +176,7 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="absolute left-0 top-full mt-4 w-48 bg-surface-card border border-neutral-200/90 dark:border-neutral-800 rounded-2xl shadow-xl py-1.5 z-30 overflow-hidden"
+                className="absolute left-0 top-full mt-2 w-48 bg-surface-card border border-neutral-200/90 dark:border-neutral-800 rounded-2xl shadow-xl py-1.5 z-30 overflow-hidden"
               >
                 <button
                   onClick={handleCopy}
@@ -231,54 +229,53 @@ export const DuaReadingView: React.FC<DuaReadingViewProps> = ({
 
       {/* Main Reading Area */}
       <div 
-        className="w-full h-full overflow-y-auto overscroll-contain bg-amber-50/30 dark:bg-neutral-900 px-4 pt-[76px] pb-12 flex justify-center"
+        className="flex-1 w-full overflow-y-auto overscroll-y-contain bg-[#fdfaf5] dark:bg-[#141a24] p-2.5 sm:p-5 md:p-6 flex flex-col"
         onScroll={handleScroll}
       >
-        {/* Book Page Container */}
-        <div className="w-full max-w-3xl bg-[#fdfaf5] dark:bg-neutral-800 rounded-lg shadow-sm border border-amber-200/50 dark:border-neutral-700 p-1 relative overflow-hidden h-max min-h-full">
-          {/* Inner Ornamental Border (CSS approximated) */}
-          <div className="border-[3px] border-double border-amber-300/40 dark:border-amber-700/40 rounded p-6 sm:p-10 h-full flex flex-col relative">
-            
-            {/* Title */}
-            <div className="text-center mb-10 relative">
-              <div className="flex items-center justify-center gap-4 mb-2">
-                <span className="w-8 h-px bg-amber-400/50"></span>
-                <span className="text-amber-500/70 text-lg">❖</span>
-                <span className="w-8 h-px bg-amber-400/50"></span>
+        {/* Manuscript Book Frame (Unified Single Illumination Border) */}
+        <div className="w-full max-w-3xl mx-auto flex-1 flex flex-col justify-between border-2 sm:border-[3px] border-double border-amber-400/70 dark:border-amber-600/60 rounded-2xl sm:rounded-3xl p-4 sm:p-8 bg-amber-50/20 dark:bg-amber-500/[0.02] shadow-xs">
+          
+          <div className="flex-1 flex flex-col justify-start">
+            {/* Title Header */}
+            <div className="text-center mb-6 sm:mb-8 relative">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <span className="w-8 sm:w-12 h-px bg-amber-400/50"></span>
+                <span className="text-amber-500/80 text-base sm:text-lg">❖</span>
+                <span className="w-8 sm:w-12 h-px bg-amber-400/50"></span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-amber-900 dark:text-amber-100 font-serif">
+              <h2 className="text-xl sm:text-3xl font-bold text-amber-900 dark:text-amber-100 font-serif">
                 {dua.title}
               </h2>
             </div>
 
             {/* Arabic Text */}
-            <div dir="rtl" className={`text-center font-arabic text-amber-950 dark:text-amber-50 mb-10 ${arabic} whitespace-pre-wrap`}>
+            <div dir="rtl" className={`text-center font-arabic text-amber-950 dark:text-amber-50 mb-8 ${arabic} whitespace-pre-wrap`}>
               {dua.arabicText}
             </div>
 
-            {/* Divider */}
+            {/* Ornamental Divider */}
             {dua.persianTranslation && (
-              <div className="flex items-center justify-center gap-4 my-8 opacity-50">
-                <span className="w-16 h-px bg-amber-800/20 dark:bg-amber-200/20"></span>
-                <span className="text-amber-800/40 dark:text-amber-200/40">◈</span>
-                <span className="w-16 h-px bg-amber-800/20 dark:bg-amber-200/20"></span>
+              <div className="flex items-center justify-center gap-3 my-6 opacity-60">
+                <span className="w-12 sm:w-20 h-px bg-amber-800/20 dark:bg-amber-200/20"></span>
+                <span className="text-amber-800/50 dark:text-amber-200/50 text-xs sm:text-sm">◈</span>
+                <span className="w-12 sm:w-20 h-px bg-amber-800/20 dark:bg-amber-200/20"></span>
               </div>
             )}
 
-            {/* Persian Text */}
+            {/* Persian Translation Text */}
             {dua.persianTranslation && (
-              <div dir="rtl" className={`text-center text-neutral-600 dark:text-neutral-300 font-body ${persian} whitespace-pre-wrap`}>
+              <div dir="rtl" className={`text-center text-neutral-700 dark:text-neutral-300 font-body ${persian} whitespace-pre-wrap`}>
                 {dua.persianTranslation}
               </div>
             )}
-
-            {/* Source */}
-            {dua.source && (
-              <div className="mt-16 text-center text-sm text-neutral-400 dark:text-neutral-500">
-                منبع: {dua.source}
-              </div>
-            )}
           </div>
+
+          {/* Source Reference at bottom of the framed page */}
+          {dua.source && (
+            <div className="mt-8 pt-4 border-t border-amber-400/30 dark:border-amber-600/30 text-center text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+              منبع: {dua.source}
+            </div>
+          )}
         </div>
       </div>
 

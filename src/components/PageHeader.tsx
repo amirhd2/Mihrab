@@ -1,5 +1,6 @@
 import React from 'react';
 import { BackButton } from './BackButton';
+import { PendingChangesBell } from './pendingChanges/PendingChangesBell';
 
 interface PageHeaderProps {
   titleFa: string;
@@ -7,6 +8,7 @@ interface PageHeaderProps {
   showBack?: boolean;
   onBackClick?: () => void;
   actions?: React.ReactNode;
+  showBell?: boolean;
   className?: string;
   centered?: boolean;
 }
@@ -17,6 +19,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   showBack = false,
   onBackClick,
   actions,
+  showBell = true,
   className = '',
   centered = false,
 }) => {
@@ -38,11 +41,10 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             </p>
           )}
         </div>
-        {actions && (
-          <div className="absolute left-0 top-0.5">
-            {actions}
-          </div>
-        )}
+        <div className="absolute left-0 top-0.5 flex items-center gap-1.5">
+          {actions}
+          {showBell && <PendingChangesBell />}
+        </div>
       </header>
     );
   }
@@ -62,7 +64,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           )}
         </div>
       </div>
-      {actions && <div className="flex items-center gap-2 mt-2 sm:mt-0">{actions}</div>}
+      <div className="flex items-center gap-2 mt-2 sm:mt-0">
+        {actions}
+        {showBell && <PendingChangesBell />}
+      </div>
     </header>
   );
 };
+

@@ -15,6 +15,10 @@ import { Dialog } from '../components/Dialog';
 import { Plus, Tag as TagIcon, BookOpen, SlidersHorizontal, FileText, SearchX, Star } from 'lucide-react';
 import { ToastAction, ToastType } from '../hooks/useToast';
 import { useMobileStickyScroll } from '../hooks/useMobileStickyScroll';
+import { usePendingChanges } from '../context/PendingChangesContext';
+import { ResetService } from '../services/resetService';
+import { RestoreDefaultModal } from '../components/RestoreDefaultModal';
+import { RotateCcw } from 'lucide-react';
 
 interface EducationPageProps {
   onShowToast?: (message: string, type?: ToastType, duration?: number, action?: ToastAction) => void;
@@ -36,6 +40,7 @@ const normalizePersian = (str: string) => {
 export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => {
   const isStickyVisible = useMobileStickyScroll();
   const navigate = useAppNavigate();
+  const { addChange } = usePendingChanges();
   const [searchParams, setSearchParams] = useSearchParams();
   const articleId = searchParams.get('article');
 
@@ -78,6 +83,17 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
 
   useEffect(() => {
     loadData();
+
+    const handleReset = () => {
+      loadData();
+    };
+
+    window.addEventListener('mihrab_data_reset', handleReset);
+    window.addEventListener('storage', handleReset);
+    return () => {
+      window.removeEventListener('mihrab_data_reset', handleReset);
+      window.removeEventListener('storage', handleReset);
+    };
   }, []);
 
   // Filtered contents based on search query and selected tag
@@ -119,9 +135,11 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
   }) => {
     if (editingItem && editingItem.id) {
       await EducationService.updateContent(editingItem.id, data);
+      addChange(`ویرایش مطلب "${data.title}"`, 'education', 'update');
       if (onShowToast) onShowToast('مطلب با موفقیت بروزرسانی شد', 'success');
     } else {
       await EducationService.addContent(data);
+      addChange(`ایجاد مطلب جدید "${data.title}"`, 'education', 'create');
       if (onShowToast) onShowToast('مطلب جدید با موفقیت ذخیره شد', 'success');
     }
     setEditingItem(null);
@@ -133,6 +151,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
     if (!item.id) return;
     try {
       const isFav = await EducationService.toggleFavorite(item.id);
+      addChange(isFav ? `افزودن مطلب "${item.title}" به نشان‌شده‌ها` : `حذف مطلب "${item.title}" از نشان‌شده‌ها`, 'education', 'update');
       await loadData();
       if (onShowToast) {
         onShowToast(
@@ -151,6 +170,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
 
     try {
       await EducationService.deleteContent(item.id);
+      addChange(`حذف مطلب "${item.title}"`, 'education', 'delete');
 
       // If viewing reading page, exit reading view
       if (activeReadingItem?.id === item.id) {
@@ -165,6 +185,7 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
           label: 'بازگردانی',
           onClick: async () => {
             await EducationService.restoreContent(item);
+            addChange(`بازگردانی مطلب "${item.title}"`, 'education', 'create');
             await loadData();
             if (onShowToast) onShowToast('مطلب بازگردانده شد', 'success');
           },
@@ -201,6 +222,12 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
       setSelectedTag('همه');
     }
     await loadData();
+  };
+
+  // Restore Default Content Modal State
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
+  const handleRestoreDefaults = () => {
+    setIsRestoreModalOpen(true);
   };
 
   // Open Form for Adding New Content
@@ -356,14 +383,24 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
           </div>
 
           {selectedTag === 'همه' && !searchQuery && (
-            <button
-              type="button"
-              onClick={handleOpenAddForm}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl shadow-md transition-all active:scale-95 inline-flex items-center gap-1.5"
-            >
-              <Plus className="w-4 h-4" />
-              افزودن مطلب جدید
-            </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={handleOpenAddForm}
+                className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl shadow-md transition-all active:scale-95 inline-flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                افزودن مطلب جدید
+              </button>
+              <button
+                type="button"
+                onClick={handleRestoreDefaults}
+                className="w-full sm:w-auto px-4 py-2.5 bg-surface-elevated hover:bg-neutral-200 dark:hover:bg-neutral-800 text-secondary-theme hover:text-primary-theme text-xs font-semibold rounded-2xl border border-theme transition-all active:scale-95 inline-flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                بارگذاری احکام پیش‌فرض
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -453,6 +490,23 @@ export const EducationPage: React.FC<EducationPageProps> = ({ onShowToast }) => 
           آیا از حذف مطلب <span className="font-bold text-blue-600 dark:text-blue-400">«{itemToDelete?.title}»</span> اطمینان دارید؟
         </p>
       </Dialog>
+
+      {/* Granular Restore Default Content Modal */}
+      <RestoreDefaultModal
+        isOpen={isRestoreModalOpen}
+        onClose={() => {
+          setIsRestoreModalOpen(false);
+          loadData();
+        }}
+        initialSelections={{ duas: false, ahkam: true, dhikrs: false }}
+        onSuccess={(msg) => {
+          if (onShowToast) onShowToast(msg, 'success');
+          loadData();
+        }}
+        onError={(msg) => {
+          if (onShowToast) onShowToast(msg, 'error');
+        }}
+      />
     </div>
   );
 };

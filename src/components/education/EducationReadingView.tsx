@@ -159,14 +159,12 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
       initial={{ opacity: 0, y: 16 }}
       animate={isClosing ? { opacity: 0, y: 16 } : { opacity: 1, y: 0 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
-      className="fixed inset-0 z-50 bg-neutral-50 dark:bg-neutral-900 overflow-hidden"
+      className="fixed inset-0 z-50 bg-neutral-50 dark:bg-neutral-900 flex flex-col overflow-hidden"
       dir="rtl"
     >
       {/* iOS-Inspired Reading Top Bar */}
       <div 
-        className={`absolute top-0 left-0 right-0 bg-surface-bg border-b border-neutral-200/80 dark:border-neutral-800 px-4 pt-2 pb-4 flex items-center justify-between z-20 transition-transform duration-300 ${
-          showTopBar ? 'translate-y-0' : '-translate-y-[120%]'
-        }`}
+        className="shrink-0 w-full bg-surface-bg border-b border-neutral-200/80 dark:border-neutral-800 px-4 py-2.5 flex items-center justify-between z-20"
       >
         <button
           type="button"
@@ -265,41 +263,43 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
 
       {/* Main Reading Area */}
       <div 
-        className="w-full h-full overflow-y-auto overscroll-contain bg-neutral-50/50 dark:bg-neutral-900 px-4 pt-[76px] pb-12 flex justify-center"
+        className="flex-1 w-full overflow-y-auto overscroll-y-contain bg-neutral-50/50 dark:bg-neutral-900 p-2.5 sm:p-5 md:p-6 flex flex-col"
         onScroll={handleScroll}
       >
         {/* Reading Article Body Container */}
-        <div className="w-full max-w-3xl bg-gradient-to-br from-blue-500/[0.06] via-surface-card to-surface-card border border-blue-500/15 dark:border-blue-500/20 rounded-3xl p-5 sm:p-8 shadow-sm space-y-6 h-max min-h-full">
-          {/* Article Title Header */}
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black text-primary-theme tracking-tight mb-3">
-              {item.title}
-            </h2>
+        <div className="w-full max-w-3xl mx-auto flex-1 flex flex-col justify-between bg-surface-card bg-gradient-to-br from-blue-500/[0.06] to-blue-500/[0.02] border border-blue-500/15 dark:border-blue-500/20 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm space-y-6">
+          <div className="space-y-6">
+            {/* Article Title Header */}
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-primary-theme tracking-tight mb-3">
+                {item.title}
+              </h2>
 
-            {/* Tags Metadata Line */}
-            {item.tags && item.tags.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 pt-1 pb-2">
-                <span className="text-xs text-muted-theme flex items-center gap-1 font-medium">
-                  <TagIcon className="w-3.5 h-3.5 text-blue-500" />
-                  دسته:
-                </span>
-                {item.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
-                  >
-                    {tag}
+              {/* Tags Metadata Line */}
+              {item.tags && item.tags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 pt-1 pb-2">
+                  <span className="text-xs text-muted-theme flex items-center gap-1 font-medium">
+                    <TagIcon className="w-3.5 h-3.5 text-blue-500" />
+                    دسته:
                   </span>
-                ))}
-              </div>
-            )}
-          </div>
+                  {item.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          <div className="border-t border-blue-500/10 dark:border-blue-500/15" />
+            <div className="border-t border-blue-500/10 dark:border-blue-500/15" />
 
-          {/* Main Article Content */}
-          <div className="text-primary-theme prose prose-blue dark:prose-invert max-w-none">
-            {renderFormattedText(item.text)}
+            {/* Main Article Content */}
+            <div className="text-primary-theme prose prose-blue dark:prose-invert max-w-none">
+              {renderFormattedText(item.text)}
+            </div>
           </div>
 
           {/* Source Citation */}

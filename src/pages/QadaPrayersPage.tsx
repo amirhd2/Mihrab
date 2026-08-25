@@ -25,6 +25,7 @@ import { NestedPrayerCard } from '../components/qada/NestedPrayerCard';
 import { QadaHistorySheet } from '../components/qada/QadaHistorySheet';
 import { useMobileStickyScroll } from '../hooks/useMobileStickyScroll';
 import { formatPersianNumber } from '../utils/persianUtils';
+import { usePendingChanges } from '../context/PendingChangesContext';
 
 const PRAYER_TITLES: Record<PrayerType, string> = {
   fajr: 'نماز صبح',
@@ -40,6 +41,7 @@ export const QadaPrayersPage: React.FC<{
 }> = ({ onShowToast }) => {
   const navigate = useAppNavigate();
   const isStickyVisible = useMobileStickyScroll();
+  const { addChange } = usePendingChanges();
 
   // Modal & Sheet States
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -117,6 +119,7 @@ export const QadaPrayersPage: React.FC<{
     } else {
       await db.qadaPrayers.add({ prayerType: type, count: newCount, completedCount: 0, updatedAt: now });
     }
+    addChange(`افزایش تعداد ${PRAYER_TITLES[type]} به ${newCount}`, 'prayers', 'update');
   };
 
   // 2. Decrement Qaza Count (-1) -> Manual adjustment, no history log
@@ -128,6 +131,7 @@ export const QadaPrayersPage: React.FC<{
     const now = new Date().toISOString();
 
     await db.qadaPrayers.update(existing.id!, { count: newCount, updatedAt: now });
+    addChange(`کاهش تعداد ${PRAYER_TITLES[type]} به ${newCount}`, 'prayers', 'update');
   };
 
   // 3. Complete Prayer (-1) -> Creates history log & triggers animation
@@ -150,6 +154,7 @@ export const QadaPrayersPage: React.FC<{
       timestamp: now,
       remainingCount: newCount,
     });
+    addChange(`ثبت یک ${PRAYER_TITLES[type]} به عنوان خوانده شده`, 'prayers', 'create');
 
     if (onShowToast) {
       onShowToast(`یک ${PRAYER_TITLES[type]} ثبت شد`, 'success', 3000, {
@@ -198,12 +203,14 @@ export const QadaPrayersPage: React.FC<{
           updatedAt: new Date().toISOString(),
         });
       }
+      addChange(`لغو ثبت یک ${PRAYER_TITLES[record.prayerType]}`, 'prayers', 'delete');
     }
   };
 
   // 5. Clear all history records
   const handleClearAllHistory = async () => {
     await db.qadaHistory.clear();
+    addChange('پاکسازی تاریخچه خوانده شده‌های نماز قضا', 'prayers', 'delete');
   };
 
   // 6. Reset all Qaza counters to 0
@@ -218,6 +225,7 @@ export const QadaPrayersPage: React.FC<{
       }
     }
 
+    addChange('بازنشانی تمامی نمازهای قضا به صفر', 'prayers', 'reset');
     setIsResetConfirmOpen(false);
     setIsMoreMenuOpen(false);
   };
@@ -232,6 +240,7 @@ export const QadaPrayersPage: React.FC<{
     } else {
       await db.qadaPrayers.add({ prayerType: type, count, completedCount: 0, updatedAt: now });
     }
+    addChange(`تنظیم دستی تعداد ${PRAYER_TITLES[type]} به ${count}`, 'prayers', 'update');
   };
 
   const renderCelebration = (type: PrayerType) => {

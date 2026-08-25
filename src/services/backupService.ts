@@ -22,6 +22,7 @@ export class BackupService {
     const educationContents = await db.educationContents.toArray();
     const educationTags = await db.educationTags.toArray();
     const preferences = await db.preferences.toArray();
+    const customDhikrs = await db.customDhikrs.toArray();
 
     const backupData: MihrabBackupData = {
       version: 1,
@@ -44,6 +45,7 @@ export class BackupService {
         educationContents,
         educationTags,
         preferences,
+        customDhikrs,
       },
     };
 
@@ -53,7 +55,7 @@ export class BackupService {
       type: 'export',
       version: '1.0',
       status: 'success',
-      details: `صادر شده با ${qadaPrayers.length} نماز قضا و ${preferences.length} تنظیمات`,
+      details: `صادر شده با ${qadaPrayers.length} نماز قضا، ${customDhikrs.length} ذکر و ${preferences.length} تنظیمات`,
     });
 
     return backupData;
@@ -82,6 +84,7 @@ export class BackupService {
     const duaBookmarks = Array.isArray(d.duaBookmarks) ? d.duaBookmarks : [];
     const educationBookmarks = Array.isArray(d.educationBookmarks) ? d.educationBookmarks : [];
     const preferences = Array.isArray(d.preferences) ? d.preferences : [];
+    const customDhikrs = Array.isArray(d.customDhikrs) ? d.customDhikrs : [];
 
     return {
       isValid: true,
@@ -93,6 +96,7 @@ export class BackupService {
         duaBookmarks: duaBookmarks.length,
         educationBookmarks: educationBookmarks.length,
         preferences: preferences.length,
+        customDhikrs: customDhikrs.length,
       },
     };
   }
@@ -124,6 +128,7 @@ export class BackupService {
         db.educationContents,
         db.educationTags,
         db.preferences,
+        db.customDhikrs,
         db.backupHistory,
       ];
 
@@ -145,6 +150,7 @@ export class BackupService {
         await db.educationContents.clear();
         await db.educationTags.clear();
         await db.preferences.clear();
+        await db.customDhikrs.clear();
 
         const d = backup.data;
 
@@ -165,6 +171,7 @@ export class BackupService {
         if (d.educationContents?.length) await db.educationContents.bulkPut(d.educationContents);
         if (d.educationTags?.length) await db.educationTags.bulkPut(d.educationTags);
         if (d.preferences?.length) await db.preferences.bulkPut(d.preferences);
+        if (d.customDhikrs?.length) await db.customDhikrs.bulkPut(d.customDhikrs);
 
         // Ensure prayer seeding if needed
         await db.seedInitialDataIfNeeded();

@@ -17,7 +17,17 @@ import {
   EducationTagRecord,
   DuaRecord,
   DuaTagRecord,
+  CustomDhikrRecord,
 } from '../types/db';
+import {
+  DEFAULT_EDUCATION_TAGS,
+  DEFAULT_EDUCATION_CONTENTS,
+  DEFAULT_DUA_TAGS,
+  DEFAULT_DUAS_AND_AZKAR,
+  DEFAULT_STANDARD_DHIKRS_LIST,
+} from './defaultSeedData';
+
+export * from './defaultSeedData';
 
 export class MihrabDatabase extends Dexie {
   qadaPrayers!: Table<QadaPrayerRecord, number>;
@@ -37,6 +47,7 @@ export class MihrabDatabase extends Dexie {
   educationTags!: Table<EducationTagRecord, number>;
   duaContents!: Table<DuaRecord, number>;
   duaTags!: Table<DuaTagRecord, number>;
+  customDhikrs!: Table<CustomDhikrRecord, number>;
 
   constructor() {
     super('MihrabDatabase');
@@ -73,13 +84,41 @@ export class MihrabDatabase extends Dexie {
       duaContents: '++id, title, *tags, isFavorite, createdAt, updatedAt',
       duaTags: '++id, &name, createdAt',
     });
+
+    // Version 5 Schema for Custom Dhikr and Tasbih Management
+    this.version(5).stores({
+      customDhikrs: '++id, key, title, isCustom, order, createdAt',
+    });
   }
 
-  // Helper method to seed initial database records if empty
+  // Helper method to seed initial database records on very first installation
   async seedInitialDataIfNeeded() {
+    const isSeededPref = await this.preferences.get('hasInitialSeed');
+    const isSeededLocal = typeof localStorage !== 'undefined' ? localStorage.getItem('mihrab_initial_seed_done') : null;
+
+    // If app has already been initialized, DO NOT overwrite or re-insert user deletions/wipes
+    if (isSeededPref?.value === 'true' || isSeededLocal === 'true') {
+      // Ensure fundamental 6 prayer slots exist only if table is completely missing records
+      const prayerCount = await this.qadaPrayers.count();
+      if (prayerCount === 0) {
+        const now = new Date().toISOString();
+        await this.qadaPrayers.bulkAdd([
+          { prayerType: 'fajr', count: 0, completedCount: 0, updatedAt: now },
+          { prayerType: 'dhuhr', count: 0, completedCount: 0, updatedAt: now },
+          { prayerType: 'asr', count: 0, completedCount: 0, updatedAt: now },
+          { prayerType: 'maghrib', count: 0, completedCount: 0, updatedAt: now },
+          { prayerType: 'isha', count: 0, completedCount: 0, updatedAt: now },
+          { prayerType: 'ayat', count: 0, completedCount: 0, updatedAt: now },
+        ]);
+      }
+      return;
+    }
+
+    // FIRST EVER APP RUN (First Install)
+    const now = new Date().toISOString();
+
     const prayerCount = await this.qadaPrayers.count();
     if (prayerCount === 0) {
-      const now = new Date().toISOString();
       await this.qadaPrayers.bulkAdd([
         { prayerType: 'fajr', count: 0, completedCount: 0, updatedAt: now },
         { prayerType: 'dhuhr', count: 0, completedCount: 0, updatedAt: now },
@@ -88,17 +127,6 @@ export class MihrabDatabase extends Dexie {
         { prayerType: 'isha', count: 0, completedCount: 0, updatedAt: now },
         { prayerType: 'ayat', count: 0, completedCount: 0, updatedAt: now },
       ]);
-    } else {
-      // Check if ayat prayer is missing in existing DB
-      const ayat = await this.qadaPrayers.where('prayerType').equals('ayat').first();
-      if (!ayat) {
-        await this.qadaPrayers.add({
-          prayerType: 'ayat',
-          count: 0,
-          completedCount: 0,
-          updatedAt: new Date().toISOString(),
-        });
-      }
     }
 
     const fastingState = await this.qadaFastingState.get('current');
@@ -106,193 +134,71 @@ export class MihrabDatabase extends Dexie {
       await this.qadaFastingState.put({
         id: 'current',
         count: 0,
-        updatedAt: new Date().toISOString(),
+        updatedAt: now,
       });
     }
 
-    const prefCount = await this.preferences.count();
-    if (prefCount === 0) {
-      const now = new Date().toISOString();
-      await this.preferences.bulkAdd([
-        { key: 'themeMode', value: 'system', updatedAt: now },
-        { key: 'appVersion', value: '1.2.0', updatedAt: now },
-        { key: 'installedAt', value: now, updatedAt: now },
-      ]);
-    }
-
-    // Seed default tags and education content if empty
-    const skipContentSeed = localStorage.getItem('mihrab_skip_content_seed') === 'true';
-
-    if (!skipContentSeed) {
-      const tagCount = await this.educationTags.count();
-      if (tagCount === 0) {
-        const now = new Date().toISOString();
-        const defaultTags = ['احکام', 'وضو', 'نماز', 'روزه', 'آموزش', 'اذکار'];
-        for (const name of defaultTags) {
-          await this.educationTags.add({ name, createdAt: now });
-        }
+    // 1. Seed or sync Education Tags
+    for (const name of DEFAULT_EDUCATION_TAGS) {
+      const existing = await this.educationTags.where('name').equals(name).first();
+      if (!existing) {
+        await this.educationTags.add({ name, createdAt: now });
       }
-
-      const contentCount = await this.educationContents.count();
-      if (contentCount === 0) {
-        const now = new Date().toISOString();
-        await this.educationContents.bulkAdd([
-        {
-          title: 'احکام وضو',
-          text: `وضو یکی از مقدمات مهم نماز است و برای انجام صحیح آن، رعایت شرایط زیر لازم است:
-
-شرایط وضو
-برای وضو، ابتدا باید نیت وضو داشته باشید و سپس صورت و دست‌ها را به ترتیب مقرر بشویید و مسح سر و پاها را انجام دهید.
-
-مبطلات وضو
-مواردی که وضو را باطل می‌کنند عبارتند از:
-- خروج ادرار یا مدفوع
-- باد معده
-- خوابی که به واسطه آن چشم نبیند و گوش نشنود
-- بیهوشی و مستی
-- هر کاری که موجب غسل می‌شود.`,
-          tags: ['احکام', 'وضو'],
-          source: 'توضیح المسائل',
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          title: 'آموزش نماز صبح',
-          text: `نماز صبح دو رکعت است و وقت آن از طلوع فجر صادق تا طلوع آفتاب است.
-
-نحوه خواندن:
-۱. نیت و تکبیره الاحرام (گفتن الله اکبر)
-۲. قرائت حمد و سوره در رکعت اول و دوم
-۳. رکوع و سجود در هر رکعت
-۴. تشهد و سلام در پایان رکعت دوم.`,
-          tags: ['نماز', 'آموزش'],
-          source: 'آموزش فقه',
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          title: 'احکام روزه و مبطلات آن',
-          text: `روزه عبارت است از خودداری و امساک از مبطلات روزه از اذان صبح تا اذان مغرب با نیت تقرب به خداوند.
-
-مهم‌ترین مبطلات روزه:
-- خوردن و آشامیدن عمداً
-- رساندن غبار غلیظ به حلق
-- فرو بردن تمام سر در آب (طبق نظر برخی مراجع)
-- اماله کردن با چیزهای روان
-- قی کردن عمدی.`,
-          tags: ['احکام', 'روزه'],
-          source: 'رساله عملیه',
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          title: 'نماز مسافر و شرایط آن',
-          text: `مسافر باید نمازهای چهار رکعتی (ظهر، عصر و عشاء) را دو رکعت بخواند به شرطی که سفر او حداقل ۸ فرسخ (حدود ۴۵ کیلومتر) باشد و قصد ماندن ۱۰ روز در مقصد را نداشته باشد.`,
-          tags: ['نماز', 'احکام'],
-          source: 'توضیح المسائل',
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          title: 'احکام غسل',
-          text: `غسل به دو روش انجام می‌شود: غسل ترتیبی و غسل ارتماسی.
-
-در غسل ترتیبی ابتدا سر و گردن، سپس نیمه راست بدن و در نهایت نیمه چپ بدن شسته می‌شود.`,
-          tags: ['احکام', 'آموزش'],
-          source: 'توضیح المسائل',
-          createdAt: now,
-          updatedAt: now,
-        },
-      ]);
     }
 
-    // Seed default Dua Tags if empty
-    const duaTagCount = await this.duaTags.count();
-    if (duaTagCount === 0) {
-      const now = new Date().toISOString();
-      const defaultDuaTags = ['نماز', 'روزه', 'صبح', 'شب', 'مناسبتها', 'استغفار', 'زیارت'];
-      for (const name of defaultDuaTags) {
+    // 2. Seed or sync Education Contents
+    for (const item of DEFAULT_EDUCATION_CONTENTS) {
+      const existing = await this.educationContents.where('title').equals(item.title).first();
+      if (!existing) {
+        await this.educationContents.add({
+          ...item,
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+    }
+
+    // 3. Seed or sync Dua Tags
+    for (const name of DEFAULT_DUA_TAGS) {
+      const existing = await this.duaTags.where('name').equals(name).first();
+      if (!existing) {
         await this.duaTags.add({ name, createdAt: now });
       }
     }
 
-    // Seed default Duas if empty
-    const duaContentCount = await this.duaContents.count();
-    if (duaContentCount === 0) {
-      const now = new Date().toISOString();
-      await this.duaContents.bulkAdd([
-        {
-          title: 'دعای بعد از نماز',
-          arabicText: 'اللَّهُمَّ رَبَّنَا وَتَقَبَّلْ صَلاَتَنَا وَاغْفِرْ لَنَا وَارْحَمْنَا وَأَنْتَ خَيْرُ الرَّاحِمِينَ',
-          persianTranslation: 'پروردگارا، ای خدای ما، نماز ما را بپذیر و ما را ببخش و به ما رحم کن که تو بهترین رحم‌کنندگانی.',
-          source: 'مفاتیح الجنان',
-          tags: ['نماز'],
-          isFavorite: true,
+    // 4. Seed or sync Duas, Ziyarats, and Azkar
+    for (const item of DEFAULT_DUAS_AND_AZKAR) {
+      const existing = await this.duaContents.where('title').equals(item.title).first();
+      if (!existing) {
+        await this.duaContents.add({
+          ...item,
           createdAt: now,
           updatedAt: now,
-        },
-        {
-          title: 'دعای روزه',
-          arabicText: 'اللَّهُمَّ إِنِّي لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ وَعَلَيْكَ تَوَكَّلْتُ',
-          persianTranslation: 'خدایا، برای تو روزه گرفتم و به تو ایمان آوردم و با روزی تو افطار کردم و بر تو توکل نمودم.',
-          source: 'مفاتیح الجنان',
-          tags: ['روزه'],
-          isFavorite: true,
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          title: 'دعای صبح',
-          arabicText: 'اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ',
-          persianTranslation: 'خدایا، تو به صبح رسیدیم و به شام رسیدیم و به تو زنده‌ایم و به تو می‌میریم و بازگشت به سوی توست.',
-          source: 'مفاتیح الجنان',
-          tags: ['صبح'],
-          isFavorite: false,
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          title: 'دعای کمیل',
-          arabicText: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ بِرَحْمَتِكَ الَّتِي وَسِعَتْ كُلَّ شَيْءٍ وَبِقُوَّتِكَ الَّتِي قَهَرْتَ بِهَا كُلَّ شَيْءٍ وَخَضَعَ لَهَا كُلُّ شَيْءٍ',
-          persianTranslation: 'خدایا، از تو می‌خواهم به نام رحمتت که همه چیز را فرا گرفته است و به نیرویت که با آن بر هر چیزی چیره شدی و همه چیز در برابرش خاضع گردید.',
-          source: 'مفاتیح الجنان',
-          tags: ['شب', 'مناسبتها'],
-          isFavorite: false,
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          title: 'دعای عهد',
-          arabicText: 'اللَّهُمَّ رَبَّ النُّورِ الْعَظِيمِ وَرَبَّ الْكُرْسِيِّ الرَّفِيعِ وَرَبَّ الْبَحْرِ الْمَسْجُورِ وَمُنْزِلَ التَّوْرَاةِ وَالإِنْجِيلِ وَالزَّبُورِ',
-          persianTranslation: 'خدایا، ای پروردگار نور بزرگ و پروردگار تخت بلند و پروردگار دریای پرشده و نازل‌کننده تورات و انجیل و زبور.',
-          source: 'مفاتیح الجنان',
-          tags: ['صبح', 'مناسبتها'],
-          isFavorite: false,
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          title: 'دعای ندبه',
-          arabicText: 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ وَصَلَّى اللَّهُ عَلَى سَيِّدِنَا مُحَمَّدٍ نَبِيِّهِ وَآلِهِ وَسَلَّمَ تَسْلِيماً',
-          persianTranslation: 'ستایش مخصوص خدای پروردگار جهانیان است و درود و سلام کامل خدا بر آقای ما محمد پیامبر او و خاندانش باد.',
-          source: 'مفاتیح الجنان',
-          tags: ['مناسبتها'],
-          isFavorite: false,
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          title: 'دعای فرج',
-          arabicText: 'إِلَهِي عَظُمَ الْبَلاءُ وَبَرِحَ الْخَفَاءُ وَانْكَشَفَ الْغِطَاءُ وَانْقَطَعَ الرَّجَاءُ وَضَاقَتِ الأَرْضُ وَمُنِعَتِ السَّمَاءُ',
-          persianTranslation: 'خدایا! بلا و گرفتاری بزرگ شده و پوشیده آشکار گشته و پرده برافتاده و امید قطع شده و زمین تنگ گشته و آسمان بازداشته شده است.',
-          source: 'مفاتیح الجنان',
-          tags: ['نماز', 'مناسبتها'],
-          isFavorite: true,
-          createdAt: now,
-          updatedAt: now,
-        },
-      ]);
+        });
       }
+    }
+
+    // 5. Seed or sync Standard Dhikrs for Tasbih & Counter
+    for (const item of DEFAULT_STANDARD_DHIKRS_LIST) {
+      if (item.key) {
+        const existing = await this.customDhikrs.where('key').equals(item.key).first();
+        if (!existing) {
+          await this.customDhikrs.add({
+            ...item,
+            createdAt: now,
+            updatedAt: now,
+          });
+        }
+      }
+    }
+
+    // Mark as initialized
+    await this.preferences.put({ key: 'hasInitialSeed', value: 'true', updatedAt: now });
+    await this.preferences.put({ key: 'themeMode', value: 'system', updatedAt: now });
+    await this.preferences.put({ key: 'appVersion', value: '3.1.3', updatedAt: now });
+    await this.preferences.put({ key: 'installedAt', value: now, updatedAt: now });
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('mihrab_initial_seed_done', 'true');
     }
   }
 }
@@ -300,7 +206,12 @@ export class MihrabDatabase extends Dexie {
 // Single instance for the application
 export const db = new MihrabDatabase();
 
-// Initialize seeding on database open
+// Initialize seeding on database open and whenever app starts
 db.on('ready', () => {
   return db.seedInitialDataIfNeeded();
+});
+
+// Also trigger immediate check on module load to guarantee syncing
+db.seedInitialDataIfNeeded().catch((err) => {
+  console.warn('Initial data seeding background check:', err);
 });

@@ -10,6 +10,8 @@ import { usePWA } from '../hooks/usePWA';
 import { BackupService } from '../services/backupService';
 import { ResetService } from '../services/resetService';
 import { MihrabBackupData } from '../types/backup';
+import { usePendingChanges } from '../context/PendingChangesContext';
+import { RestoreDefaultModal } from '../components/RestoreDefaultModal';
 import {
   Sun,
   Moon,
@@ -26,6 +28,7 @@ import {
   Sparkles,
   DownloadCloud,
   CheckCircle2,
+  BookOpen,
 } from 'lucide-react';
 
 interface ReleaseInfo {
@@ -38,10 +41,60 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۳.۰.۵',
+    version: 'نسخه ۳.۱.۳',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'افزودن پنجره تأیید و انتخاب تفکیک‌شده بخش‌ها (ادعیه، احکام، اذکار) در زمان بارگذاری محتوای پیش‌فرض',
+      'اصلاح قطعی و کامل فرآیند حذف داده‌ها برای پاکسازی واقعی و ۱۰۰٪ تمام جداول ادعیه، احکام و اذکار',
+      'حذف کامل محتوای اذکار دیتابیس در فرآیند پاکسازی داده‌ها و امکان بارگذاری مجدد در صورت نیاز',
+      'به‌روزرسانی خودکار و پویا ذکر روز و تاریخ در داشبورد منطبق با تاریخ روز و تغییر خودکار در گذر زمان',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۱.۲',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'اصلاح و هوشمندسازی فرآیند پاکسازی داده‌ها (Reset) در بخش پشتیبان‌گیری',
+      'حذف خودکار اذکار و ادعیه سفارشی اضافه شده توسط کاربر و بازنشانی دقیق شمارنده‌ها به صفر',
+      'حفظ و بازیابی تمیز اذکار و ادعیه معتبر پیش‌فرض برنامه در وضعیت اولیه استاندارد',
+      'بهینه‌سازی ابعاد و چیدمان فشرده کارت ذکر روز در نمای عمودی موبایل',
+      'طراحی زیباتر و تعاملی دکمه کپسولی شمارش ذکر و ورود یکپارچه به بخش تسبیح با لمس کارت',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۱.۰',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'همگام‌سازی کامل و لحظه‌ای کانتر ذکر روزانه بین پیش‌خوان اصلی و صفحه ذکرشمار (تسبیح)',
+      'بازگشت کامل مجموعه اذکار پیش‌فرض و ادعیه معتبر همراه با اذکار تمام روزهای هفته',
+      'امکان مدیریت کامل تمامی اذکار پیش‌فرض و شخصی (ویرایش عنوان، متن عربی، ترجمه، فضیلت و تعداد هدف)',
+      'قابلیت مرتب‌سازی اذکار با درگ و دراپ (Drag & Drop) و جابجایی دلخواه ترتیب کارت‌ها',
+      'یکپارچه‌سازی کامل جدول اذکار در سیستم پشتیبان‌گیری، بازیابی فایل و پاکسازی کامل داده‌ها',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۰.۷',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'حل ریشه‌ای مشکل کانتینر و حاشیه تذهیب دعاها در انواع ابعاد موبایل (حالت عمودی و افقی)',
+      'یکپارچه‌سازی کامل پس‌زمینه نسخه خطی و کادر دوبل طلایی بدون شکستگی یا چندتکه شدن لایه‌ها',
+      'بهینه‌سازی اسکرول روان و خودکار در نمایش دعاهای کوتاه و بلند در تمامی نمایشگرها',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۰.۶',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'بهبود چشمگیر سوایپ کارت‌ها و حذف حس چسبندگی؛ تشخیص روان حرکت افقی حتی در صورت لرزش دست به بالا و پایین',
+      'اصلاح لایه‌بندی (Z-index) و پس‌زمینه کارت‌ها جهت پنهان‌سازی کامل دکمه قرمز سطل زباله در زیر کارت',
+      'اصلاح نمایش حاشیه طلایی صفحه دعاها به صورت تمام‌ارتفاع (Full-Height) همانند صفحات واقعی کتب ادعیه',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۰.۵',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'افزایش زمان نمایش اسپلش اسکرین جهت نمایش زیباتر و کامل‌تر آرت‌ورک محراب',
       'بهینه‌سازی تایمر ترنزیشن و ورود نرم به صفحه اصلی برنامه',
@@ -178,6 +231,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
   const navigate = useAppNavigate();
   const { mode, setMode } = useTheme();
   const { isInstallable, installPWA } = usePWA();
+  const { addChange } = usePendingChanges();
 
   // Modals state
   const [isWipeDialogOpen, setIsWipeDialogOpen] = useState(false);
@@ -272,6 +326,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
     setIsRestoring(true);
     try {
       await BackupService.importData(pendingBackup);
+      addChange('بازیابی اطلاعات از فایل پشتیبان', 'settings', 'import');
       setIsRestoreDialogOpen(false);
       setPendingBackup(null);
       onShowToast('اطلاعات با موفقیت بازیابی شد', 'success');
@@ -288,6 +343,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
     setIsWiping(true);
     try {
       await ResetService.wipeAllUserData();
+      addChange('پاکسازی تمامی اطلاعات برنامه', 'settings', 'reset');
       setIsWipeDialogOpen(false);
       onShowToast('تمامی داده‌های برنامه‌ای با موفقیت پاکسازی شدند', 'success');
     } catch (err) {
@@ -296,6 +352,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
     } finally {
       setIsWiping(false);
     }
+  };
+
+  // 5. Restore Default Islamic Content Modal State
+  const [isRestoreDefaultModalOpen, setIsRestoreDefaultModalOpen] = useState(false);
+  const handleOpenRestoreDefaultModal = () => {
+    setIsRestoreDefaultModalOpen(true);
   };
 
   return (
@@ -517,7 +579,32 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
                   className="hidden"
                 />
 
-                {/* Action 3: Complete Data Wipe */}
+                {/* Action 3: Load Default Content */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={handleOpenRestoreDefaultModal}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleOpenRestoreDefaultModal()}
+                  aria-label="بارگذاری محتوای پیش‌فرض - ادعیه، زیارات، احکام و اذکار پیش‌فرض برنامه را بارگذاری کنید"
+                  className="flex items-center justify-between p-4 sm:p-4.5 hover:bg-surface-elevated/60 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                      <BookOpen className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-primary-theme">
+                        بارگذاری محتوای پیش‌فرض
+                      </h3>
+                      <p className="text-xs text-secondary-theme mt-0.5">
+                        ادعیه، زیارات، احکام شرعی و اذکار تسبیح را به دلخواه بازگردانید.
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 text-secondary-theme/60 group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:-translate-x-1 transition-all shrink-0" />
+                </div>
+
+                {/* Action 4: Complete Data Wipe */}
                 <div
                   role="button"
                   tabIndex={0}
@@ -566,7 +653,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
 
           <div className="flex items-center gap-2.5">
             <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-persian shrink-0">
-              نسخه ۳.۰.۵
+              نسخه ۳.۱.۲
             </span>
             <motion.div
               animate={{ rotate: openSection3 ? 180 : 0 }}
@@ -850,6 +937,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
           </div>
         </div>
       </Dialog>
+
+      {/* DIALOG 5: Granular Restore Default Content Modal */}
+      <RestoreDefaultModal
+        isOpen={isRestoreDefaultModalOpen}
+        onClose={() => setIsRestoreDefaultModalOpen(false)}
+        onSuccess={(msg) => {
+          addChange('بارگذاری محتوای پیش‌فرض', 'settings', 'import');
+          onShowToast(msg, 'success');
+        }}
+        onError={(msg) => onShowToast(msg, 'error')}
+      />
     </div>
   );
 };
