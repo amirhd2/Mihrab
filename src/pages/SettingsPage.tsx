@@ -46,10 +46,11 @@ const RELEASES: ReleaseInfo[] = [
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
     changes: [
+      'صفر شدن خودکار نشانگر زنگوله و پاکسازی فهرست تغییرات پس از دانلود فایل پشتیبان (از پنجره زنگوله یا صفحه تنظیمات)',
+      'تغییر دکمه پنجره اعلان‌ها و تغییرات (زنگوله) به «پشتیبان‌گیری و دریافت فایل (JSON)» با عملکرد مستقیم و کامل',
       'حفظ و تثبیت وضعیت «ذکر امروز انجام شد» در صفحه اصلی پس از اتمام ذکر و عدم صفر شدن خودکار شمارنده',
       'افزودن پنجره تأیید و انتخاب تفکیک‌شده بخش‌ها (ادعیه، احکام، اذکار) در زمان بارگذاری محتوای پیش‌فرض',
       'اصلاح قطعی و کامل فرآیند حذف داده‌ها برای پاکسازی واقعی و ۱۰۰٪ تمام جداول ادعیه، احکام و اذکار',
-      'به‌روزرسانی خودکار و پویا ذکر روز و تاریخ در داشبورد منطبق با تاریخ روز و تغییر خودکار در گذر زمان',
     ],
   },
   {
@@ -231,7 +232,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
   const navigate = useAppNavigate();
   const { mode, setMode } = useTheme();
   const { isInstallable, installPWA } = usePWA();
-  const { addChange } = usePendingChanges();
+  const { addChange, clearAllChanges } = usePendingChanges();
 
   // Modals state
   const [isWipeDialogOpen, setIsWipeDialogOpen] = useState(false);
@@ -289,6 +290,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
       URL.revokeObjectURL(url);
 
       onShowToast('پشتیبان‌گیری با موفقیت انجام شد', 'success');
+      clearAllChanges();
     } catch (err) {
       console.error('Export backup error:', err);
       onShowToast('خطا در تهیه نسخه پشتیبان', 'error');

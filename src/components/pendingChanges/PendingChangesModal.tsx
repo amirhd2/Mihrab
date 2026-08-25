@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
   CheckCircle2,
   Trash2,
-  CheckCheck,
   Clock,
   Sparkles,
   Layers,
@@ -15,12 +14,15 @@ import {
   RotateCcw,
   PlusCircle,
   Edit3,
+  Download,
+  Loader2,
 } from 'lucide-react';
 import { Portal } from '../Portal';
 import { usePreventBodyScroll } from '../../hooks/usePreventBodyScroll';
 import { usePendingChanges } from '../../context/PendingChangesContext';
 import { PendingChangeItem, ChangeCategory, ChangeActionType } from '../../types/pendingChanges';
 import { toPersianDigits } from '../../utils/persianUtils';
+import { BackupService } from '../../services/backupService';
 
 interface PendingChangesModalProps {
   onShowToast?: (message: string, type?: 'info' | 'success' | 'error' | 'warning', duration?: number) => void;
@@ -142,31 +144,43 @@ function formatRelativeTimestamp(isoString: string): string {
 
 export const PendingChangesModal: React.FC<PendingChangesModalProps> = ({ onShowToast }) => {
   const { changes, count, isPanelOpen, closePanel, removeChange, clearAllChanges } = usePendingChanges();
+  const [isExporting, setIsExporting] = useState(false);
 
   usePreventBodyScroll(isPanelOpen);
 
-  const handleConfirmAndSync = () => {
-    if (count === 0) {
+  const handleExportBackup = async () => {
+    try {
+      setIsExporting(true);
+      if ('vibrate' in navigator) {
+        try {
+          navigator.vibrate([20, 40, 20]);
+        } catch (_) {}
+      }
+
+      const backupData = await BackupService.exportData();
+      const jsonStr = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `mihrab-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      if (onShowToast) {
+        onShowToast('پشتیبان‌گیری با موفقیت انجام شد', 'success', 4000);
+      }
+      clearAllChanges();
       closePanel();
-      return;
-    }
-
-    if ('vibrate' in navigator) {
-      try {
-        navigator.vibrate([20, 40, 20]);
-      } catch (_) {}
-    }
-
-    const savedCount = count;
-    clearAllChanges();
-    closePanel();
-
-    if (onShowToast) {
-      onShowToast(
-        `تعداد ${toPersianDigits(savedCount)} تغییر با موفقیت تایید و نهایی‌سازی شدند.`,
-        'success',
-        4000
-      );
+    } catch (err) {
+      console.error('Export backup error from pending changes:', err);
+      if (onShowToast) {
+        onShowToast('خطا در تهیه نسخه پشتیبان', 'error', 4000);
+      }
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -323,31 +337,32 @@ export const PendingChangesModal: React.FC<PendingChangesModalProps> = ({ onShow
                 )}
               </div>
 
-              {/* Footer: Confirm / Sync / Clear Button */}
+              {/* Footer: Backup Download / Close / Clear Button */}
               <div className="p-4 sm:p-5 border-t border-theme/50 bg-surface-elevated/40 flex items-center gap-3 shrink-0">
                 {count > 0 && (
                   <button
                     type="button"
                     onClick={clearAllChanges}
                     className="px-3.5 py-3 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-colors cursor-pointer shrink-0"
-                    title="پاکسازی تمام تاریخچه تغییرات بدون نهایی‌سازی"
+                    title="پاکسازی تمام تاریخچه تغییرات"
                   >
-                    پاکسازی همه
+                    پاکسازی تاریخچه
                   </button>
                 )}
 
                 <button
                   type="button"
-                  id="btn-confirm-pending-changes"
-                  onClick={handleConfirmAndSync}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white transition-all shadow-sm active:scale-[0.99] cursor-pointer ${
-                    count > 0
-                      ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 shadow-emerald-600/20'
-                      : 'bg-neutral-600 hover:bg-neutral-700'
-                  }`}
+                  id="btn-export-backup-pending-changes"
+                  onClick={handleExportBackup}
+                  disabled={isExporting}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white transition-all shadow-sm active:scale-[0.99] cursor-pointer bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 shadow-blue-600/20 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <CheckCheck className="w-4 h-4" />
-                  <span>{count > 0 ? 'تایید و نهایی‌سازی تغییرات' : 'بستن پنجره'}</span>
+                  {isExporting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4" />
+                  )}
+                  <span>{isExporting ? 'در حال دریافت فایل...' : 'پشتیبان‌گیری و دریافت فایل (JSON)'}</span>
                 </button>
               </div>
             </motion.div>
