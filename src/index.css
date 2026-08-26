@@ -114,3 +114,16 @@
 .font-persian {
   font-family: 'Vazirmatn', 'Tahoma', sans-serif;
 }
+
+@font-face {
+  font-family: 'Uthman Taha Naskh';
+  src: url('./assets/fonts/KFGQPC_Uthman_Taha_Naskh_Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-arabic, .font-quran {
+  font-family: 'Uthman Taha Naskh', 'Amiri', 'Traditional Arabic', serif;
+  line-height: 1.8;
+}

@@ -95,7 +95,7 @@ export class ResetService {
       await db.preferences.bulkAdd([
         { key: 'hasInitialSeed', value: 'true', updatedAt: now },
         { key: 'themeMode', value: 'system', updatedAt: now },
-        { key: 'appVersion', value: '3.1.3', updatedAt: now },
+        { key: 'appVersion', value: '3.1.4', updatedAt: now },
         { key: 'installedAt', value: now, updatedAt: now },
       ]);
     });
@@ -211,16 +211,17 @@ export class ResetService {
       // 3. Standard dhikrs (Dhikrs & Tasbih)
       if (shouldRestoreDhikrs) {
         for (const item of DEFAULT_STANDARD_DHIKRS_LIST) {
-          if (item.key) {
-            const existing = await db.customDhikrs.where('key').equals(item.key).first();
-            if (!existing) {
-              await db.customDhikrs.add({
-                ...item,
-                createdAt: now,
-                updatedAt: now,
-              });
-              addedDhikrs++;
-            }
+          const existing = await db.customDhikrs
+            .filter(d => (item.key && d.key === item.key) || d.title === item.title)
+            .first();
+          
+          if (!existing) {
+            await db.customDhikrs.add({
+              ...item,
+              createdAt: now,
+              updatedAt: now,
+            });
+            addedDhikrs++;
           }
         }
         restoredLabels.push('اذکار و تسبیح');

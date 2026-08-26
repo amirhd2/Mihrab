@@ -1,0 +1,15 @@
+1:import { Portal } from "../Portal";
+2:import React, { useState, useRef, useEffect, UIEvent } from 'react';
+3:import { ArrowRight, MoreVertical, Star, Edit, Trash2, Copy, Share2, Heart, Type } from 'lucide-react';
+4:import { DuaRecord, DuaTagRecord } from '../../types/db';
+5:import { motion, AnimatePresence } from 'motion/react';
+6-
+7-interface DuaReadingViewProps {
+8-  dua: DuaRecord;
+9-  onClose: () => void;
+10-  onEdit: (dua: DuaRecord) => void;
+11-  onDelete: (id: number) => void;
+12-  onToggleFavorite: (id: number) => void;
+13-}
+14-
+15-type TextSize = 'sm' | 'base' | 'lg' | 'xl';

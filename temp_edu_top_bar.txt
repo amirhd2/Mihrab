@@ -1,0 +1,101 @@
+165:      {/* iOS-Inspired Reading Top Bar */}
+166-      <div 
+167-        className="shrink-0 w-full bg-surface-bg border-b border-neutral-200/80 dark:border-neutral-800 px-4 py-2.5 flex items-center justify-between z-20"
+168-      >
+169-        <button
+170-          type="button"
+171-          onClick={handleBack}
+172-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors active:scale-95"
+173-        >
+174-          <ArrowRight className="w-4 h-4" />
+175-          <span>بازگشت</span>
+176-        </button>
+177-
+178-        <h1 className="text-base sm:text-lg font-bold text-primary-theme truncate px-4 max-w-[220px] sm:max-w-md text-center">
+179-          {item.title}
+180-        </h1>
+181-
+182-        {/* Action Buttons: Star + Edit Pencil + Three-Dot Menu */}
+183-        <div className="flex items-center gap-1 relative" ref={menuRef}>
+184-          {onToggleFavorite && (
+185-            <button
+186-              type="button"
+187-              onClick={() => onToggleFavorite(item)}
+188-              className={`p-2 rounded-xl transition-colors active:scale-95 ${
+189-                item.isFavorite
+190-                  ? 'text-amber-500 hover:bg-amber-500/10'
+191-                  : 'text-secondary-theme hover:text-amber-500 hover:bg-surface-elevated'
+192-              }`}
+193-              title={item.isFavorite ? 'حذف از نشان‌شده‌ها' : 'نشان کردن (ستاره‌دار)'}
+194-            >
+195-              <Star className={`w-5 h-5 ${item.isFavorite ? 'fill-current' : ''}`} />
+196-            </button>
+197-          )}
+198-
+199-          <button
+200-            type="button"
+201-            onClick={() => onEdit(item)}
+202-            className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors active:scale-95"
+203-            title="ویرایش مطلب"
+204-          >
+205-            <Edit className="w-5 h-5" />
+206-          </button>
+207-
+208-          {/* Three-Dot Menu Button */}
+209-          <button
+210-            type="button"
+211-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+212-            className="p-2 text-secondary-theme hover:text-primary-theme hover:bg-surface-elevated rounded-xl transition-colors"
+213-            title="منوی عملیات"
+214-          >
+215-            <MoreVertical className="w-5 h-5" />
+216-          </button>
+217-
+218-          {/* Three-Dot Menu with AnimatePresence */}
+219-          <AnimatePresence>
+220-            {isMenuOpen && (
+221-              <motion.div
+222-                initial={{ opacity: 0, scale: 0.95 }}
+223-                animate={{ opacity: 1, scale: 1 }}
+224-                exit={{ opacity: 0, scale: 0.95 }}
+225-                className="absolute left-0 top-full mt-4 w-48 bg-surface-card border border-neutral-200/90 dark:border-neutral-800 rounded-2xl shadow-xl py-1.5 z-30 overflow-hidden"
+226-              >
+227-                <button
+228-                  type="button"
+229-                  onClick={handleCopy}
+230-                  className="w-full px-4 py-2.5 text-xs font-medium text-primary-theme hover:bg-surface-elevated flex items-center gap-2.5 text-right transition-colors"
+231-                >
+232-                  {copied ? <Check className="w-4 h-4 text-blue-500" /> : <Copy className="w-4 h-4 text-secondary-theme" />}
+233-                  <span>کپی متن</span>
+234-                </button>
+235-
+236-                <button
+237-                  type="button"
+238-                  onClick={handleShare}
+239-                  className="w-full px-4 py-2.5 text-xs font-medium text-primary-theme hover:bg-surface-elevated flex items-center gap-2.5 text-right transition-colors"
+240-                >
+241-                  <Share2 className="w-4 h-4 text-secondary-theme" />
+242-                  <span>اشتراک‌گذاری</span>
+243-                </button>
+244-
+245-                <div className="my-1 border-t border-neutral-200/60 dark:border-neutral-800/60" />
+246-
+247-                <button
+248-                  type="button"
+249-                  onClick={() => {
+250-                    setIsMenuOpen(false);
+251-                    onDelete(item);
+252-                  }}
+253-                  className="w-full px-4 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 flex items-center gap-2.5 text-right transition-colors"
+254-                >
+255-                  <Trash2 className="w-4 h-4" />
+256-                  <span>حذف مطلب</span>
+257-                </button>
+258-              </motion.div>
+259-            )}
+260-          </AnimatePresence>
+261-        </div>
+262-      </div>
+263-
+264-      {/* Main Reading Area */}
+265-      <div 

@@ -66,25 +66,34 @@ export const DashboardPage: React.FC = () => {
 
   // Live auto-updating Date and Dhikr data
   const currentDate = useCurrentDate();
-  const todayDhikr = useMemo(() => getTodayDhikr(currentDate), [currentDate]);
   const formattedDates = useMemo(() => getFormattedDates(currentDate), [currentDate]);
 
-  // Daily target check from localStorage or default
-  const dailyTarget = useMemo(() => {
-    try {
-      const saved = localStorage.getItem('mihrab_daily_dhikr_target');
-      return saved ? Math.max(1, Number(saved)) : todayDhikr.targetCount;
-    } catch {
-      return todayDhikr.targetCount;
-    }
-  }, [todayDhikr]);
-
   // Database Live Queries
+  const dbDhikrs = useLiveQuery(() => db.customDhikrs.toArray(), []);
   const qadaRecords = useLiveQuery(() => db.qadaPrayers.toArray(), []);
   const fastingState = useLiveQuery(() => db.qadaFastingState.get('current'), []);
   const kaffarahState = useLiveQuery(() => db.kaffarahState.get('current'), []);
   const duaRecords = useLiveQuery(() => db.duaContents.toArray(), []);
   const educationRecords = useLiveQuery(() => db.educationContents.toArray(), []);
+
+  // Compute today's db dhikr
+  const dbTodayDhikr = useMemo(() => {
+    if (!dbDhikrs) return null;
+    const EN_DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const todayKey = 'dhikr_' + EN_DAYS[currentDate.getDay()];
+    return dbDhikrs.find(d => d.key === todayKey) || null;
+  }, [dbDhikrs, currentDate]);
+
+  // Daily target check from localStorage or default
+  const dailyTarget = useMemo(() => {
+    try {
+      const saved = localStorage.getItem('mihrab_daily_dhikr_target');
+      return saved ? Math.max(1, Number(saved)) : (dbTodayDhikr?.targetCount || 100);
+    } catch {
+      return dbTodayDhikr?.targetCount || 100;
+    }
+  }, [dbTodayDhikr]);
+
 
   // Compute total remaining qada prayers
   const totalQadaRemaining = useMemo(() => {
@@ -114,11 +123,12 @@ export const DashboardPage: React.FC = () => {
   const totalEducationCount = educationRecords?.length || 0;
 
   // Daily Dhikr completion check
-  const isDailyCompleted = quickDhikrCount >= dailyTarget;
+  const isDailyCompleted = dbTodayDhikr ? quickDhikrCount >= dailyTarget : false;
 
   // Handle Quick Dhikr Tap
   const handleQuickDhikrTap = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!dbTodayDhikr) return;
     setQuickDhikrCount((prev) => {
       const next = prev + 1;
       if (next >= dailyTarget) {
@@ -235,17 +245,22 @@ export const DashboardPage: React.FC = () => {
               {/* Arabic Dhikr Calligraphy with Virtue */}
               <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
                 <span
-                  className={`text-xs sm:text-sm md:text-base font-extrabold truncate font-persian ${
+                  className={`text-xs sm:text-sm md:text-base font-extrabold truncate ${
+                    dbTodayDhikr ? 'font-arabic' : 'font-persian'
+                  } ${
+                    !dbTodayDhikr ? 'text-secondary-theme font-medium' :
                     isDailyCompleted
                       ? 'text-emerald-950 dark:text-emerald-200'
                       : 'text-amber-900 dark:text-amber-200'
                   }`}
                 >
-                  {todayDhikr.dhikrArabic}
+                  {dbTodayDhikr ? dbTodayDhikr.arabic : 'دعایی وجود ندارد'}
                 </span>
-                <span className="hidden md:inline-flex text-[10px] bg-amber-500/15 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-md font-medium shrink-0">
-                  {todayDhikr.virtue}
-                </span>
+                {dbTodayDhikr && dbTodayDhikr.virtue && (
+                  <span className="hidden md:inline-flex text-[10px] bg-amber-500/15 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-md font-medium shrink-0">
+                    {dbTodayDhikr.virtue}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -256,12 +271,15 @@ export const DashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={handleQuickDhikrTap}
-              title={isDailyCompleted ? 'ذکر امروز انجام شده است' : 'برای شمارش ذکر لمس کنید'}
-              aria-label={isDailyCompleted ? 'ذکر امروز انجام شده است' : 'شمارش ذکر امروز'}
-              className={`relative group/counter flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-white shadow-xs hover:shadow-md active:scale-90 transition-all duration-200 border ${
-                isDailyCompleted
-                  ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 border-emerald-400/50'
-                  : 'bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-600 border-amber-400/40'
+              disabled={!dbTodayDhikr}
+              title={!dbTodayDhikr ? 'دعایی برای امروز یافت نشد' : isDailyCompleted ? 'ذکر امروز انجام شده است' : 'برای شمارش ذکر لمس کنید'}
+              aria-label={!dbTodayDhikr ? 'دعایی برای امروز یافت نشد' : isDailyCompleted ? 'ذکر امروز انجام شده است' : 'شمارش ذکر امروز'}
+              className={`relative group/counter flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-white shadow-xs hover:shadow-md transition-all duration-200 border ${
+                !dbTodayDhikr
+                  ? 'bg-neutral-400 dark:bg-neutral-600 border-neutral-300 dark:border-neutral-500 opacity-60 cursor-not-allowed'
+                  : isDailyCompleted
+                  ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 border-emerald-400/50 active:scale-90'
+                  : 'bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-600 border-amber-400/40 active:scale-90'
               }`}
             >
               {/* Animated Icon */}

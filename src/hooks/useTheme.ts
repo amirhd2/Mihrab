@@ -30,8 +30,10 @@ export function useTheme() {
 
     if (isDark) {
       root.classList.add('dark');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#090d16');
     } else {
       root.classList.remove('dark');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f8fafc');
     }
 
     setEffectiveTheme(isDark ? 'dark' : 'light');

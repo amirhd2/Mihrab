@@ -1,5 +1,5 @@
 // Mihrab Service Worker - Offline Support & PWA Cache
-const CACHE_NAME = 'mihrab-pwa-v2';
+const CACHE_NAME = 'mihrab-pwa-v6';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

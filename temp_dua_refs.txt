@@ -1,0 +1,6 @@
+30:  const menuRef = useRef<HTMLDivElement>(null);
+31-
+32-  const handleBack = () => {
+33-    if (isClosing) return;
+34-    setIsClosing(true);
+35-    setTimeout(() => {

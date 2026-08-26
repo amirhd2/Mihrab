@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence, Reorder } from 'motion/react';
+import { motion, AnimatePresence, Reorder, useDragControls } from 'motion/react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/database';
 import {
@@ -236,6 +236,119 @@ const DEFAULT_STANDARD_PRESETS: Omit<CustomDhikrRecord, 'id'>[] = [
   },
 ];
 
+const ReorderablePresetItem = ({
+  preset,
+  selectedPresetId,
+  setSelectedPresetId,
+  setLocalCount,
+  setFatimaStepIndex,
+  setViewMode,
+  handleOpenEdit,
+  handleDeleteDhikr,
+}: {
+  preset: TasbihPresetItem;
+  selectedPresetId: string | null;
+  setSelectedPresetId: (id: string) => void;
+  setLocalCount: (count: number) => void;
+  setFatimaStepIndex: (index: number) => void;
+  setViewMode: (mode: 'counter' | 'manage' | 'add_edit' | 'quick_target') => void;
+  handleOpenEdit: (preset: TasbihPresetItem) => void;
+  handleDeleteDhikr: (preset: TasbihPresetItem) => void;
+}) => {
+  const controls = useDragControls();
+
+  return (
+    <Reorder.Item
+      value={preset}
+      dragListener={false}
+      dragControls={controls}
+      className={`p-3 sm:p-3.5 rounded-2xl border transition-shadow select-none flex items-center justify-between gap-2.5 ${
+        selectedPresetId === preset.id
+          ? 'bg-amber-500/10 border-amber-500/40 shadow-xs'
+          : 'bg-surface-elevated/70 border-theme hover:border-theme/80 hover:shadow-xs'
+      }`}
+    >
+      {/* Drag Handle */}
+      <div
+        className="cursor-grab active:cursor-grabbing p-1.5 text-secondary-theme hover:text-amber-600 rounded-lg hover:bg-surface-card touch-none shrink-0"
+        title="برای تغییر ترتیب بکشید"
+        onPointerDown={(e) => controls.start(e)}
+      >
+        <GripVertical className="w-4 h-4" />
+      </div>
+
+      {/* Dhikr Content Info */}
+      <div className="flex-1 text-right min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs sm:text-sm font-bold text-primary-theme truncate">
+            {preset.title}
+          </span>
+          {preset.isCustom && (
+            <span className="px-1.5 py-0.2 rounded-md bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 text-[10px] font-bold">
+              شخصی
+            </span>
+          )}
+          {preset.category === 'daily' && (
+            <span className="px-1.5 py-0.2 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 text-[10px] font-bold">
+              ذکر امروز
+            </span>
+          )}
+        </div>
+
+        <p className="text-xs text-amber-900 dark:text-amber-200 mt-0.5 font-extrabold font-arabic line-clamp-1">
+          {preset.arabic}
+        </p>
+
+        <div className="flex items-center gap-3 mt-1 text-[11px] text-secondary-theme">
+          <span>
+            تعداد:{' '}
+            <strong className="text-primary-theme">
+              {preset.steps ? '۳۴+۳۳+۳۳' : toPersianDigits(preset.target)}
+            </strong>
+          </span>
+          {preset.virtue && <span className="truncate hidden sm:inline">فضیلت: {preset.virtue}</span>}
+        </div>
+      </div>
+
+      {/* Actions: Select, Edit (for ALL), Trash (for ALL) */}
+      <div className="flex items-center gap-1 shrink-0">
+        {/* Select for Counting */}
+        <button
+          onClick={() => {
+            setSelectedPresetId(preset.id);
+            setLocalCount(0);
+            setFatimaStepIndex(0);
+            setViewMode('counter');
+          }}
+          className="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-300 text-xs font-bold transition-colors"
+        >
+          انتخاب
+        </button>
+
+        {/* Edit Button (Enabled for ALL dhikrs) */}
+        <button
+          onClick={() => handleOpenEdit(preset)}
+          title="ویرایش نام، متن یا تعداد"
+          className="p-1.5 rounded-xl hover:bg-surface-card text-secondary-theme hover:text-amber-600 transition-colors"
+        >
+          <Edit2 className="w-3.5 h-3.5" />
+        </button>
+
+        {/* Delete Button (Enabled for ALL dhikrs except special non-db daily) */}
+        {preset.id !== 'daily' && (
+          <button
+            onClick={() => handleDeleteDhikr(preset)}
+            title="حذف ذکر"
+            className="p-1.5 rounded-xl hover:bg-red-500/10 text-secondary-theme hover:text-red-600 transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+    </Reorder.Item>
+  );
+};
+
 export const TasbihModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
@@ -266,37 +379,29 @@ export const TasbihModal: React.FC<{
     } catch {}
   };
 
-  // Convert db records + daily into a structured preset list sorted by order
+  // Convert db records into a structured preset list sorted by order
   const allPresets: TasbihPresetItem[] = useMemo(() => {
-    const dailyPreset: TasbihPresetItem = {
-      id: 'daily',
-      key: 'daily',
-      title: `ذکر روز ${todayDhikr.dayName}`,
-      arabic: todayDhikr.dhikrArabic,
-      meaning: todayDhikr.meaning,
-      virtue: todayDhikr.virtue,
-      target: dailyTarget || todayDhikr.targetCount,
-      category: 'daily',
-      isCustom: false,
-      order: 0,
-    };
+    const EN_DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const todayDbKey = 'dhikr_' + EN_DAYS[currentDate.getDay()];
 
     const sortedDb = [...dbDhikrs].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
     const list: TasbihPresetItem[] = sortedDb.map((item, idx) => {
       const isFatima = item.key === 'fatima' || item.category === 'fatima';
+      const isTodayDhikr = item.key === todayDbKey;
+      
       return {
-        id: `db_${item.id}`,
+        id: isTodayDhikr ? 'daily' : `db_${item.id}`,
         dbId: item.id,
         key: item.key,
         title: item.title,
         arabic: item.arabic,
         meaning: item.meaning,
         virtue: item.virtue,
-        target: item.targetCount,
-        category: item.category || (item.isCustom ? 'custom' : 'standard'),
+        target: isTodayDhikr ? (dailyTarget || item.targetCount) : item.targetCount,
+        category: isTodayDhikr ? 'daily' : (item.category || (item.isCustom ? 'custom' : 'standard')),
         isCustom: item.isCustom,
-        order: item.order ?? idx + 1,
+        order: isTodayDhikr ? 0 : (item.order ?? idx + 1), // Optional: Keep today's dhikr at the top by forcing order 0
         steps: isFatima
           ? [
               { title: 'الله اکبر', arabic: 'اللّهُ اَکْبَرُ', target: 34 },
@@ -307,23 +412,25 @@ export const TasbihModal: React.FC<{
       };
     });
 
-    return [dailyPreset, ...list];
-  }, [todayDhikr, dailyTarget, dbDhikrs]);
+    // Ensure it's sorted again if we forced order 0 for daily
+    return list.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+  }, [currentDate, dailyTarget, dbDhikrs]);
 
   const [selectedPresetId, setSelectedPresetId] = useState<string>(initialPresetId || 'daily');
   const activePreset: TasbihPresetItem = useMemo(() => {
     return (
       allPresets.find((p) => p.id === selectedPresetId) ||
       allPresets[0] || {
-        id: 'daily',
-        title: 'ذکر روز',
-        arabic: todayDhikr.dhikrArabic,
+        id: 'empty',
+        title: 'هیچ ذکری یافت نشد',
+        arabic: 'برای افزودن ذکر به بخش مدیریت بروید',
         target: 100,
-        category: 'daily',
+        category: 'custom',
         order: 0,
-      }
+        isCustom: true,
+      } as TasbihPresetItem
     );
-  }, [allPresets, selectedPresetId, todayDhikr]);
+  }, [allPresets, selectedPresetId]);
 
   // Daily dhikr sync with DashboardPage
   const [dailyDhikrCount, setDailyDhikrCount] = useDailyDhikrSync();
@@ -389,12 +496,24 @@ export const TasbihModal: React.FC<{
 
   // Reset or Sync on initialPresetId
   useEffect(() => {
-    if (initialPresetId) {
-      setSelectedPresetId(initialPresetId);
+    if (isOpen) {
+      if (initialPresetId) {
+        setSelectedPresetId(initialPresetId);
+      }
       setLocalCount(0);
       setFatimaStepIndex(0);
+      setViewMode('counter');
     }
-  }, [initialPresetId]);
+  }, [isOpen, initialPresetId]);
+
+  // Close logic: If not in counter view, X returns to counter. Else closes modal.
+  const handleClose = useCallback(() => {
+    if (viewMode !== 'counter') {
+      setViewMode('counter');
+    } else {
+      onClose();
+    }
+  }, [viewMode, onClose]);
 
   // Tactile Vibration Feedback
   const triggerHaptic = useCallback(
@@ -677,7 +796,7 @@ export const TasbihModal: React.FC<{
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
           />
 
@@ -756,7 +875,7 @@ export const TasbihModal: React.FC<{
 
                 {/* Close Button */}
                 <button
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="p-2 rounded-xl text-secondary-theme hover:bg-surface-elevated border border-transparent hover:border-theme transition-colors"
                 >
                   <X className="w-4 h-4" />
@@ -847,7 +966,7 @@ export const TasbihModal: React.FC<{
                 <div className="flex-1 flex flex-col items-center justify-center px-5 py-2 text-center select-none">
                   {/* Dhikr Arabic Calligraphy Display */}
                   <div className="min-h-[70px] flex flex-col items-center justify-center px-2 mb-2">
-                    <p className="text-lg sm:text-xl font-black text-amber-900 dark:text-amber-200 leading-relaxed font-persian">
+                    <p className="text-lg sm:text-xl font-black text-amber-900 dark:text-amber-200 leading-relaxed font-arabic">
                       {currentArabicText}
                     </p>
                     {activePreset.meaning && (
@@ -921,7 +1040,7 @@ export const TasbihModal: React.FC<{
                       </svg>
 
                       {/* Number and Step details */}
-                      <span className="text-4xl sm:text-5xl font-black text-amber-900 dark:text-amber-100 tracking-tight font-persian">
+                      <span className="text-4xl sm:text-5xl font-black text-amber-900 dark:text-amber-100 tracking-tight font-arabic">
                         {toPersianDigits(count)}
                       </span>
                       <span className="text-xs text-secondary-theme font-medium mt-1">
@@ -984,7 +1103,7 @@ export const TasbihModal: React.FC<{
                   </div>
 
                   <button
-                    onClick={onClose}
+                    onClick={handleClose}
                     className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs transition-colors"
                   >
                     بستن
@@ -1104,92 +1223,17 @@ export const TasbihModal: React.FC<{
                     className="space-y-2.5"
                   >
                     {reorderList.map((preset) => (
-                      <Reorder.Item
+                      <ReorderablePresetItem
                         key={preset.id}
-                        value={preset}
-                        className={`p-3 sm:p-3.5 rounded-2xl border transition-shadow select-none flex items-center justify-between gap-2.5 ${
-                          selectedPresetId === preset.id
-                            ? 'bg-amber-500/10 border-amber-500/40 shadow-xs'
-                            : 'bg-surface-elevated/70 border-theme hover:border-theme/80 hover:shadow-xs'
-                        }`}
-                      >
-                        {/* Drag Handle */}
-                        <div
-                          className="cursor-grab active:cursor-grabbing p-1.5 text-secondary-theme hover:text-amber-600 rounded-lg hover:bg-surface-card touch-none shrink-0"
-                          title="برای تغییر ترتیب بکشید"
-                        >
-                          <GripVertical className="w-4 h-4" />
-                        </div>
-
-                        {/* Dhikr Content Info */}
-                        <div className="flex-1 text-right min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs sm:text-sm font-bold text-primary-theme truncate">
-                              {preset.title}
-                            </span>
-                            {preset.isCustom && (
-                              <span className="px-1.5 py-0.2 rounded-md bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 text-[10px] font-bold">
-                                شخصی
-                              </span>
-                            )}
-                            {preset.category === 'daily' && (
-                              <span className="px-1.5 py-0.2 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 text-[10px] font-bold">
-                                ذکر امروز
-                              </span>
-                            )}
-                          </div>
-
-                          <p className="text-xs text-amber-900 dark:text-amber-200 mt-0.5 font-extrabold font-persian line-clamp-1">
-                            {preset.arabic}
-                          </p>
-
-                          <div className="flex items-center gap-3 mt-1 text-[11px] text-secondary-theme">
-                            <span>
-                              تعداد:{' '}
-                              <strong className="text-primary-theme">
-                                {preset.steps ? '۳۴+۳۳+۳۳' : toPersianDigits(preset.target)}
-                              </strong>
-                            </span>
-                            {preset.virtue && <span className="truncate hidden sm:inline">فضیلت: {preset.virtue}</span>}
-                          </div>
-                        </div>
-
-                        {/* Actions: Select, Edit (for ALL), Trash (for ALL) */}
-                        <div className="flex items-center gap-1 shrink-0">
-                          {/* Select for Counting */}
-                          <button
-                            onClick={() => {
-                              setSelectedPresetId(preset.id);
-                              setLocalCount(0);
-                              setFatimaStepIndex(0);
-                              setViewMode('counter');
-                            }}
-                            className="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-300 text-xs font-bold transition-colors"
-                          >
-                            انتخاب
-                          </button>
-
-                          {/* Edit Button (Enabled for ALL dhikrs) */}
-                          <button
-                            onClick={() => handleOpenEdit(preset)}
-                            title="ویرایش نام، متن یا تعداد"
-                            className="p-1.5 rounded-xl hover:bg-surface-card text-secondary-theme hover:text-amber-600 transition-colors"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-
-                          {/* Delete Button (Enabled for ALL dhikrs except special non-db daily) */}
-                          {preset.id !== 'daily' && (
-                            <button
-                              onClick={() => handleDeleteDhikr(preset)}
-                              title="حذف ذکر"
-                              className="p-1.5 rounded-xl hover:bg-red-500/10 text-secondary-theme hover:text-red-600 transition-colors"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
-                      </Reorder.Item>
+                        preset={preset}
+                        selectedPresetId={selectedPresetId}
+                        setSelectedPresetId={setSelectedPresetId}
+                        setLocalCount={setLocalCount}
+                        setFatimaStepIndex={setFatimaStepIndex}
+                        setViewMode={setViewMode}
+                        handleOpenEdit={handleOpenEdit}
+                        handleDeleteDhikr={handleDeleteDhikr}
+                      />
                     ))}
                   </Reorder.Group>
 

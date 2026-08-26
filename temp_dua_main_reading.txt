@@ -1,0 +1,57 @@
+231:      {/* Main Reading Area */}
+232-      <div 
+233-        className="flex-1 w-full overflow-y-auto overscroll-y-contain bg-[#fdfaf5] dark:bg-[#141a24] p-2.5 sm:p-5 md:p-6 flex flex-col"
+234-        onScroll={handleScroll}
+235-      >
+236-        {/* Manuscript Book Frame (Unified Single Illumination Border) */}
+237-        <div className="w-full max-w-3xl mx-auto flex-1 flex flex-col justify-between border-2 sm:border-[3px] border-double border-amber-400/70 dark:border-amber-600/60 rounded-2xl sm:rounded-3xl p-4 sm:p-8 bg-amber-50/20 dark:bg-amber-500/[0.02] shadow-xs">
+238-          
+239-          <div className="flex-1 flex flex-col justify-start">
+240-            {/* Title Header */}
+241-            <div className="text-center mb-6 sm:mb-8 relative">
+242-              <div className="flex items-center justify-center gap-3 mb-2">
+243-                <span className="w-8 sm:w-12 h-px bg-amber-400/50"></span>
+244-                <span className="text-amber-500/80 text-base sm:text-lg">❖</span>
+245-                <span className="w-8 sm:w-12 h-px bg-amber-400/50"></span>
+246-              </div>
+247-              <h2 className="text-xl sm:text-3xl font-bold text-amber-900 dark:text-amber-100 font-serif">
+248-                {dua.title}
+249-              </h2>
+250-            </div>
+251-
+252-            {/* Arabic Text */}
+253-            <div dir="rtl" className={`text-center font-arabic text-amber-950 dark:text-amber-50 mb-8 ${arabic} whitespace-pre-wrap`}>
+254-              {dua.arabicText}
+255-            </div>
+256-
+257-            {/* Ornamental Divider */}
+258-            {dua.persianTranslation && (
+259-              <div className="flex items-center justify-center gap-3 my-6 opacity-60">
+260-                <span className="w-12 sm:w-20 h-px bg-amber-800/20 dark:bg-amber-200/20"></span>
+261-                <span className="text-amber-800/50 dark:text-amber-200/50 text-xs sm:text-sm">◈</span>
+262-                <span className="w-12 sm:w-20 h-px bg-amber-800/20 dark:bg-amber-200/20"></span>
+263-              </div>
+264-            )}
+265-
+266-            {/* Persian Translation Text */}
+267-            {dua.persianTranslation && (
+268-              <div dir="rtl" className={`text-center text-neutral-700 dark:text-neutral-300 font-body ${persian} whitespace-pre-wrap`}>
+269-                {dua.persianTranslation}
+270-              </div>
+271-            )}
+272-          </div>
+273-
+274-          {/* Source Reference at bottom of the framed page */}
+275-          {dua.source && (
+276-            <div className="mt-8 pt-4 border-t border-amber-400/30 dark:border-amber-600/30 text-center text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+277-              منبع: {dua.source}
+278-            </div>
+279-          )}
+280-        </div>
+281-      </div>
+282-
+283-      {/* Bottom Floating Bar removed to match EducationReadingView style */}
+284-    </motion.div>
+285-    </Portal>
+286-  );
+287-};

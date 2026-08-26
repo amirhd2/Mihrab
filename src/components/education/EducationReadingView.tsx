@@ -1,6 +1,6 @@
 import { Portal } from "../Portal";
 import React, { useState, useRef, useEffect, UIEvent } from 'react';
-import { ArrowRight, MoreVertical, Edit, Trash2, Copy, Share2, Tag as TagIcon, Check, Star } from 'lucide-react';
+import { ArrowRight, MoreVertical, Edit, Trash2, Copy, Share2, Tag as TagIcon, Check, Star, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { EducationContentRecord } from '../../types/db';
 
@@ -27,6 +27,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
   const [showTopBar, setShowTopBar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const handleBack = () => {
     if (isClosing) return;
@@ -163,8 +164,11 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
       dir="rtl"
     >
       {/* iOS-Inspired Reading Top Bar */}
-      <div 
-        className="shrink-0 w-full bg-surface-bg border-b border-neutral-200/80 dark:border-neutral-800 px-4 py-2.5 flex items-center justify-between z-20"
+      <motion.div
+        initial={false}
+        animate={{ y: showTopBar ? 0 : '-100%' }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="absolute top-0 left-0 right-0 z-30 w-full bg-surface-bg/95 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800 px-4 py-2.5 flex items-center justify-between"
       >
         <button
           type="button"
@@ -259,11 +263,12 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
             )}
           </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Reading Area */}
       <div 
-        className="flex-1 w-full overflow-y-auto overscroll-y-contain bg-neutral-50/50 dark:bg-neutral-900 p-2.5 sm:p-5 md:p-6 flex flex-col"
+        ref={scrollContainerRef}
+        className="flex-1 w-full h-full overflow-y-auto overscroll-y-contain bg-neutral-50/50 dark:bg-neutral-900 p-2.5 pt-20 sm:p-5 sm:pt-24 md:p-6 md:pt-24 flex flex-col"
         onScroll={handleScroll}
       >
         {/* Reading Article Body Container */}
@@ -312,6 +317,30 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
           )}
         </div>
       </div>
+      
+      <AnimatePresence>
+        {!showTopBar && lastScrollY > 200 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            className="absolute bottom-6 left-6 z-40"
+          >
+            <button
+              onClick={() => {
+                if (scrollContainerRef.current) {
+                  scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              className="w-12 h-12 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-xl rounded-full flex items-center justify-center transition-all active:scale-95"
+              aria-label="بازگشت به بالا"
+            >
+              <ChevronUp className="w-6 h-6" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </motion.div>
     </Portal>
   );
