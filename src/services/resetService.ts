@@ -95,7 +95,7 @@ export class ResetService {
       await db.preferences.bulkAdd([
         { key: 'hasInitialSeed', value: 'true', updatedAt: now },
         { key: 'themeMode', value: 'system', updatedAt: now },
-        { key: 'appVersion', value: '3.1.9', updatedAt: now },
+        { key: 'appVersion', value: '3.2.0', updatedAt: now },
         { key: 'installedAt', value: now, updatedAt: now },
       ]);
     });

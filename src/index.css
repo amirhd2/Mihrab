@@ -47,6 +47,11 @@
   html, body {
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
+    background-color: var(--bg-main);
+  }
+
+  html {
+    background-color: var(--bg-main);
   }
 
   body {

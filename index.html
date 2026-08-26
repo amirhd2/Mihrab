@@ -2,27 +2,30 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>محراب | Mihrab</title>
     <meta name="description" content="محراب - همراه و دستیار آفلاین عبادات و نمازهای قضا" />
     
     <!-- Theme & Status Bar Meta Tags for iOS / Android Web App (PWA) -->
     <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" id="meta-theme-color-light" />
     <meta name="theme-color" content="#090d16" media="(prefers-color-scheme: dark)" id="meta-theme-color-dark" />
-    <meta name="theme-color" content="#f8fafc" id="meta-theme-color" />
+    <meta name="theme-color" content="#090d16" id="meta-theme-color" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" id="meta-apple-status-bar" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="meta-apple-status-bar" />
     
     <script>
       (function() {
         try {
           var saved = localStorage.getItem('mihrab_theme_mode');
-          var isDark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = saved === 'dark' || (saved !== 'light' && prefersDark);
           if (isDark) {
             document.documentElement.classList.add('dark');
+            document.documentElement.style.backgroundColor = '#090d16';
           } else {
             document.documentElement.classList.remove('dark');
+            document.documentElement.style.backgroundColor = '#f8fafc';
           }
           var color = isDark ? '#090d16' : '#f8fafc';
           var metas = document.querySelectorAll('meta[name="theme-color"]');

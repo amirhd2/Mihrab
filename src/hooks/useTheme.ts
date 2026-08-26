@@ -10,6 +10,14 @@ const DARK_BG_COLOR = '#090d16';
 export function updateStatusBarTheme(isDark: boolean) {
   const color = isDark ? DARK_BG_COLOR : LIGHT_BG_COLOR;
 
+  // Set root and body background color for overscroll & status bar blending
+  if (typeof document !== 'undefined') {
+    document.documentElement.style.backgroundColor = color;
+    if (document.body) {
+      document.body.style.backgroundColor = color;
+    }
+  }
+
   // 1. Update all meta[name="theme-color"] tags
   const metas = document.querySelectorAll('meta[name="theme-color"]');
   if (metas.length > 0) {

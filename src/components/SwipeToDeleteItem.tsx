@@ -211,17 +211,21 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
           card.classList.add('rounded-2xl', 'shadow-lg');
           wrapper.style.touchAction = 'none';
           card.style.touchAction = 'none';
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation();
         } else if (absDeltaX < 3 && absDeltaY < 3) {
           // Sub-pixel jitter: hold
           return;
-        } else if (absDeltaX >= 3 && absDeltaX >= absDeltaY * 0.35) {
-          // Horizontal intent detected (allows wide diagonal thumb arcs up to 70 degrees)
+        } else if (absDeltaX >= 4 && absDeltaX >= absDeltaY * 0.35) {
+          // Horizontal intent detected (allows natural diagonal thumb arcs)
           isSlopPassed = true;
           card.classList.add('rounded-2xl', 'shadow-lg');
           wrapper.style.touchAction = 'none';
           card.style.touchAction = 'none';
-        } else if (absDeltaY > 8 && absDeltaY > absDeltaX * 1.8) {
-          // Explicit vertical scroll intent
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation();
+        } else if (absDeltaY > 12 && absDeltaY > absDeltaX * 2.0) {
+          // Unambiguous vertical page scroll intent before horizontal motion
           isVerticalScrolling = true;
           isDragging = false;
           return;
@@ -234,6 +238,7 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       if (e.cancelable) {
         e.preventDefault();
       }
+      e.stopPropagation();
 
       const deltaX = startX - x;
       let calculatedX = initialTranslateX - deltaX;
@@ -250,7 +255,6 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
     const onTouchCancel = (e: TouchEvent | MouseEvent) => {
       if (!isDragging) return;
       if (isSlopPassed) {
-        // Prevent accidental cancellation from discarding user swipe
         onTouchEnd(e);
       } else {
         isDragging = false;
@@ -292,8 +296,8 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
       const movedDist = e ? (startX - getX(e)) : 0;
       const velocity = movedDist / Math.max(1, elapsed); // px / ms
 
-      // Mode 1: Full swipe over 50% width OR quick swipe flick over 30% width
-      if (currentTranslateX < 0 && (ratio >= FULL_SWIPE_RATIO || (ratio >= 0.30 && velocity > 0.4))) {
+      // Mode 1: Full swipe over 50% width OR quick swipe flick over 28% width
+      if (currentTranslateX < 0 && (ratio >= FULL_SWIPE_RATIO || (ratio >= 0.28 && velocity > 0.35))) {
         card.style.transform = `translate3d(-${wrapperWidth}px, 0, 0)`;
         deleteBtn.style.width = `${wrapperWidth}px`;
         deleteBtn.style.borderRadius = '16px';
@@ -305,8 +309,8 @@ export const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
 
         triggerFullDelete();
       }
-      // Mode 2: Swiped past 36px or brisk swipe -> Open button
-      else if (currentTranslateX < 0 && (absTranslate >= (BTN_OPEN_WIDTH + CARD_BTN_GAP) / 2 || (velocity > 0.3 && movedDist > 20))) {
+      // Mode 2: Swiped past 34px or brisk swipe -> Open button
+      else if (currentTranslateX < 0 && (absTranslate >= (BTN_OPEN_WIDTH + CARD_BTN_GAP) / 2 || (velocity > 0.25 && movedDist > 18))) {
         openSwipe();
       }
       // Mode 3: Small drag or pulled right -> Close back
