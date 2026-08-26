@@ -41,10 +41,56 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۳.۱.۳',
+    version: 'نسخه ۳.۱.۸',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'اصلاح ریشه‌ای و بهینه‌سازی الگوریتم سوایپ کارت‌ها برای حذف کامل (Gesture Lock و جلوگیری از لغو ناگهانی سوایپ در وب‌اپ موبایل)',
+      'تشخیص هوشمند حرکات مورب و قوسی انگشت شست تا زاویه ۶۰ درجه جهت سوایپ روان و بدون وقفه',
+      'پشتیبانی از حذف سریع با پرتاب یا کشیدن سریع (Flick / Quick Swipe) کارت‌ها',
+      'ارتقای سیستم کش آفلاین Service Worker برای دریافت بی‌درنگ آخرین به‌روزرسانی‌ها در وب‌اپ',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۱.۷',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'رفع باگ منوی سه‌نقطه بالای صفحات مطالعه (دعاها و احکام) و جلوگیری از بریده شدن منو با بازطراحی انیمیشن هدر',
+      'رفع کامل مشکل پرش و ناپایداری صفحه در هنگام اسکرول در حالت نمایش کارت‌های احکام شرعی',
+      'تغییر دکمه شناور رفتن به بالای صفحه (FAB) به فرم کاملاً دایره‌ای (گرد) و ارگونومیک در صفحات ادعیه و احکام',
+      'بهبود ترنزیشن‌های انیمیشنی باز و بسته شدن هدر با افکت شیشه‌ای بلور (Backdrop Blur)',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۱.۶',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'مخفی‌سازی هوشمند و خودکار نوار بالای صفحه (هدر) در هنگام اسکرول به پایین جهت تمرکز بیشتر بر مطالعه',
+      'ظاهر شدن سریع و نرم هدر با کوچک‌ترین اسکرول به سمت بالا یا بازگشت به ابتدای صفحه',
+      'افزودن دکمه شناور برگشت به ابتدای صفحه با انیمیشن ورود و اسکرول نرم (Smooth Scroll)',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۱.۵',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'بهینه‌سازی لایه‌بندی و پورتال‌های اختصاصی در صفحات مطالعه متن دعاها و احکام شرعی',
+      'بهبود استایل‌های تایپوگرافی، فاصله خطوط و تنظیمات اندازه فونت برای مطالعه طولانی‌مدت',
+      'رفع باگ‌های جزئی در منوی عملیات متون و تسهیل کپی و اشتراک‌گذاری',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۱.۴',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
+      'بهینه‌سازی و هماهنگ‌سازی پایگاه داده داخلی IndexedDB (Dexie) و ارتقای سرعت بارگذاری اولیه',
+      'بهبود فرآیند همگام‌سازی وضعیت سیستم و پایدارسازی جداول اطلاعاتی',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۱.۳',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'صفر شدن خودکار نشانگر زنگوله و پاکسازی فهرست تغییرات پس از دانلود فایل پشتیبان (از پنجره زنگوله یا صفحه تنظیمات)',
       'تغییر دکمه پنجره اعلان‌ها و تغییرات (زنگوله) به «پشتیبان‌گیری و دریافت فایل (JSON)» با عملکرد مستقیم و کامل',
@@ -655,7 +701,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
 
           <div className="flex items-center gap-2.5">
             <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-persian shrink-0">
-              نسخه ۳.۱.۲
+              نسخه ۳.۱.۸
             </span>
             <motion.div
               animate={{ rotate: openSection3 ? 180 : 0 }}
@@ -913,7 +959,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
             <Sparkles className="w-8 h-8" />
           </div>
           <div>
-            <h3 className="text-lg font-extrabold text-primary-theme">محراب</h3>
+            <div className="flex items-center justify-center gap-2">
+              <h3 className="text-lg font-extrabold text-primary-theme">محراب</h3>
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-persian">
+                نسخه ۳.۱.۸
+              </span>
+            </div>
             <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
               همراه همیشگی شما در مسیر بندگی
             </p>
