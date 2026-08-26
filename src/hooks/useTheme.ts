@@ -4,6 +4,33 @@ import { PreferencesService } from '../services/preferencesService';
 
 const STORAGE_KEY = 'mihrab_theme_mode';
 
+const LIGHT_BG_COLOR = '#f8fafc';
+const DARK_BG_COLOR = '#090d16';
+
+export function updateStatusBarTheme(isDark: boolean) {
+  const color = isDark ? DARK_BG_COLOR : LIGHT_BG_COLOR;
+
+  // 1. Update all meta[name="theme-color"] tags
+  const metas = document.querySelectorAll('meta[name="theme-color"]');
+  if (metas.length > 0) {
+    metas.forEach((meta) => meta.setAttribute('content', color));
+  } else {
+    const meta = document.createElement('meta');
+    meta.name = 'theme-color';
+    meta.content = color;
+    document.head.appendChild(meta);
+  }
+
+  // 2. Update Apple Status Bar Style
+  let appleStatus = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if (!appleStatus) {
+    appleStatus = document.createElement('meta');
+    appleStatus.setAttribute('name', 'apple-mobile-web-app-status-bar-style');
+    document.head.appendChild(appleStatus);
+  }
+  appleStatus.setAttribute('content', isDark ? 'black-translucent' : 'default');
+}
+
 export function useTheme() {
   const [mode, setModeState] = useState<ThemeMode>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -30,12 +57,11 @@ export function useTheme() {
 
     if (isDark) {
       root.classList.add('dark');
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#090d16');
     } else {
       root.classList.remove('dark');
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f8fafc');
     }
 
+    updateStatusBarTheme(isDark);
     setEffectiveTheme(isDark ? 'dark' : 'light');
   }, []);
 

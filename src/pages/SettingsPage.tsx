@@ -41,10 +41,20 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۳.۱.۸',
+    version: 'نسخه ۳.۱.۹',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
+    changes: [
+      'اصلاح و تثبیت کامل رفتار سوایپ کارت‌ها در وب‌اپ موبایل؛ عدم رها شدن یا بازگشت ناگهانی کارت در اثر حرکات انحرافی عمودی انگشت',
+      'قفل هوشمند حالت ژست افقی (Touch Direction Lock) و جلوگیری از لغو لمس توسط مرورگرهای وب در تبلت و گوشی',
+      'هماهنگ‌سازی خودکار و پویا رنگ نوار وضعیت (Status Bar) مرورگر و وب‌اپ با تم انتخابی برنامه (حالت تاریک / روشن) بدون هیچ‌گونه المان اضافه در بالای صفحه',
+      'ارتقای کش سرویس‌ورکر (PWA v7) و تضمین عملکرد پایدار در تمامی صفحات ادعیه، احکام، اذکار و تاریخچه',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۱.۸',
+    date: 'مرداد ۱۴۰۵',
     changes: [
       'اصلاح ریشه‌ای و بهینه‌سازی الگوریتم سوایپ کارت‌ها برای حذف کامل (Gesture Lock و جلوگیری از لغو ناگهانی سوایپ در وب‌اپ موبایل)',
       'تشخیص هوشمند حرکات مورب و قوسی انگشت شست تا زاویه ۶۰ درجه جهت سوایپ روان و بدون وقفه',
@@ -701,7 +711,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
 
           <div className="flex items-center gap-2.5">
             <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-persian shrink-0">
-              نسخه ۳.۱.۸
+              نسخه ۳.۱.۹
             </span>
             <motion.div
               animate={{ rotate: openSection3 ? 180 : 0 }}
@@ -962,7 +972,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
             <div className="flex items-center justify-center gap-2">
               <h3 className="text-lg font-extrabold text-primary-theme">محراب</h3>
               <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-persian">
-                نسخه ۳.۱.۸
+                نسخه ۳.۱.۹
               </span>
             </div>
             <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
