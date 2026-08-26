@@ -19,14 +19,14 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
       {/* Offline Banner */}
       {isOffline && (
-        <div className="relative z-10 bg-amber-500/10 border-b border-amber-500/20 text-amber-700 dark:text-amber-400 px-4 py-1.5 text-xs text-center font-medium flex items-center justify-center gap-1.5">
+        <div className="relative z-10 bg-amber-500/10 border-b border-amber-500/20 text-amber-700 dark:text-amber-400 px-4 py-1.5 text-xs text-center font-medium flex items-center justify-center gap-1.5 pt-[max(env(safe-area-inset-top),6px)]">
           <WifiOff className="w-3.5 h-3.5" />
           <span>حالت آفلاین — تمامی اطلاعات به‌صورت محلی ذخیره می‌گردند.</span>
         </div>
       )}
 
-      {/* Main Content Viewport Container */}
-      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-3.5 sm:px-6 py-3 sm:py-5 flex flex-col">
+      {/* Main Content Viewport Container with iPhone/Android Safe-Area padding */}
+      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-3.5 sm:px-6 flex flex-col pt-[max(env(safe-area-inset-top),14px)] pb-[max(env(safe-area-inset-bottom),20px)] pl-[max(env(safe-area-inset-left),14px)] pr-[max(env(safe-area-inset-right),14px)]">
         {children}
       </main>
     </div>

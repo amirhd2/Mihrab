@@ -195,7 +195,7 @@ export class MihrabDatabase extends Dexie {
     // Mark as initialized and update app version
     await this.preferences.put({ key: 'hasInitialSeed', value: 'true', updatedAt: now });
     await this.preferences.put({ key: 'themeMode', value: 'system', updatedAt: now });
-    await this.preferences.put({ key: 'appVersion', value: '3.2.0', updatedAt: now });
+    await this.preferences.put({ key: 'appVersion', value: '3.2.1', updatedAt: now });
     await this.preferences.put({ key: 'installedAt', value: now, updatedAt: now });
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('mihrab_initial_seed_done', 'true');

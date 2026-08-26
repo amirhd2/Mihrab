@@ -41,15 +41,25 @@ interface ReleaseInfo {
 
 const RELEASES: ReleaseInfo[] = [
   {
-    version: 'نسخه ۳.۲.۰',
+    version: 'نسخه ۳.۲.۱',
     badge: 'جدیدترین نسخه',
     date: 'مرداد ۱۴۰۵',
     isLatest: true,
     changes: [
+      'محاسبه و اعمال دقیق فاصله امن ناچ و نوار وضعیت (Safe Area Insets) در تمام صفحات و ویوهای مطالعه',
+      'جلوگیری کامل از ورود یا تداخل هدر و دکمه‌های ناوبری با ساعت، باتری و Status Bar آیفون و آیپد',
+      'یکپارچگی و همرنگ‌سازی ۱۰۰٪ نوار وضعیت با تم‌های تاریک و روشن بدون المان اضافه',
+      'ارتقای کش آفلاین Service Worker به نسخه v8 جهت همگام‌سازی فوری آخرین بهینه‌سازی‌ها',
+    ],
+  },
+  {
+    version: 'نسخه ۳.۲.۰',
+    date: 'مرداد ۱۴۰۵',
+    changes: [
       'رفع ریشه‌ای مشکل رها شدن سوایپ کارت‌ها و رفع تداخل آن با دکمه شناور و اسکرول عمودی در مرورگرهای وب و وب‌اپ موبایل',
       'تثبیت کامل ژست سوایپ افقی با انحراف انگشت شست به بالا/پایین و جلوگیری از بروز رویداد Cancel حین کشیدن کارت',
-      'حل کامل مشکل نوار سفید در Status Bar آیفون، آیپد و اندروید در تم تاریک و هماهنگی ۱۰۰٪ با رنگ پس‌زمینه تم بدون اضافه کردن هیچ المان اضافه به بالای صفحه',
-      'پشتیبانی کامل از Safe Area آیفون و ناچ با viewport-fit=cover و متاتگ‌های هماهنگ پی‌دبلیوای',
+      'حل مشکل نوار سفید در Status Bar آیفون، آیپد و اندروید در تم تاریک و هماهنگی با رنگ پس‌زمینه تم',
+      'پشتیبانی ارتقایافته از viewport-fit=cover برای هماهنگی با نمایشگرهای بدون حاشیه',
     ],
   },
   {
@@ -711,7 +721,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
 
           <div className="flex items-center gap-2.5">
             <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-persian shrink-0">
-              نسخه ۳.۲.۰
+              نسخه ۳.۲.۱
             </span>
             <motion.div
               animate={{ rotate: openSection3 ? 180 : 0 }}
@@ -972,7 +982,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
             <div className="flex items-center justify-center gap-2">
               <h3 className="text-lg font-extrabold text-primary-theme">محراب</h3>
               <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-persian">
-                نسخه ۳.۲.۰
+                نسخه ۳.۲.۱
               </span>
             </div>
             <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">

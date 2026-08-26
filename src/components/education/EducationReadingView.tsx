@@ -168,7 +168,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
         initial={false}
         animate={{ y: showTopBar ? 0 : '-100%' }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="absolute top-0 left-0 right-0 z-30 w-full bg-surface-bg/95 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800 px-4 py-2.5 flex items-center justify-between"
+        className="absolute top-0 left-0 right-0 z-30 w-full bg-surface-bg/95 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800 px-4 pt-[max(env(safe-area-inset-top),10px)] pb-2.5 flex items-center justify-between"
       >
         <button
           type="button"
@@ -268,7 +268,7 @@ export const EducationReadingView: React.FC<EducationReadingViewProps> = ({
       {/* Main Reading Area */}
       <div 
         ref={scrollContainerRef}
-        className="flex-1 w-full h-full overflow-y-auto overscroll-y-contain bg-neutral-50/50 dark:bg-neutral-900 p-2.5 pt-20 sm:p-5 sm:pt-24 md:p-6 md:pt-24 flex flex-col"
+        className="flex-1 w-full h-full overflow-y-auto overscroll-y-contain bg-neutral-50/50 dark:bg-neutral-900 p-2.5 pt-[max(calc(env(safe-area-inset-top)+56px),80px)] sm:p-5 sm:pt-24 md:p-6 md:pt-24 flex flex-col"
         onScroll={handleScroll}
       >
         {/* Reading Article Body Container */}
