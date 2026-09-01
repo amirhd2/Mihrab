@@ -44,9 +44,12 @@ const LOCAL_STORAGE_USER_PROFILE = 'mihrab_google_user_profile';
 const LOCAL_STORAGE_TOKEN = 'mihrab_google_access_token';
 const LOCAL_STORAGE_TOKEN_EXPIRY = 'mihrab_google_token_expiry';
 
-// Google OAuth Client ID
+import firebaseConfig from '../../firebase-applet-config.json';
+
+// Google OAuth Client ID matching the authorized project
 const OAUTH_CLIENT_ID =
-  '1001555329901-k0qs5dk02si9a4kiebft20jr4sd0b45o.apps.googleusercontent.com';
+  firebaseConfig.oAuthClientId ||
+  '897340517747-f493nhnd91fsimdqnnee2gieaf59vpcj.apps.googleusercontent.com';
 
 const SCOPES = [
   'https://www.googleapis.com/auth/drive.appdata',
