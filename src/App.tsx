@@ -14,6 +14,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { PageTransition } from './components/PageTransition';
 import { PendingChangesProvider } from './context/PendingChangesContext';
 import { PendingChangesModal } from './components/pendingChanges/PendingChangesModal';
+import { GoogleSyncProvider } from './context/GoogleSyncContext';
 
 function AppRoutes({ showToast }: { showToast: any }) {
   const location = useLocation();
@@ -44,16 +45,19 @@ export default function App() {
   return (
     <ErrorBoundary>
       {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-      <PendingChangesProvider>
-        <Router>
-          <AppShell>
-            <AppRoutes showToast={showToast} />
-          </AppShell>
-          <Snackbar toasts={toasts} onRemove={removeToast} />
-          <PendingChangesModal onShowToast={showToast} />
-        </Router>
-      </PendingChangesProvider>
+      <GoogleSyncProvider onShowToast={showToast}>
+        <PendingChangesProvider>
+          <Router>
+            <AppShell onShowToast={showToast}>
+              <AppRoutes showToast={showToast} />
+            </AppShell>
+            <Snackbar toasts={toasts} onRemove={removeToast} />
+            <PendingChangesModal onShowToast={showToast} />
+          </Router>
+        </PendingChangesProvider>
+      </GoogleSyncProvider>
     </ErrorBoundary>
   );
 }
+
 

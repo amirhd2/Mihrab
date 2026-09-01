@@ -11,6 +11,7 @@ import { BackupService } from '../services/backupService';
 import { ResetService } from '../services/resetService';
 import { MihrabBackupData } from '../types/backup';
 import { usePendingChanges } from '../context/PendingChangesContext';
+import { useGoogleSync } from '../context/GoogleSyncContext';
 import { RestoreDefaultModal } from '../components/RestoreDefaultModal';
 import {
   Sun,
@@ -29,6 +30,8 @@ import {
   DownloadCloud,
   CheckCircle2,
   BookOpen,
+  RefreshCw,
+  LogOut,
 } from 'lucide-react';
 
 interface ReleaseInfo {
@@ -299,6 +302,55 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
   const { mode, setMode } = useTheme();
   const { isInstallable, installPWA } = usePWA();
   const { addChange, clearAllChanges } = usePendingChanges();
+  const {
+    user,
+    isAuthenticated,
+    isSyncing,
+    lastSyncTime,
+    signIn,
+    signOut,
+    syncNow,
+  } = useGoogleSync();
+  const [isSigningIn, setIsSigningIn] = useState(false);
+
+  const formatLastSync = (isoString: string | null) => {
+    if (!isoString) return 'هنوز همگام‌سازی نشده است';
+    try {
+      const date = new Date(isoString);
+      const diffSec = Math.floor((Date.now() - date.getTime()) / 1000);
+      if (diffSec < 60) return 'چند لحظه پیش';
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) return `${diffMin} دقیقه پیش`;
+      const diffHour = Math.floor(diffMin / 60);
+      if (diffHour < 24) return `${diffHour} ساعت پیش`;
+      return `${date.toLocaleDateString('fa-IR')} ساعت ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    } catch {
+      return 'به‌تازگی';
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsSigningIn(true);
+    try {
+      await signIn();
+    } catch (e) {
+      console.error('Sign in error', e);
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
+
+  const handleGoogleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (e) {
+      console.error('Sign out error', e);
+    }
+  };
+
+  const handleGoogleSyncNow = async () => {
+    await syncNow({ forceToast: true });
+  };
 
   // Modals state
   const [isWipeDialogOpen, setIsWipeDialogOpen] = useState(false);
@@ -589,6 +641,139 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onShowToast }) => {
               className="overflow-hidden"
             >
               <Card className="divide-y divide-theme/40 p-0 overflow-hidden">
+                {/* Google Sync (Google Drive) Integration */}
+                {!isAuthenticated ? (
+                  <div className="p-4 sm:p-5 bg-gradient-to-l from-emerald-500/5 via-transparent to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start sm:items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-surface-card border border-theme/60 shadow-xs flex items-center justify-center shrink-0">
+                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                          <path
+                            fill="#4285F4"
+                            d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-bold text-primary-theme">همگام‌سازی با گوگل</h3>
+                          <span className="text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">Google Drive</span>
+                        </div>
+                        <p className="text-xs text-secondary-theme mt-0.5 leading-relaxed">
+                          همگام‌سازی خودکار و لحظه‌ای اطلاعات بین دستگاه‌ها (مشابه Google Keep)
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleGoogleSignIn}
+                      disabled={isSigningIn}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-surface-elevated hover:bg-surface-card border border-theme/80 text-primary-theme text-xs font-bold transition-all shadow-xs hover:shadow cursor-pointer active:scale-98 shrink-0 disabled:opacity-50"
+                    >
+                      {isSigningIn ? (
+                        <RefreshCw className="w-4 h-4 animate-spin text-emerald-600 dark:text-emerald-400" />
+                      ) : (
+                        <svg className="w-4 h-4" viewBox="0 0 24 24">
+                          <path
+                            fill="#4285F4"
+                            d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                          />
+                        </svg>
+                      )}
+                      <span>{isSigningIn ? 'در حال اتصال...' : 'ورود با گوگل'}</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-4 sm:p-5 bg-gradient-to-l from-emerald-500/10 via-emerald-500/5 to-transparent space-y-3.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3.5">
+                        {user?.photoURL ? (
+                          <img
+                            src={user.photoURL}
+                            alt={user.displayName || 'Google Profile'}
+                            referrerPolicy="no-referrer"
+                            className="w-10 h-10 rounded-xl border border-emerald-500/40 object-cover shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 flex items-center justify-center font-bold text-sm shrink-0">
+                            {user?.displayName ? user.displayName.charAt(0) : 'G'}
+                          </div>
+                        )}
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-bold text-primary-theme">
+                              {user?.displayName || 'حساب کاربری گوگل'}
+                            </h3>
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              همگام‌سازی فعال
+                            </span>
+                          </div>
+                          <p className="text-xs text-secondary-theme mt-0.5 dir-ltr text-right truncate max-w-[240px] sm:max-w-xs">
+                            {user?.email}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Action buttons: Sync Now & Logout */}
+                      <div className="flex items-center gap-2 shrink-0 pt-1 sm:pt-0">
+                        <button
+                          type="button"
+                          onClick={handleGoogleSyncNow}
+                          disabled={isSyncing}
+                          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs active:scale-98 cursor-pointer disabled:opacity-60"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                          <span>{isSyncing ? 'در حال همگام‌سازی...' : 'همگام‌سازی اکنون'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleGoogleSignOut}
+                          title="خروج از حساب گوگل"
+                          className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-surface-elevated hover:bg-red-500/10 hover:text-red-600 border border-theme/60 text-secondary-theme text-xs font-bold transition-all cursor-pointer active:scale-98 shrink-0"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">خروج</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-secondary-theme pt-1 border-t border-theme/30">
+                      <span className="flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        آخرین همگام‌سازی: {formatLastSync(lastSyncTime)}
+                      </span>
+                      <span className="text-[10px] text-emerald-700/80 dark:text-emerald-400/80 font-medium">
+                        ذخیره لحظه‌ای در Google Drive
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 {/* Action 1: Export Backup */}
                 <div
                   role="button"

@@ -1,4 +1,5 @@
 import { PendingChangeItem, ChangeCategory, ChangeActionType } from '../types/pendingChanges';
+import { googleSyncService } from './googleSyncService';
 
 const STORAGE_KEY = 'mihrab_pending_changes_log';
 const EVENT_NAME = 'mihrab_pending_changes_updated';
@@ -43,6 +44,8 @@ export class PendingChangesService {
       const updated = [newItem, ...current].slice(0, 100);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       this.dispatchUpdateEvent();
+      // Trigger background auto sync to Google Drive (Google Keep style)
+      googleSyncService.triggerAutoSync();
     } catch (err) {
       console.error('Error saving pending change:', err);
     }

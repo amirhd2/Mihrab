@@ -3,14 +3,29 @@ import { WifiOff } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
 import { useTheme } from '../hooks/useTheme';
 import { IslamicPatternBg } from './IslamicPatternBg';
+import { PullToRefresh } from './PullToRefresh';
+import { useGoogleSync } from '../context/GoogleSyncContext';
 
 interface AppShellProps {
   children: React.ReactNode;
+  onShowToast?: (message: string, type?: any) => void;
 }
 
-export const AppShell: React.FC<AppShellProps> = ({ children }) => {
+export const AppShell: React.FC<AppShellProps> = ({ children, onShowToast }) => {
   const { isOffline } = usePWA();
+  const { isAuthenticated, syncNow } = useGoogleSync();
   useTheme(); // Initialize and apply saved or system theme mode to document element
+
+  const handleRefresh = async () => {
+    if (isAuthenticated) {
+      await syncNow({ forceToast: true });
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      if (onShowToast) {
+        onShowToast('اطلاعات محلی به‌روزرسانی شد. برای همگام‌سازی ابری وارد حساب گوگل شوید.', 'info');
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-surface-bg text-primary-theme flex flex-col font-persian transition-theme relative">
@@ -25,12 +40,15 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         </div>
       )}
 
-      {/* Main Content Viewport Container with iPhone/Android Safe-Area padding */}
-      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-3.5 sm:px-6 flex flex-col pt-[max(env(safe-area-inset-top),14px)] pb-[max(env(safe-area-inset-bottom),20px)] pl-[max(env(safe-area-inset-left),14px)] pr-[max(env(safe-area-inset-right),14px)]">
-        {children}
-      </main>
+      {/* Main Content Viewport Container with Google Keep-style Pull to Refresh and Safe-Area padding */}
+      <PullToRefresh onRefresh={handleRefresh}>
+        <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-3.5 sm:px-6 flex flex-col pt-[max(env(safe-area-inset-top),14px)] pb-[max(env(safe-area-inset-bottom),20px)] pl-[max(env(safe-area-inset-left),14px)] pr-[max(env(safe-area-inset-right),14px)]">
+          {children}
+        </main>
+      </PullToRefresh>
     </div>
   );
 };
+
 
 
